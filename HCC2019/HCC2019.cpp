@@ -3,10 +3,41 @@
 
 #include "pch.h"
 #include <iostream>
+#include <string>
+#include "lib_io.h"
 
-int main()
+
+int main(int argc, char *argv[])
 {
-    std::cout << "Hello World!\n"; 
+	std::cout << "Begin" << std::endl;
+
+	if (argc < 5) {
+		std::cout << "please input args: carPath, roadPath, crossPath, answerPath" << std::endl;
+		exit(1);
+	}
+
+	std::string carPath(argv[1]);
+	std::string roadPath(argv[2]);
+	std::string crossPath(argv[3]);
+	std::string answerPath(argv[4]);
+
+	char *data_road_file = argv[2];
+
+	std::cout << "carPath is " << carPath << std::endl;
+	std::cout << "roadPath is " << roadPath << std::endl;
+	std::cout << "crossPath is " << crossPath << std::endl;
+	std::cout << "answerPath is " << answerPath << std::endl;
+
+	char *data_road[MAX_ROAD_NUM];
+	int data_line_num = read_file(data_road, MAX_ROAD_NUM, data_road_file);
+	printf("data file line num is :%d \n", data_line_num);
+
+
+	// TODO:read input filebuf
+	// TODO:process
+	// TODO:write output file
+
+	return 0;
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
