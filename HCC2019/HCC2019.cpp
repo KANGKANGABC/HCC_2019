@@ -6,7 +6,6 @@
 #include "lib_io.h"
 #include "DataCenter.h"
 
-
 int main(int argc, char *argv[])
 {
 	std::cout << "Begin" << std::endl;
