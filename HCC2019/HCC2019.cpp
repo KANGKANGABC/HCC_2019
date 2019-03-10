@@ -21,7 +21,6 @@ int main(int argc, char *argv[])
 	std::string crossPath(argv[3]);
 	std::string answerPath(argv[4]);
 
-	char *data_road_file = argv[2];
 
 	std::cout << "carPath is " << carPath << std::endl;
 	std::cout << "roadPath is " << roadPath << std::endl;
@@ -29,11 +28,16 @@ int main(int argc, char *argv[])
 	std::cout << "answerPath is " << answerPath << std::endl;
 
 	char *data_road[MAX_ROAD_NUM];
-	int data_line_num = read_file(data_road, MAX_ROAD_NUM, data_road_file);
-	printf("data file line num is :%d \n", data_line_num);
+	char *data_car[MAX_CAR_NUM];
+	char *data_cross[MAX_CROSS_NUM];
+	int road_line_num = read_file(data_road, MAX_ROAD_NUM, roadPath.c_str());
+	int car_line_num = read_file(data_car, MAX_CAR_NUM, carPath.c_str());
+	int cross_line_num = read_file(data_cross, MAX_CROSS_NUM, crossPath.c_str());
 
-	DataCenter dc(data_road, data_line_num);
+
+	DataCenter dc(data_road, road_line_num, data_car, car_line_num, data_cross, cross_line_num);
 	dc.readRoadData();
+	dc.readCarData();
 
 	// TODO:read input filebuf
 	// TODO:process
