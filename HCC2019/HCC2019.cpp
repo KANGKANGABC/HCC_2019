@@ -1,10 +1,10 @@
 ﻿// HCC2019.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
 //
 
-#include "pch.h"
 #include <iostream>
-#include <string>
+#include "define.h"
 #include "lib_io.h"
+#include "DataCenter.h"
 
 
 int main(int argc, char *argv[])
@@ -32,6 +32,8 @@ int main(int argc, char *argv[])
 	int data_line_num = read_file(data_road, MAX_ROAD_NUM, data_road_file);
 	printf("data file line num is :%d \n", data_line_num);
 
+	DataCenter dc(data_road, data_line_num);
+	dc.readRoadData();
 
 	// TODO:read input filebuf
 	// TODO:process
