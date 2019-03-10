@@ -77,11 +77,12 @@ void DataCenter::write_graph()
 		}
 		graph += "\n";
 	}
-	
-	const char *graph_file = graph. c_str(); 
+
+	const char *graph_file = graph.c_str();
 	const char * fileName = "road_graph.txt";
 
-	write_result( graph_file, fileName);
+	write_result(graph_file, fileName);
+}
 
 void DataCenter::readCarData()
 {
