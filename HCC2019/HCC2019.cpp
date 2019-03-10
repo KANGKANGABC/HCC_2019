@@ -34,6 +34,8 @@ int main(int argc, char *argv[])
 	DataCenter dc(data_road, data_line_num);
 	dc.readRoadData();
 
+	dc.write_graph();
+
 	// TODO:read input filebuf
 	// TODO:process
 	// TODO:write output file

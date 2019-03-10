@@ -11,6 +11,9 @@ public:
 	DataCenter(char * data_road[MAX_ROAD_NUM], int road_count);
 	~DataCenter();
 
+	//将邻接矩阵写出到文件
+	void write_graph();
+
 	//读入数据
 	void readRoadData();
 private:
@@ -25,9 +28,6 @@ private:
 
 	//道路有向图邻接矩阵
 	std::vector<std::vector<int>> graphRoad;
-		
-
-	
 
 };
 

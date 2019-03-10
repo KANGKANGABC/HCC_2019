@@ -2,6 +2,8 @@
 #include "Tools.h"
 #include <iostream>
 #include <algorithm>
+#include <string>
+
 
 DataCenter::DataCenter()
 {
@@ -18,9 +20,11 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count)
 	}
 
 }
+
 DataCenter::~DataCenter()
 {
 }
+
 void DataCenter::readRoadData()
 {
 	printf("readRoadData\n");
@@ -41,6 +45,29 @@ void DataCenter::readRoadData()
 
 	}
 	printf("readRoadData done!\n");
+}
+
+void DataCenter::write_graph()
+{
+	int rowCount = 0;
+	int columnCount = 0;
+	std::string graph;
+
+	for (rowCount = 0; rowCount < 36; ++rowCount)
+	{
+		for (columnCount = 0; columnCount < 36; ++columnCount)
+		{
+			graph += std::to_string(graphRoad[rowCount][columnCount]);
+			graph += " ";
+		}
+		graph += "\n";
+	}
+	
+	const char *graph_file = graph. c_str(); 
+	const char * fileName = "road_graph.txt";
+
+	write_result( graph_file, fileName);
+		
 }
 
 void DataCenter::splitRoadData()
