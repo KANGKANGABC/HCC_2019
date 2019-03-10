@@ -6,7 +6,6 @@
 #include "lib_io.h"
 #include "DataCenter.h"
 
-
 int main(int argc, char *argv[])
 {
 	std::cout << "Begin" << std::endl;
@@ -38,6 +37,8 @@ int main(int argc, char *argv[])
 	DataCenter dc(data_road, road_line_num, data_car, car_line_num, data_cross, cross_line_num);
 	dc.readRoadData();
 	dc.readCarData();
+
+	dc.write_graph();
 
 	// TODO:read input filebuf
 	// TODO:process

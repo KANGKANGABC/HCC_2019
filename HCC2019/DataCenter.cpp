@@ -2,6 +2,8 @@
 #include "Tools.h"
 #include <iostream>
 #include <algorithm>
+#include <string>
+
 
 DataCenter::DataCenter()
 {
@@ -10,36 +12,38 @@ DataCenter::DataCenter()
 DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_car[MAX_CAR_NUM], int car_count, char *data_cross[MAX_CROSS_NUM], int cross_count)
 {
 	inputRoadData = data_road;
-	m_road_num = road_count - 1;//ºöÂÔµÚÒ»ĞĞ×¢ÊÍ
+	m_road_num = road_count - 1;//å¿½ç•¥ç¬¬ä¸€è¡Œæ³¨é‡Š
 	inputCarData = data_car;
-	m_car_num = car_count - 1;//ºöÂÔµÚÒ»ĞĞ×¢ÊÍ
+	m_car_num = car_count - 1;//å¿½ç•¥ç¬¬ä¸€è¡Œæ³¨é‡Š
 	inputCrossData = data_cross;
-	m_cross_num = cross_count - 1;//ºöÂÔµÚÒ»ĞĞ×¢ÊÍ
+	m_cross_num = cross_count - 1;//å¿½ç•¥ç¬¬ä¸€è¡Œæ³¨é‡Š
 
-	//½«ÁÚ½Ó¾ØÕó´óĞ¡ÉèÖÃÎª36
+	//å°†é‚»æ¥çŸ©é˜µå¤§å°è®¾ç½®ä¸º36
 	graphRoad.resize(36);
 	for (int i = 0; i < 36; ++i) {
 		graphRoad[i].resize(36);
 	}
 
-	//Carµ÷¶ÈÈÎÎñÏòÁ¿´óĞ¡ÉèÖÃ
-	//CarÈÎÎñÊıÁ¿ÎªËùÓĞĞèÒªµ÷¶ÈµÄCarÊı
+	//Carè°ƒåº¦ä»»åŠ¡å‘é‡å¤§å°è®¾ç½®
+	//Carä»»åŠ¡æ•°é‡ä¸ºæ‰€æœ‰éœ€è¦è°ƒåº¦çš„Caræ•°
 	carTask.resize(m_car_num);
 	// |   0     1    2     3       4        5           6         7   |
-	// | ³µÁ¾ID Æğµã ÖÕµã ³µÁ¾ËÙ¶È ³ö·¢Ê±¼ä µ±Ç°µÀÂ·ID µ±Ç°µÀÂ·ÏŞËÙ µ±Ç°×´Ì¬|
+	// | è½¦è¾†ID èµ·ç‚¹ ç»ˆç‚¹ è½¦è¾†é€Ÿåº¦ å‡ºå‘æ—¶é—´ å½“å‰é“è·¯ID å½“å‰é“è·¯é™é€Ÿ å½“å‰çŠ¶æ€|
 	for (int i = 0; i < m_car_num; ++i) {
 		carTask[i].resize(8);
 	}
 
 
 }
+
 DataCenter::~DataCenter()
 {
 }
+
 void DataCenter::readRoadData()
 {
 	printf("readRoadData\n");
-	for (int i = 1; i <= m_road_num; ++i)//ºöÂÔµÚ0ĞĞÊı¾İ
+	for (int i = 1; i <= m_road_num; ++i)//å¿½ç•¥ç¬¬0è¡Œæ•°æ®
 	{
 		std::string roadInfo = inputRoadData[i];
 		std::vector<std::string> sp = Tools::split(roadInfo, ", ");
@@ -58,20 +62,41 @@ void DataCenter::readRoadData()
 	printf("readRoadData done!\n");
 }
 
+void DataCenter::write_graph()
+{
+	int rowCount = 0;
+	int columnCount = 0;
+	std::string graph;
+
+	for (rowCount = 0; rowCount < 36; ++rowCount)
+	{
+		for (columnCount = 0; columnCount < 36; ++columnCount)
+		{
+			graph += std::to_string(graphRoad[rowCount][columnCount]);
+			graph += " ";
+		}
+		graph += "\n";
+	}
+	
+	const char *graph_file = graph. c_str(); 
+	const char * fileName = "road_graph.txt";
+
+	write_result( graph_file, fileName);
+
 void DataCenter::readCarData()
 {
 	printf("readCarData\n");
 	// |   0     1    2     3       4        5           6         7   |
-    // | ³µÁ¾ID Æğµã ÖÕµã ³µÁ¾ËÙ¶È ³ö·¢Ê±¼ä µ±Ç°µÀÂ·ID µ±Ç°µÀÂ·ÏŞËÙ µ±Ç°×´Ì¬|
-	for (int i = 1; i <= m_car_num; ++i)//ºöÂÔµÚ0ĞĞÊı¾İ
+    // | è½¦è¾†ID èµ·ç‚¹ ç»ˆç‚¹ è½¦è¾†é€Ÿåº¦ å‡ºå‘æ—¶é—´ å½“å‰é“è·¯ID å½“å‰é“è·¯é™é€Ÿ å½“å‰çŠ¶æ€|
+	for (int i = 1; i <= m_car_num; ++i)//å¿½ç•¥ç¬¬0è¡Œæ•°æ®
 	{
 		std::string carInfo = inputCarData[i];
 		std::vector<std::string> sp = Tools::split(carInfo, ", ");
-		carTask[i - 1][0] = std::stoi(sp[0].substr(1));//È¥³ı×óÀ¨ºÅ
+		carTask[i - 1][0] = std::stoi(sp[0].substr(1));//å»é™¤å·¦æ‹¬å·
 		carTask[i - 1][1] = std::stoi(sp[1]);
 		carTask[i - 1][2] = std::stoi(sp[2]);
 		carTask[i - 1][3] = std::stoi(sp[3]);
-		carTask[i - 1][4] = std::stoi(sp[4].substr(0, sp[4].size()-1));//È¥³ıÓÒÀ¨ºÅ
+		carTask[i - 1][4] = std::stoi(sp[4].substr(0, sp[4].size()-1));//å»é™¤å³æ‹¬å·
 		carTask[i - 1][5] = 0;
 		carTask[i - 1][6] = 0;
 		carTask[i - 1][7] = 0;

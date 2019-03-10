@@ -11,32 +11,32 @@ public:
 	DataCenter(char *data_road[MAX_ROAD_NUM], int road_count, char *data_car[MAX_CAR_NUM], int car_count, char *data_cross[MAX_CROSS_NUM], int cross_count);
 	~DataCenter();
 
-	//¶ÁÈëÊı¾İ
+	//å°†é‚»æ¥çŸ©é˜µå†™å‡ºåˆ°æ–‡ä»¶
+	void write_graph();
+
+	//è¯»å…¥æ•°æ®
 	void readRoadData();
 	void readCarData();
 	void readCrossData();
 private:
 
-	//·Ö¸îÊı¾İ
+	//åˆ†å‰²æ•°æ®
 	void splitRoadData();
 
-	char **inputRoadData;//ÊäÈëµÀÂ·Êı¾İ
-	char **inputCarData;//ÊäÈëµÀÂ·Êı¾İ
-	char **inputCrossData;//ÊäÈëµÀÂ·Êı¾İ
+	char **inputRoadData;//è¾“å…¥é“è·¯æ•°æ®
+	char **inputCarData;//è¾“å…¥é“è·¯æ•°æ®
+	char **inputCrossData;//è¾“å…¥é“è·¯æ•°æ®
 
-	int m_road_num;//ROADÊı¾İĞĞÊı
-	int m_car_num;//CARÊı¾İĞĞÊı
-	int m_cross_num;//CROSSÊı¾İĞĞÊı
+	int m_road_num;//ROADæ•°æ®è¡Œæ•°
+	int m_car_num;//CARæ•°æ®è¡Œæ•°
+	int m_cross_num;//CROSSæ•°æ®è¡Œæ•°
 
-	//µÀÂ·ÓĞÏòÍ¼ÁÚ½Ó¾ØÕó
+	//é“è·¯æœ‰å‘å›¾é‚»æ¥çŸ©é˜µ
 	std::vector<std::vector<int>> graphRoad;
 
-	//Carµ÷¶ÈÈÎÎñÏòÁ¿
+	//Carè°ƒåº¦ä»»åŠ¡å‘é‡
 	std::vector<std::vector<int>> carTask;
 	
-
-	
-
 };
 
 
