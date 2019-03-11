@@ -3,6 +3,7 @@
 
 #include "lib_io.h"
 #include "define.h"
+#include "Road.h"
 
 class DataCenter
 {
@@ -18,6 +19,21 @@ public:
 	void readRoadData();
 	void readCarData();
 	void readCrossData();
+
+	//计算当前路径的运行时间
+	int calSysTime();
+
+	enum
+	{// 车辆运行状态 //请参考论坛中关于任务调度的解释
+		SLEEPING,	// 等待出发（车库中）
+		WAITTING,	// 等待行驶 
+		FINESHED,   // 终止车辆 
+	};
+
+	//所有道路
+	//道路对象的指针
+	Road * road;
+
 private:
 
 	//分割数据
@@ -32,10 +48,21 @@ private:
 	int m_cross_num;//CROSS数据行数
 
 	//道路有向图邻接矩阵
-	std::vector<std::vector<int>> graphRoad;
+	std::vector<std::vector<int> > graphRoad;
 
-	//Car调度任务向量
-	std::vector<std::vector<int>> carTask;
+	//路口信息表
+	//(id,roadId,roadId,roadId,roadId)
+	std::vector<std::vector<int> > crossList;
+
+	//Car调度任务表
+	std::vector<std::vector<int> > carTask;
+
+	//路径列表
+	std::vector<std::vector<int> > carPathList;
+
+	//系统时间
+	int timeSysMachine;
+
 	
 };
 
