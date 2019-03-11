@@ -63,11 +63,13 @@ void DataCenter::readRoadData()
 		this->road[i - 1].idTo = std::stoi(sp[5]);
 		this->road[i - 1].isDuplex = std::stoi(sp[6].substr(0, sp[6].size() - 1));//去除右括号
 
+		//初始化每个Road中Lane
+		this->road[i - 1].CreateLane();
+
 		if (sp[6].substr(0, 1) == "1")
 		{
 			graphRoad[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[1]);
 			graphRoad[std::stoi(sp[5]) - 1][std::stoi(sp[4]) - 1] = std::stoi(sp[1]);
-
 		}
 		else
 		{

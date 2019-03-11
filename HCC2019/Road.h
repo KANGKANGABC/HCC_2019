@@ -13,6 +13,9 @@ public:
 	Road();
 	~Road();
 
+	//创建车道信息
+	void CreateLane();
+
 	int id;
 	int length;
 	int speed;

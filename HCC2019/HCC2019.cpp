@@ -33,7 +33,6 @@ int main(int argc, char *argv[])
 	int car_line_num = read_file(data_car, MAX_CAR_NUM, carPath.c_str());
 	int cross_line_num = read_file(data_cross, MAX_CROSS_NUM, crossPath.c_str());
 
-
 	DataCenter dc(data_road, road_line_num, data_car, car_line_num, data_cross, cross_line_num);
 	dc.readRoadData();
 	dc.readCarData();
