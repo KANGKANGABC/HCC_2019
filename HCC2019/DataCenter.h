@@ -34,6 +34,9 @@ public:
 	//道路对象的指针
 	Road * road;
 
+	//所有路口的指针
+	Cross * cross;
+
 private:
 
 	char **inputRoadData;//输入道路数据

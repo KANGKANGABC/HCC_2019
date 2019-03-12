@@ -1,16 +1,6 @@
 #pragma once
 #include "define.h"
-class Cross
-{
-public:
-	int id;
-	std::vector<Car> crossCar;//记录目前在路口等待调度的车辆信息
-	int roadID_T; //顺时针第1个 Top
-	int roadID_R; //顺时针第2个 Right
-	int roadID_D; //顺时针第3个 Down
-	int roadID_L; //顺时针第4个 Left
 
-};
 class Car
 {
 public:
@@ -18,7 +8,20 @@ public:
 	int location;
 	int status;
 	int speed;
+	std::vector<int> path;
+}; 
+
+class Cross
+{
+public:
+	int id;
+	int roadID_T; //顺时针第1个 Top
+	int roadID_R; //顺时针第2个 Right
+	int roadID_D; //顺时针第3个 Down
+	int roadID_L; //顺时针第4个 Left
+
 };
+
 class Lane
 {
 public:

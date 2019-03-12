@@ -40,6 +40,7 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 	}
 
 	road = new Road[m_road_num];//创建所有道路的对象
+	cross = new Cross[m_cross_num];//创建所有路口的对象
 }
 
 DataCenter::~DataCenter()
@@ -135,23 +136,30 @@ void DataCenter::readCrossData()
 		crossList[i - 1][2] = std::stoi(sp[2]);
 		crossList[i - 1][3] = std::stoi(sp[3]);
 		crossList[i - 1][4] = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
+
+		
+		cross[i - 1].id = std::stoi(sp[0].substr(1));//去除左括号
+		cross[i - 1].roadID_D = std::stoi(sp[1]);
+		cross[i - 1].roadID_L = std::stoi(sp[2]);
+		cross[i - 1].roadID_R = std::stoi(sp[3]);
+		cross[i - 1].roadID_T = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
 	}
 	printf("readCrossData done!\n");
 }
 
 int DataCenter::calSysTime()
 {
-	//这里将carPathList路径列表初始化为1条路径
-	std::vector<int> carPath { 1001, 1, 501, 502, 503, 516, 506, 505, 518, 508, 509, 524 };
-	carPathList.push_back(carPath);
-
-	//将carTask车辆调度任务列表初始化为1辆车
-	std::vector<std::vector<int>> carTaskTmp;//避免和私有变量重名
-	carTaskTmp.push_back({ 0, 1, 16, 6, 1, 0, 0, 0 });
+	//新建一个car对象，对系统进行测试
+	Car *car = new Car;
+	car->id = 10000;
+	car->location = 0;
+	car->speed = 6;
+	car->status = SLEEPING;
+	car->path = { 5029, 5040, 5051, 5057, 5058 };//规划一个简单路径
 
 	timeSysMachine = 0;//系统调度时间初始化为0
 
-	while (carTaskTmp.size() != 0)
+	while (1)//终止条件为所有车辆调度完成
 	{
 		//先调度在路上行驶的车辆
 		//第一步：先处理所有道路上的车辆，进行遍历扫描
@@ -176,8 +184,8 @@ int DataCenter::calSysTime()
 							else//如果不在该路径，那么该车设置为等待状态
 							{
 								road[i].lane[j].laneCar[m].status = WAITTING;//该车等待驶出路口
-
-								//如果车到达路口，将车加入路口
+								//如果该路口为车的终点
+								//那么此车调度完成
 
 							}
 						}
@@ -211,39 +219,20 @@ int DataCenter::calSysTime()
 		}
 
 		//第二步：处理所有路口等待的车辆
-
-		while ()//循环调度，直到所有的车辆行驶一个单位，也就是说所有车辆必须为FINESHED状态？
+		
+		while (1)//循环调度，直到所有的车辆行驶一个单位，也就是说所有车辆必须为FINESHED状态？对的，论坛写到了这一点
 		{
 			//按照升序调度所有路口
+			for (int i = 0; i < m_cross_num; ++i)
+			{
+				;
+				//根据cross的顺序，遍历road，再遍历road的lane，调度在路口WAITTING的车（每次路口调度，只调度路口的一辆车）
+			}
 
 			//按照顺序调度所有道路
-
+			//再调度道路中WAITTING的车
 		}
-
-
-
-
-		//第二步：处理所有路口等待的车辆
-		for (int i = 0; i < carTaskTmp.size(); ++i)
-		{
-			if (carTaskTmp[i][7] != SLEEPING)
-			{
-				//让该车行驶,同时判断是否到终点
-			}
-		}
-
-		//再调度等待上路行驶的车辆
-		for (int i = 0; i < carTaskTmp.size(); ++i)
-		{
-			if (carTaskTmp[i][7] == SLEEPING)
-			{
-				if (carTaskTmp[i][4] == timeSysMachine)
-				{
-					//尝试将该车加入道路，并修改车的状态
-					//如果加入道路失败，则修改该车启动时间
-				}
-			}
-		}
+		
 		timeSysMachine ++;
 
 	}
@@ -252,4 +241,3 @@ int DataCenter::calSysTime()
 
 	return timeSysMachine;
 }
-
