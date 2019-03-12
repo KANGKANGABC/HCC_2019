@@ -155,6 +155,63 @@ int DataCenter::calSysTime()
 	{
 		//先调度在路上行驶的车辆
 		//第一步：先处理所有道路上的车辆，进行遍历扫描
+		for (int i = 0; i < m_road_num; ++i)//按道路ID升序进行调度
+		{
+			for (int j = 0; j < road[i].channel * (1 + road[i].isDuplex); ++j)
+			{
+				//先从正向开始
+				if (road[i].lane[j].laneCar.size() > 0)//该车道有车
+				{
+					for (int m = 0; m < road[i].lane[j].laneCar.size(); ++m)//遍历该车道的所有车辆
+					{
+						//判断该车前面有没有车
+						if (m == 0)//m==0 代表该车为该车道第一辆车
+						{
+							//该车行驶后是否还在相同路径上？
+							if (road[i].lane[j].laneCar[m].location + std::min(road[i].lane[j].laneCar[m].speed, road[i].speed) <= road[i].length)
+							{
+								road[i].lane[j].laneCar[m].location += std::min(road[i].lane[j].laneCar[m].speed, road[i].speed);
+								road[i].lane[j].laneCar[m].status = FINESHED;//该车行驶完成
+							}
+							else//如果不在该路径，那么该车设置为等待状态
+							{
+								road[i].lane[j].laneCar[m].status = WAITTING;//该车等待驶出路口
+							}
+						}
+						else
+						{
+							//判断能否完成行驶，前面的车是否形成阻挡？
+							if (road[i].lane[j].laneCar[m].location + std::min(road[i].lane[j].laneCar[m].speed, road[i].speed) < road[i].lane[j].laneCar[m - 1].location)
+							{
+								//前面的车不行成阻挡
+								road[i].lane[j].laneCar[m].location += std::min(road[i].lane[j].laneCar[m].speed, road[i].speed);
+								road[i].lane[j].laneCar[m].status = FINESHED;//该车行驶完成
+							}
+							else
+							{
+								//前面的车形成阻挡,则需要根据前面阻挡车的状态来决定
+								if (road[i].lane[j].laneCar[m - 1].status == FINESHED)//如果前车行驶完成，则行驶至前车后一位置
+								{
+									road[i].lane[j].laneCar[m].location = road[i].lane[j].laneCar[m - 1].location - 1;//行驶至前面车后
+									road[i].lane[j].laneCar[m].status = FINESHED;//该车行驶完成
+								}
+								else if(road[i].lane[j].laneCar[m - 1].status == WAITTING)//如果前车等待行驶，则此车也等待行驶
+								{
+									road[i].lane[j].laneCar[m].status = WAITTING;//该车等待
+								}
+								
+							}
+						}
+					}
+				}
+			}
+		}
+
+		//第二步：处理所有路口等待的车辆
+
+
+
+
 
 
 		//第二步：处理所有路口等待的车辆
@@ -187,6 +244,3 @@ int DataCenter::calSysTime()
 	return timeSysMachine;
 }
 
-void DataCenter::splitRoadData()
-{
-}

@@ -1,11 +1,21 @@
 #pragma once
 #include "define.h"
 
+class Car
+{
+public:
+	int id;
+	int location;
+	int status;
+	int speed;
+};
 class Lane
 {
 public:
 	bool dir;//车道方向
-	std::vector<int> laneCarId;//记录每个车道上的车辆ID
+	int idLane;//车道ID
+	std::vector<Car> laneCar;//记录每个车道上的车辆信息
+
 };
 class Road
 {
@@ -24,5 +34,11 @@ public:
 	int idTo;
 	int isDuplex;
 	Lane *lane;
+
+	enum
+	{// 车道方向
+		FORWARD,	// 正向
+		BACKWARD,	// 逆向
+	};
 };
 

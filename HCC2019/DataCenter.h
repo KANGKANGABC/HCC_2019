@@ -36,9 +36,6 @@ public:
 
 private:
 
-	//分割数据
-	void splitRoadData();
-
 	char **inputRoadData;//输入道路数据
 	char **inputCarData;//输入道路数据
 	char **inputCrossData;//输入道路数据
