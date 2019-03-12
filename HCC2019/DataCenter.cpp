@@ -176,6 +176,9 @@ int DataCenter::calSysTime()
 							else//如果不在该路径，那么该车设置为等待状态
 							{
 								road[i].lane[j].laneCar[m].status = WAITTING;//该车等待驶出路口
+
+								//如果车到达路口，将车加入路口
+
 							}
 						}
 						else
@@ -209,7 +212,13 @@ int DataCenter::calSysTime()
 
 		//第二步：处理所有路口等待的车辆
 
+		while ()//循环调度，直到所有的车辆行驶一个单位，也就是说所有车辆必须为FINESHED状态？
+		{
+			//按照升序调度所有路口
 
+			//按照顺序调度所有道路
+
+		}
 
 
 
