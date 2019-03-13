@@ -8,6 +8,7 @@ public:
 	int location;
 	int status;
 	int speed;
+	int dirCross;//标志在路口的状态 
 	std::vector<int> path;
 }; 
 
@@ -47,11 +48,5 @@ public:
 	int idTo;
 	int isDuplex;
 	Lane *lane;
-
-	enum
-	{// 车道方向
-		FORWARD,	// 正向
-		BACKWARD,	// 逆向
-	};
 };
 
