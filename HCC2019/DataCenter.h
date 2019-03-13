@@ -43,9 +43,9 @@ private:
 	char **inputCarData;//输入道路数据
 	char **inputCrossData;//输入道路数据
 
-	int m_road_num;//ROAD数据行数
-	int m_car_num;//CAR数据行数
-	int m_cross_num;//CROSS数据行数
+	int m_road_num;//ROAD数量
+	int m_car_num;//CAR数量
+	int m_cross_num;//CROSS数量
 
 	//道路有向图邻接矩阵
 	std::vector<std::vector<int> > graphRoad;

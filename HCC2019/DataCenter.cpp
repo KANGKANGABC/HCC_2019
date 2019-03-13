@@ -225,6 +225,52 @@ int DataCenter::calSysTime()
 			//按照升序调度所有路口
 			for (int i = 0; i < m_cross_num; ++i)
 			{
+				if (cross[i].roadID_D != -1)
+				{
+					//先调度路口的D方向
+					int idRoad = cross[i].roadID_D;
+					if (road[idRoad - 5000].idTo == cross[i].id) //此cross为road的toID,
+					{
+						while ()//按顺序逐排调度该道路到达路口的全部车辆，终止条件为：road所有车不可行驶
+						{
+
+						}
+						for (int j = 0; j < road[idRoad - 5000].channel; ++j)//遍历此road的所有FORWARD车道
+						{
+							if (road[idRoad - 5000].lane[j].laneCar.size() != 0 && road[idRoad - 5000].lane[j].laneCar[0].status == WAITTING)
+								//如果该车道有车,且车辆为WAITTING状态，代表该车即将通过路口
+							{
+								switch (road[idRoad - 5000].lane[j].laneCar[0].dirCross)
+								{
+								NONE:
+									break;
+								DD:
+									break;
+								LEFT:
+									break;
+								RIGHT:
+									break;
+								default:
+									break;
+								}
+								
+							}
+						}
+					}
+					else //此cross为road的fromID
+					{
+						for (int j = road[idRoad - 5000].channel; j < 2 * road[idRoad - 5000].channel; ++j)//遍历此road的所有BACKWARD车道
+						{
+
+						}
+					}
+
+					//
+					
+
+
+					road[idRoad - 5000].lane
+				}
 				;
 				//根据cross的顺序，遍历road，再遍历road的lane，调度在路口WAITTING的车（每次路口调度，只调度路口的一辆车）
 			}
