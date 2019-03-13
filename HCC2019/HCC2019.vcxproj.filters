@@ -30,6 +30,7 @@
     <ClInclude Include="DataCenter.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Road.h">
     <ClInclude Include="dijkstra.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -50,6 +51,7 @@
     <ClCompile Include="DataCenter.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Road.cpp">
     <ClCompile Include="dijkstra.cpp">
       <Filter>源文件</Filter>
     </ClCompile>

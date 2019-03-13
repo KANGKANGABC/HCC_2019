@@ -3,6 +3,7 @@
 
 #include "lib_io.h"
 #include "define.h"
+#include "Road.h"
 
 class DataCenter
 {
@@ -11,32 +12,58 @@ public:
 	DataCenter(char *data_road[MAX_ROAD_NUM], int road_count, char *data_car[MAX_CAR_NUM], int car_count, char *data_cross[MAX_CROSS_NUM], int cross_count);
 	~DataCenter();
 
-	//¶ÁÈëÊı¾İ
+	//å°†é‚»æ¥çŸ©é˜µå†™å‡ºåˆ°æ–‡ä»¶
+	void write_graph();
+
+	//è¯»å…¥æ•°æ®
 	void readRoadData();
 	void readCarData();
 	void readCrossData();
+
+	//è®¡ç®—å½“å‰è·¯å¾„çš„è¿è¡Œæ—¶é—´
+	int calSysTime();
+
+	enum
+	{// è½¦è¾†è¿è¡ŒçŠ¶æ€ //è¯·å‚è€ƒè®ºå›ä¸­å…³äºä»»åŠ¡è°ƒåº¦çš„è§£é‡Š
+		SLEEPING,	// ç­‰å¾…å‡ºå‘ï¼ˆè½¦åº“ä¸­ï¼‰
+		WAITTING,	// ç­‰å¾…è¡Œé©¶ 
+		FINESHED,   // ç»ˆæ­¢è½¦è¾† 
+	};
+
+	//æ‰€æœ‰é“è·¯
+	//é“è·¯å¯¹è±¡çš„æŒ‡é’ˆ
+	Road * road;
+
+	//æ‰€æœ‰è·¯å£çš„æŒ‡é’ˆ
+	Cross * cross;
+
 private:
 
-	//·Ö¸îÊı¾İ
-	void splitRoadData();
+	char **inputRoadData;//è¾“å…¥é“è·¯æ•°æ®
+	char **inputCarData;//è¾“å…¥é“è·¯æ•°æ®
+	char **inputCrossData;//è¾“å…¥é“è·¯æ•°æ®
 
-	char **inputRoadData;//ÊäÈëµÀÂ·Êı¾İ
-	char **inputCarData;//ÊäÈëµÀÂ·Êı¾İ
-	char **inputCrossData;//ÊäÈëµÀÂ·Êı¾İ
+	int m_road_num;//ROADæ•°æ®è¡Œæ•°
+	int m_car_num;//CARæ•°æ®è¡Œæ•°
+	int m_cross_num;//CROSSæ•°æ®è¡Œæ•°
 
-	int m_road_num;//ROADÊı¾İĞĞÊı
-	int m_car_num;//CARÊı¾İĞĞÊı
-	int m_cross_num;//CROSSÊı¾İĞĞÊı
+	//é“è·¯æœ‰å‘å›¾é‚»æ¥çŸ©é˜µ
+	std::vector<std::vector<int> > graphRoad;
 
-	//µÀÂ·ÓĞÏòÍ¼ÁÚ½Ó¾ØÕó
-	std::vector<std::vector<int>> graphRoad;
+	//è·¯å£ä¿¡æ¯è¡¨
+	//(id,roadId,roadId,roadId,roadId)
+	std::vector<std::vector<int> > crossList;
 
-	//Carµ÷¶ÈÈÎÎñÏòÁ¿
-	std::vector<std::vector<int>> carTask;
+	//Carè°ƒåº¦ä»»åŠ¡è¡¨
+	std::vector<std::vector<int> > carTask;
+
+	//è·¯å¾„åˆ—è¡¨
+	std::vector<std::vector<int> > carPathList;
+
+	//ç³»ç»Ÿæ—¶é—´
+	int timeSysMachine;
+
 	
-
-	
-
 };
 
 
