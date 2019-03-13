@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="DataCenter.h" />
     <ClInclude Include="define.h" />
+    <ClInclude Include="dijkstra.h" />
     <ClInclude Include="lib_io.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Road.h" />
@@ -160,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DataCenter.cpp" />
+    <ClCompile Include="dijkstra.cpp" />
     <ClCompile Include="HCC2019.cpp" />
     <ClCompile Include="io.cpp" />
     <ClCompile Include="pch.cpp">
