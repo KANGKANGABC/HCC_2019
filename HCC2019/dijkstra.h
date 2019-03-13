@@ -2,17 +2,18 @@
 
 #include<iostream>
 #include<string>
+#include<vector>
 using namespace std;
 
 
 struct Dis {
-	string path;
+	vector<int> path;
 	int value;
 	bool visit;
 	Dis() {
 		visit = false;	//判断是否已经被访问
 		value = 0;		//路径的长度
-		path = "";		//路径的经过
+		//path = "";		//路径的经过
 	}
 };
 

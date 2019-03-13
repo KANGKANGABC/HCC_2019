@@ -81,7 +81,12 @@ void Graph_DG::Dijkstra(int begin) {
 	int i;
 	for (i = 0; i < this->vexnum; i++) {
 		//设置当前的路径
-		dis[i].path = "v" + to_string(begin) + "-->v" + to_string(i + 1);
+		vector<int> tmp;
+		//dis[i].path = "v" + to_string(begin) + "-->v" + to_string(i + 1);
+		tmp = dis[i].path;
+		tmp.push_back(begin);
+		tmp.push_back(i + 1);
+		dis[i].path = tmp;
 		dis[i].value = arc[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
 	}
 	//设置起点到起点自己的路径为0
@@ -109,7 +114,11 @@ void Graph_DG::Dijkstra(int begin) {
 		for (i = 0; i < this->vexnum; i++) {
 			if (!dis[i].visit && arc[temp][i] != INT_MAX && (dis[temp].value + arc[temp][i]) < dis[i].value) {
 				dis[i].value = dis[temp].value + arc[temp][i];
-				dis[i].path = dis[temp].path + "-->" + to_string(i + 1);
+				//dis[i].path = dis[temp].path + "-->" + to_string(i + 1);
+				vector<int> tmp;
+				tmp = dis[temp].path;
+				tmp.push_back(i + 1);
+				dis[i].path = tmp;
 			}
 		}
 	}
@@ -121,9 +130,15 @@ void Graph_DG::print_path(int begin) {
 	cout << "以" << str << "为起点的图的最短路径为：" << endl;
 	for (int i = 0; i != this->vexnum; i++) {
 		if (dis[i].value != INT_MAX)
-			cout << dis[i].path << "=" << dis[i].value << endl;
+		{
+			for (int j = 0; j < dis[i].path.size(); j++)
+				cout << dis[i].path.at(j) << " ";
+			cout << "value= "<< dis[i].value << endl;
+		}
 		else {
-			cout << dis[i].path << "是最短路径的" << endl;
+			for (int j = 0; j < dis[i].path.size(); j++)
+				cout << dis[i].path.at(j) << " ";
+			cout << "亮点间是无最短路径的" << endl;
 		}
 	}
 }
