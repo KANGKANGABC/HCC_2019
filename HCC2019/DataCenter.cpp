@@ -18,16 +18,37 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 	inputCrossData = data_cross;
 	m_cross_num = cross_count - 1;//忽略第一行注释
 
-	//将邻接矩阵大小设置为36
+	//将距离邻接矩阵大小设置为36
 	graphRoad.resize(36);
-	for (int i = 0; i < 36; ++i) {
+	for (int i = 0; i < 36; ++i)
+	{
 		graphRoad[i].resize(36);
 	}
-	//将邻接矩阵初始化为正无穷
+	//将距离矩阵初始化为正无穷
 	for (int i= 0; i < 36; ++i)
 		for (int j = 0; j < 36; ++j)
 		{
 			graphRoad[i][j] = INT_MAX;
+		}
+
+	//将速度邻接矩阵大小设置为36，不邻接的点初值为0
+	graphMaxSpeed.resize(36);
+	for (int i = 0; i < 36; ++i)
+	{
+		graphMaxSpeed[i].resize(36);
+	}
+
+	//将时间邻接矩阵大小设置为36，不邻接的点初值设为正无穷
+	timeGraph.resize(36);
+	for (int i = 0; i < 36; ++i)
+	{
+		timeGraph[i].resize(36);
+	}
+	//将时间矩阵初始化为正无穷
+	for (int i = 0; i < 36; ++i)
+		for (int j = 0; j < 36; ++j)
+		{
+			timeGraph[i][j] =FLT_MAX;
 		}
 
 	//将车辆类型向量大小设置为3
@@ -84,10 +105,14 @@ void DataCenter::readRoadData()
 		{
 			graphRoad[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[1]);
 			graphRoad[std::stoi(sp[5]) - 1][std::stoi(sp[4]) - 1] = std::stoi(sp[1]);
+
+			graphMaxSpeed[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[2]);
+			graphMaxSpeed[std::stoi(sp[5]) - 1][std::stoi(sp[4]) - 1] = std::stoi(sp[2]);
 		}
 		else
 		{
 			graphRoad[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[1]);
+			graphMaxSpeed[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[2]);
 		}
 
 	}
@@ -194,6 +219,31 @@ void DataCenter::getCarSpeedType()
 
 	printf("getCarSpeedType done!\n");
 }
+
+/********************************************************根据输入的车辆速度计算时间邻接矩阵*****内有常数36为cross数目！！！！！*************************************/
+void DataCenter::getTimeGraph(int speed)
+{
+	printf("getTimeGraph\n");
+	//根据输入速度和道路限速邻接矩阵，得到车辆行驶过程中最大速度邻接矩阵
+	for(int i=0; i<36 ; i++)
+		for (int j = 0; j < 36; j++)
+		{
+			graphMaxSpeed[i][j] = std:: min(graphMaxSpeed[i][j] , speed);
+		}
+
+	//根据距离邻接矩阵和车辆行驶最大速度邻接矩阵得到时间邻接矩阵
+	for (int i = 0; i < 36; i++)
+		for (int j = 0; j < 36; j++)
+		{
+			if (graphRoad[i][j] != INT_MAX)
+			{
+				timeGraph[i][j] = graphRoad[i][j] / float(graphMaxSpeed[i][j]);
+			}
+
+		}
+	printf("getTimeGraph done!\n");
+}
+
 
 /******************************************************************************为调度部分代码*****************************************************************************************/
 int DataCenter::calSysTime()

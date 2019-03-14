@@ -23,6 +23,9 @@ public:
 	//统计car.txt中的各车辆速度类型到Vector speedType中
 	void getCarSpeedType ();
 
+	//计算输入速度下时间邻接矩阵
+	void getTimeGraph (int speed );
+
 	//计算当前路径的运行时间
 	int calSysTime();
 
@@ -63,7 +66,9 @@ private:
 	int m_cross_num;//CROSS数量
 
 	//道路有向图邻接矩阵
-	std::vector<std::vector<int> > graphRoad;	//不邻接的点用正无穷表示
+	std::vector<std::vector<int> > graphRoad;	//距离邻接矩阵，不邻接的点用正无穷表示
+	std::vector<std::vector<int> > graphMaxSpeed;	//道路最大速度邻接矩阵，不邻接的点用0表示
+	std::vector<std::vector<float> > timeGraph;		// 时间邻接矩阵，不邻接的点用正无穷表示
 
 	//存储车辆的速度种类的向量
 	std::vector<int> speedType;

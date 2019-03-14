@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
 
 	//dc.write_graph();
 	dc.getCarSpeedType();
+	dc.getTimeGraph(2);
 
 	// TODO:read input filebuf
 	// TODO:process
