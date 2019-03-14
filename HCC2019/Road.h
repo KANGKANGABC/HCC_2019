@@ -8,7 +8,7 @@ public:
 	int location;
 	int status;
 	int speed;
-	int dirCross;//
+	int dirCross;//标志在路口的状态 
 	std::vector<int> path;
 }; 
 

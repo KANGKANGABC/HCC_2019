@@ -186,7 +186,6 @@ int DataCenter::calSysTime()
 								road[i].lane[j].laneCar[m].status = WAITTING;//该车等待驶出路口
 								//如果该路口为车的终点
 								//那么此车调度完成
-
 							}
 						}
 						else
@@ -225,55 +224,74 @@ int DataCenter::calSysTime()
 			//按照升序调度所有路口
 			for (int i = 0; i < m_cross_num; ++i)
 			{
-				if (cross[i].roadID_D != -1)
+				int idCross = cross[i].id;//获得路口ID
+				while (1)//循环调度路口四个方向的车，直到全部车辆完成调度，或者阻塞
 				{
-					//先调度路口的D方向
-					int idRoad = cross[i].roadID_D;
-					if (road[idRoad - 5000].idTo == cross[i].id) //此cross为road的toID,
+					bool isWorkingCross = false;//标志变量，如果一个循环后没有任何一辆车被调度，则退出循环
+					if (cross[i].roadID_T != -1)//先调度直行路口
 					{
-						while ()//按顺序逐排调度该道路到达路口的全部车辆，终止条件为：road所有车不可行驶
+						int idRoad = cross[i].roadID_T;//被调度的道路id
+						int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
+						if (road[idRoad - 5000].idTo == cross[i].id)//如果cross为道路的出方向
+							idStartLane = road[idRoad - 5000].channel;
+						while (1)
 						{
-
-						}
-						for (int j = 0; j < road[idRoad - 5000].channel; ++j)//遍历此road的所有FORWARD车道
-						{
-							if (road[idRoad - 5000].lane[j].laneCar.size() != 0 && road[idRoad - 5000].lane[j].laneCar[0].status == WAITTING)
-								//如果该车道有车,且车辆为WAITTING状态，代表该车即将通过路口
+							bool isWorkingRoad = false;
+							for (int j = idStartLane; j < idStartLane + road[idRoad - 5000].channel; ++j)//遍历所有lane
 							{
-								switch (road[idRoad - 5000].lane[j].laneCar[0].dirCross)
+								if (road[idRoad - 5000].lane[j].laneCar.size() != 0)//lane非空则调度
 								{
-								NONE:
-									break;
-								DD:
-									break;
-								LEFT:
-									break;
-								RIGHT:
-									break;
-								default:
-									break;
+									switch (road[idRoad - 5000].lane[j].laneCar[0].dirCross)
+									{
+									NONE:
+										break;
+									DD://直行>左转>右转
+										//判断转入的road是否可以行驶
+
+										break;
+									LEFT://左转>右转
+										//判断即将转入的方向是否有直行进入的车辆
+										if (!isBeDD(cross[i].roadID_L, i))
+										{
+											//判断转入的road是否可以行驶
+										}
+										break;
+									RIGHT://右转优先级最低
+										//判断即将转入的方向是否有直行进入的车辆
+										if (!isBeDD(cross[i].roadID_R, i))
+										{
+											//判断即将转入的方向是否有左转进入的车辆
+											if (!isBeLEFT(cross[i].roadID_D, i))
+											{
+												//判断转入的road是否可以行驶
+
+											}
+										}
+										break;
+									default:
+										break;
+									}
 								}
-								
 							}
+							if (!isWorkingRoad)//如果本轮调度未调度任何车辆，则退出调度循环
+								break;
 						}
-					}
-					else //此cross为road的fromID
-					{
-						for (int j = road[idRoad - 5000].channel; j < 2 * road[idRoad - 5000].channel; ++j)//遍历此road的所有BACKWARD车道
-						{
 
-						}
 					}
 
-					//
-					
 
-
-					road[idRoad - 5000].lane
+					if (!isWorkingCross)//如果一个循环后没有任何一辆车被调度，则退出调度循环
+						break;
 				}
+
+				//
+				//路口ID
 				;
 				//根据cross的顺序，遍历road，再遍历road的lane，调度在路口WAITTING的车（每次路口调度，只调度路口的一辆车）
 			}
+
+
+
 
 			//按照顺序调度所有道路
 			//再调度道路中WAITTING的车
@@ -286,4 +304,68 @@ int DataCenter::calSysTime()
 
 
 	return timeSysMachine;
+}
+
+bool DataCenter::isBeDD(int idRoad, int idCross)
+{
+	int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
+	if (road[idRoad - 5000].idTo == cross[idCross].id)//如果cross为道路的出方向
+		idStartLane = road[idRoad - 5000].channel;
+	for (int j = idStartLane; j < idStartLane + road[idRoad - 5000].channel; ++j)//遍历所有lane
+	{
+		if (road[idRoad - 5000].lane[j].laneCar.size() != 0)
+		{
+			if (road[idRoad - 5000].lane[j].laneCar[0].dirCross == DD)
+				return true;//存在直行车辆
+		}
+	}
+
+	return false;
+}
+
+bool DataCenter::isBeLEFT(int idRoad, int idCross)
+{
+	int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
+	if (road[idRoad - 5000].idTo == cross[idCross].id)//如果cross为道路的出方向
+		idStartLane = road[idRoad - 5000].channel;
+	for (int j = idStartLane; j < idStartLane + road[idRoad - 5000].channel; ++j)//遍历所有lane
+	{
+		if (road[idRoad - 5000].lane[j].laneCar.size() != 0)
+		{
+			if (road[idRoad - 5000].lane[j].laneCar[0].dirCross == LEFT)
+				return true;//存在左转车辆
+		}
+	}
+	return false;
+}
+
+bool DataCenter::isCanEnter(int idRoad, int idCross)
+{
+	int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
+	if (road[idRoad - 5000].idFrom == cross[idCross].id)//如果cross为道路的入方向
+		idStartLane = road[idRoad - 5000].channel;
+	for (int j = idStartLane; j < idStartLane + road[idRoad - 5000].channel; ++j)//遍历所有lane
+	{
+		if (road[idRoad - 5000].lane[j].laneCar.size() < road[idRoad - 5000].length)
+		{
+			//将车辆加入新的road
+			//
+
+			return true;//存在空位，可加入
+		}
+	}
+	return false;
+}
+
+void DataCenter::carRun(Car car)
+{
+	//预设车的路径已经规划好，行驶过程中会更新path，path为将要进入的道路，如果进入下一条道路，
+	//将上一条道路从path中删除，便于编程（不用每次都查path自己接下来走那条路径）
+
+	//如果车处于SLEEP状态，将其加入对应道路
+		//如果加入道路失败，将Car的起始时间加1，等待下次调度
+
+	//如果车处于WAITTING/FINSHED状态
+		//判断该车是否在路口，如果不是在路口等待，那么正常行驶（WAITTING/FINSHED）
+		//判断该车是否在路口，如果已经在路口等待，那么将该车驶出到下一道路
 }

@@ -23,6 +23,18 @@ public:
 	//计算当前路径的运行时间
 	int calSysTime();
 
+	//判断某cross的某road是否存在需要直行的车
+	bool isBeDD(int idRoad,int idCross);
+
+	//判断某cross的某road是否存在需要左转的车
+	bool isBeLEFT(int idRoad, int idCross);
+
+	//判断某cross的某road是否可以行驶进入
+	bool isCanEnter(int idRoad, int idCross);
+
+	//驱动某car行驶
+	void carRun(Car car);
+
 	enum
 	{// 车辆运行状态 //请参考论坛中关于任务调度的解释
 		SLEEPING,	// 等待出发（车库中）
