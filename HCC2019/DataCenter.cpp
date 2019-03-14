@@ -286,8 +286,6 @@ int DataCenter::calSysTime()
 
 				//
 				//路口ID
-				;
-				//根据cross的顺序，遍历road，再遍历road的lane，调度在路口WAITTING的车（每次路口调度，只调度路口的一辆车）
 			}
 
 
@@ -357,14 +355,117 @@ bool DataCenter::isCanEnter(int idRoad, int idCross)
 	return false;
 }
 
-void DataCenter::carRun(Car car)
+void DataCenter::carRun(Car car,int indexLane)
 {
 	//预设车的路径已经规划好，行驶过程中会更新path，path为将要进入的道路，如果进入下一条道路，
 	//将上一条道路从path中删除，便于编程（不用每次都查path自己接下来走那条路径）
+	
+	if (car.status == FINESHED)
+	{
+		int locationTarget = 
+	}
 
 	//如果车处于SLEEP状态，将其加入对应道路
 		//如果加入道路失败，将Car的起始时间加1，等待下次调度
+	if (car.status == SLEEPING)
+	{
+		int idRoadTarget = car.path[car.path.size()-1];//获取目标道路
+		int idCrossTarget = car.idCrossFrom;//获得该车出发路口
+		if (isCanEnter(idRoadTarget, idCrossTarget))//如果该道路可加入车
+		{
+			car.status = WAITTING;//切换car的状态
+			carRun(car,-1);//car行驶
+		}
+	}
+	else
+	{
+		if (car.dirCross == NONE)//该车不是在路口等待
+		{
+			if (indexLane == 0)//该车为该车道的第一辆车，且上个时间片不准备通过路口
+			{
 
+			}
+			else//该车前面有车
+			{
+				if (car.location + std::min(road[car.idCurRoad].speed, car.speed) < road[car.idCurRoad].lane[car.idCurLane].laneCar[indexLane - 1].location)
+				{//前面的车不形成阻挡
+					car.location += std::min(road[car.idCurRoad].speed, car.speed);//车正常行驶
+					car.status = FINESHED;//车标记为终止状态
+				}
+				else
+				{//前面的车形成阻挡
+					//判断此车会不会通过路口
+					if (car.location + std::min(road[car.idCurRoad].speed, car.speed) <= road[car.idCurRoad].length)//不会驶出路口
+					{
+						car.location = road[car.idCurRoad].lane[car.idCurLane].laneCar[indexLane - 1].location - 1;//行驶到前车的后一个位置
+						car.status = road[car.idCurRoad].lane[car.idCurLane].laneCar[indexLane - 1].status;//继承前车的状态
+					}
+					else
+					{
+						//此车也将行驶出路口
+						//那么判断此车在路口的方向
+						int idNextCross = road[car.idCurRoad - 5000].idTo;//此车即将驶入的路口
+						int idNextRoad = car.path[car.path.size() - 1];//此车即将驶入的道路
+						int idCurRoad = car.idCurRoad;//此车当前道路
+
+						int dirCurRoad = 0;//当前道路在路口的方向
+						int dirNextRoad = 0;//即将驶入道路在路口的方向
+						if (cross[idNextCross].roadID_T == idCurRoad)
+							dirCurRoad = 0;
+						else if (cross[idNextCross].roadID_R == idCurRoad)
+							dirCurRoad = 1;
+						else if (cross[idNextCross].roadID_D == idCurRoad)
+							dirCurRoad = 2;
+						else if (cross[idNextCross].roadID_L == idCurRoad)
+							dirCurRoad = 3;
+
+						if (cross[idNextCross].roadID_T == idNextRoad)
+							dirNextRoad = 0;
+						else if(cross[idNextCross].roadID_R == idNextRoad)
+							dirNextRoad = 1;
+						else if(cross[idNextCross].roadID_D == idNextRoad)
+							dirNextRoad = 2;
+						else if(cross[idNextCross].roadID_L == idNextRoad)
+							dirNextRoad = 3;
+
+						switch (dirNextRoad - dirCurRoad)
+						{
+						case 0:
+							break;
+						case 1:
+							car.dirCross = LEFT;
+							break;
+						case -1:
+							car.dirCross = RIGHT;
+							break;
+						case 2:
+							car.dirCross = DD;
+							break;
+						case -2:
+							car.dirCross = DD;
+							break;
+						case 3:
+							car.dirCross = RIGHT;
+							break;
+						case -3:
+							car.dirCross = LEFT;
+							break;
+						default:
+							break;
+						}
+						car.location = road[car.idCurRoad].lane[car.idCurLane].laneCar[indexLane - 1].location - 1;//行驶到前车的后一个位置
+						car.status = road[car.idCurRoad].lane[car.idCurLane].laneCar[indexLane - 1].status;//继承前车的状态
+						//此时前车肯定WAITTING状态
+					}
+
+				}
+			}
+		}
+		else//该车准备驶出路口
+		{
+
+		}
+	}
 	//如果车处于WAITTING/FINSHED状态
 		//判断该车是否在路口，如果不是在路口等待，那么正常行驶（WAITTING/FINSHED）
 		//判断该车是否在路口，如果已经在路口等待，那么将该车驶出到下一道路

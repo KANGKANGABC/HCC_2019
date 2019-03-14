@@ -8,7 +8,11 @@ public:
 	int location;
 	int status;
 	int speed;
+	int idCurRoad;//当前车所在的道路ID
+	int idCurLane;//当前车所在的车道ID
 	int dirCross;//标志在路口的状态 
+	int idCrossFrom;//车的出发路口
+	int idCrossTo;//车的终止路口
 	std::vector<int> path;
 }; 
 

@@ -12,6 +12,7 @@ public:
 	DataCenter(char *data_road[MAX_ROAD_NUM], int road_count, char *data_car[MAX_CAR_NUM], int car_count, char *data_cross[MAX_CROSS_NUM], int cross_count);
 	~DataCenter();
 
+	friend class Graph_DG;
 	//将邻接矩阵写出到文件
 	void write_graph();
 
@@ -32,8 +33,8 @@ public:
 	//判断某cross的某road是否可以行驶进入
 	bool isCanEnter(int idRoad, int idCross);
 
-	//驱动某car行驶
-	void carRun(Car car);
+	//驱动某car行驶,indexLane参数为车辆当前在lane队列中的序号
+	void carRun(Car car,int indexLane);
 
 	enum
 	{// 车辆运行状态 //请参考论坛中关于任务调度的解释
