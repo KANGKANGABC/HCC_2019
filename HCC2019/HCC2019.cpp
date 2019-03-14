@@ -6,6 +6,8 @@
 #include "lib_io.h"
 #include "DataCenter.h"
 #include "dijkstra.h"
+#include "Scheduler.h"
+
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -39,6 +41,9 @@ int main(int argc, char *argv[])
 	dc.readRoadData();
 	dc.readCarData();
 	dc.readCrossData();
+	Scheduler sd(dc);
+	int time = sd.getSysTime();
+
 
 	//dc.write_graph();
 

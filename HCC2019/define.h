@@ -7,6 +7,7 @@
 #include <ctime>
 #include <cmath>
 #include <vector>
+#include <assert.h>
 
 #define MAX_ROAD_NUM    100 //最大ROAD条数
 #define MAX_CAR_NUM    150 //最大CAR条数
@@ -24,6 +25,13 @@ enum
 	DD,	// 直行 //不明白官方为什么用D字母表示直行
 	LEFT,	// 左转
 	RIGHT,  //右转
+};
+
+enum
+{// 车辆运行状态 //请参考论坛中关于任务调度的解释
+	SLEEPING,	// 等待出发（车库中）
+	WAITTING,	// 等待行驶 
+	FINESHED,   // 终止车辆 
 };
 
 

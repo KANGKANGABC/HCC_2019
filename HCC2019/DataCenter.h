@@ -13,6 +13,8 @@ public:
 	~DataCenter();
 
 	friend class Graph_DG;
+	friend class Scheduler;
+
 	//将邻接矩阵写出到文件
 	void write_graph();
 
@@ -21,28 +23,6 @@ public:
 	void readCarData();
 	void readCrossData();
 
-	//计算当前路径的运行时间
-	int calSysTime();
-
-	//判断某cross的某road是否存在需要直行的车
-	bool isBeDD(int idRoad,int idCross);
-
-	//判断某cross的某road是否存在需要左转的车
-	bool isBeLEFT(int idRoad, int idCross);
-
-	//判断某cross的某road是否可以行驶进入
-	bool isCanEnter(int idRoad, int idCross);
-
-	//驱动某car行驶,indexLane参数为车辆当前在lane队列中的序号
-	void carRun(Car car,int indexLane);
-
-	enum
-	{// 车辆运行状态 //请参考论坛中关于任务调度的解释
-		SLEEPING,	// 等待出发（车库中）
-		WAITTING,	// 等待行驶 
-		FINESHED,   // 终止车辆 
-	};
-
 	//所有道路
 	//道路对象的指针
 	Road * road;
@@ -50,15 +30,18 @@ public:
 	//所有路口的指针
 	Cross * cross;
 
+	//所有Car的指针
+	Car * car;
+
+	int m_road_num;//ROAD数量
+	int m_car_num;//CAR数量
+	int m_cross_num;//CROSS数量
+
 private:
 
 	char **inputRoadData;//输入道路数据
 	char **inputCarData;//输入道路数据
 	char **inputCrossData;//输入道路数据
-
-	int m_road_num;//ROAD数量
-	int m_car_num;//CAR数量
-	int m_cross_num;//CROSS数量
 
 	//道路有向图邻接矩阵
 	std::vector<std::vector<int> > graphRoad;
@@ -72,11 +55,6 @@ private:
 
 	//路径列表
 	std::vector<std::vector<int> > carPathList;
-
-	//系统时间
-	int timeSysMachine;
-
-	
 };
 
 
