@@ -7,13 +7,12 @@ using namespace std;
 
 
 struct Dis {
-	vector<int> path;
+	vector<int> path;//路径的经过
 	int value;
 	bool visit;
 	Dis() {
 		visit = false;	//判断是否已经被访问
 		value = 0;		//路径的长度
-		//path = "";		//路径的经过
 	}
 };
 
@@ -38,6 +37,10 @@ public:
 	void print();
 	//利用dijkstra算法求最短路径，输入起点
 	void Dijkstra(int begin);
-	//打印最短路径
-	void print_path(int);
+	//dijkstra算法，返回从start到end的路径
+	vector<int> Dijkstra(int begin, int end);
+	//打印begin到所有顶点的最短路径
+	void print_path(int begin);
+	//打印begin到end之间的最短距离
+	vector<int> print_path(int begin, int end);
 };
