@@ -1,5 +1,6 @@
 #include "dijkstra.h"
 #include "iostream"
+#include "DataCenter.h"
 using namespace std;
 
 //构造函数定义
@@ -17,6 +18,7 @@ Graph_DG::Graph_DG(int vexnum, int edge) {
 			arc[i][k] = INT_MAX;
 		}
 	}
+
 }
 
 //析构函数
@@ -38,21 +40,34 @@ bool Graph_DG::check_edge_value(int start, int end, int weight) {
 }
 
 //创建图形，即建立邻接矩阵,需要手动输入
-void Graph_DG::createGraph() {
-	cout << "请输入每条边的起点和终点以及权重" << endl;
-	int start;
-	int end;
-	int weight;
-	int count = 0;
-	while (count != this->edge) {
-		cin >> start >> end >> weight;
-		while (!this->check_edge_value(start, end, weight)) {
-			cout << "输入边的信息不合法，请重新输入" << endl;
-			cin >> start >> end >> weight;
+void Graph_DG::createGraph(vector<std::vector<int> > graphRoad) {
+	//cout << "请输入每条边的起点和终点以及权重" << endl;
+	//int start;
+	//int end;
+	//int weight;
+	//int count = 0;
+	//while (count != this->edge) {
+	//	cin >> start >> end >> weight;
+	//	while (!this->check_edge_value(start, end, weight)) {
+	//		cout << "输入边的信息不合法，请重新输入" << endl;
+	//		cin >> start >> end >> weight;
+	//	}
+	//	//对邻接矩阵对应的点赋值
+	//	arc[start - 1][end - 1] = weight;
+	//	++count;
+	//}
+
+	for (int i = 0; i < graphRoad.size(); i++)
+	{
+		for (int j = 0; j < graphRoad[0].size(); j++)
+		{
+			if(graphRoad[i][j] == 0)
+				arc[i][j] = INT_MAX;
+			else
+			{
+				arc[i][j] = graphRoad[i][j];
+			}
 		}
-		//对邻接矩阵对应的点赋值
-		arc[start - 1][end - 1] = weight;
-		++count;
 	}
 }
 
@@ -82,7 +97,6 @@ void Graph_DG::Dijkstra(int begin) {
 	for (i = 0; i < this->vexnum; i++) {
 		//设置当前的路径
 		vector<int> tmp;
-		//dis[i].path = "v" + to_string(begin) + "-->v" + to_string(i + 1);
 		tmp = dis[i].path;
 		tmp.push_back(begin);
 		tmp.push_back(i + 1);
@@ -138,7 +152,7 @@ void Graph_DG::print_path(int begin) {
 		else {
 			for (int j = 0; j < dis[i].path.size(); j++)
 				cout << dis[i].path.at(j) << " ";
-			cout << "亮点间是无最短路径的" << endl;
+			cout << "两点间是无最短路径的" << endl;
 		}
 	}
 }

@@ -25,7 +25,7 @@ private:
 	Dis *dis;		//记录各个顶点的最短路径信息
 	
 public:
-	//构造函数
+	//构造函数（参数表：邻接矩阵，顶点数（cross数量），边数（road数量））
 	Graph_DG(int vexnum, int edge);
 	//析构函数
 	~Graph_DG();
@@ -33,7 +33,7 @@ public:
 	//顶点从1开始编号
 	bool check_edge_value(int start, int end, int weight);
 	//创建图
-	void createGraph();
+	void createGraph(vector<std::vector<int> > graphRoad);
 	//打印邻接矩阵
 	void print();
 	//利用dijkstra算法求最短路径，输入起点

@@ -40,20 +40,24 @@ int main(int argc, char *argv[])
 	dc.readCarData();
 	dc.readCrossData();
 
-	//dc.write_graph();
 
 	// TODO:read input filebuf
 	// TODO:process
 	// TODO:write output file
 
+
 	//测试dijkstra算法
 	int vexnum, edge;
-	cout << "输入图的顶点个数和边的条数：" << endl;
-	cin >> vexnum >> edge;
+	//cout << "输入图的顶点个数和边的条数：" << endl;
+	//cin >> vexnum >> edge;
+	std::vector<std::vector<int> > tmp = dc.getArc();
+	vexnum = dc.getCrossNum();
+	cout << "cross has " << vexnum << endl;
+	edge = dc.getRoadNum();
 
 	Graph_DG graph(vexnum, edge);
-	graph.createGraph();
-	graph.print();
+	graph.createGraph(tmp);
+	//graph.print();
 	graph.Dijkstra(1);
 	graph.print_path(1);
 	system("pause");

@@ -7,6 +7,8 @@
 
 class DataCenter
 {
+
+	friend class Graph_DG;
 public:
 	DataCenter();
 	DataCenter(char *data_road[MAX_ROAD_NUM], int road_count, char *data_car[MAX_CAR_NUM], int car_count, char *data_cross[MAX_CROSS_NUM], int cross_count);
@@ -19,6 +21,13 @@ public:
 	void readRoadData();
 	void readCarData();
 	void readCrossData();
+
+	//获取点和边的数量
+	int getRoadNum();
+	int getCrossNum();
+
+	//获得邻接矩阵
+	std::vector<std::vector<int> > getArc();
 
 	//计算当前路径的运行时间
 	int calSysTime();
