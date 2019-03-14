@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
 	dc.readCrossData();
 
 	//dc.write_graph();
+	dc.getCarSpeedType();
 
 	// TODO:read input filebuf
 	// TODO:process

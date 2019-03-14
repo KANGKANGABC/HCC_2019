@@ -23,6 +23,18 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 	for (int i = 0; i < 36; ++i) {
 		graphRoad[i].resize(36);
 	}
+	//将邻接矩阵初始化为正无穷
+	for (int i= 0; i < 36; ++i)
+		for (int j = 0; j < 36; ++j)
+		{
+			graphRoad[i][j] = INT_MAX;
+		}
+
+	//将车辆类型向量大小设置为3
+	speedType.resize(3);
+	//将车辆类型向量初始化为0
+	for (int i = 0; i < 3; i++)
+		speedType[i] = 0;
 
 	//Car调度任务向量大小设置
 	//Car任务数量为所有需要调度的Car数
@@ -48,6 +60,7 @@ DataCenter::~DataCenter()
 	delete[] this->road;
 }
 
+/******************************************************** readRoadData() ,readCarData() ,readCrossData() ******************************************************************/
 void DataCenter::readRoadData()
 {
 	printf("readRoadData\n");
@@ -81,27 +94,6 @@ void DataCenter::readRoadData()
 	printf("readRoadData done!\n");
 }
 
-void DataCenter::write_graph()
-{
-	int rowCount = 0;
-	int columnCount = 0;
-	std::string graph;
-
-	for (rowCount = 0; rowCount < 36; ++rowCount)
-	{
-		for (columnCount = 0; columnCount < 36; ++columnCount)
-		{
-			graph += std::to_string(graphRoad[rowCount][columnCount]);
-			graph += " ";
-		}
-		graph += "\n";
-	}
-
-	const char *graph_file = graph.c_str();
-	const char * fileName = "road_graph.txt";
-
-	write_result(graph_file, fileName);
-}
 
 void DataCenter::readCarData()
 {
@@ -147,6 +139,63 @@ void DataCenter::readCrossData()
 	printf("readCrossData done!\n");
 }
 
+/************************************************************************ 输出邻接矩阵到road_graph.txt *************************************************************************/
+void DataCenter::write_graph()
+{
+	printf("write_graph\n");
+
+	int rowCount = 0;
+	int columnCount = 0;
+	std::string graph;
+
+	for (rowCount = 0; rowCount < 36; ++rowCount)
+	{
+		for (columnCount = 0; columnCount < 36; ++columnCount)
+		{
+			graph += std::to_string(graphRoad[rowCount][columnCount]);
+			graph += " ";
+		}
+		graph += "\n";
+	}
+
+	const char *graph_file = graph.c_str();
+	const char * fileName = "road_graph.txt";
+
+	write_result(graph_file, fileName);
+
+	printf("write_graph done!\n");
+}
+
+/*******************************统计car.txt中的各车辆速度类型到Vector speedType中********此处有常数3！！是车辆速度种类****************/
+void DataCenter::getCarSpeedType()
+{
+	printf("getCarSpeedType\n");
+
+	int  typeNum = 0;		                                             //已有速度种类
+
+	for (int i = 0; i < m_car_num - 1; ++i)
+	{
+		bool haveThisSpeed = false;
+
+		for (int j = 0; j < 3; ++j)
+		{
+			if (carTask[i][3] == speedType[j])
+				haveThisSpeed = true;
+		}
+
+		if (haveThisSpeed == false)
+		{
+				speedType[typeNum++] = carTask[i][3];
+		}
+
+		if (typeNum == 3)                                             //该样例中速度只有三种，集齐三种速度就能退出了
+			break;         
+	}
+
+	printf("getCarSpeedType done!\n");
+}
+
+/******************************************************************************为调度部分代码*****************************************************************************************/
 int DataCenter::calSysTime()
 {
 	//新建一个car对象，对系统进行测试
