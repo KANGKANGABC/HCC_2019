@@ -2,7 +2,7 @@
 
 
 
-Scheduler::Scheduler(DataCenter dc)
+Scheduler::Scheduler(DataCenter &dc)
 {
 	num_CarsScheduling = dc.m_car_num;//获得需要调度的车数量
 	num_Roads = dc.m_road_num;

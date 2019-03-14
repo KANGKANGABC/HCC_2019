@@ -47,6 +47,8 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 DataCenter::~DataCenter()
 {
 	delete[] this->road;
+	delete[] this->cross;
+	delete[] this->car;
 }
 
 void DataCenter::readRoadData()

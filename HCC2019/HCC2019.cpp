@@ -44,7 +44,6 @@ int main(int argc, char *argv[])
 	Scheduler sd(dc);
 	int time = sd.getSysTime();
 
-
 	//dc.write_graph();
 
 	// TODO:read input filebuf

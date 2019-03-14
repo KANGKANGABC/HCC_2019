@@ -8,7 +8,7 @@ class DataCenter;
 class Scheduler
 {
 public:
-	Scheduler(DataCenter dc);
+	Scheduler(DataCenter &dc);
 	~Scheduler();
 	int getSysTime();
 
