@@ -32,7 +32,7 @@ private:
 	/*将该车加入道路行驶*/
 	void addCar(Car &car);
 
-	//判断某cross的某road是否可以行驶进入
+	//判断某cross的某road是否可以行驶进入//输入ID为修正前的ID
 	int isCanEnter(int idRoad, int idCross);//如果返回值-1，代表不可加入，否则返回可驶入的lane ID
 		
 	//判断某cross的某road是否存在需要直行的车
