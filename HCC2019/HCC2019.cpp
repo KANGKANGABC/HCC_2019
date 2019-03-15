@@ -41,9 +41,9 @@ int main(int argc, char *argv[])
 	dc.readRoadData();
 	dc.readCarData();
 	dc.readCrossData();
-	Scheduler sd(dc);
-	sd.getPath();
-	int time = sd.getSysTime();
+	//Scheduler sd(dc);
+	//sd.getPath();
+	//int time = sd.getSysTime();
 
 
 	// TODO:read input filebuf

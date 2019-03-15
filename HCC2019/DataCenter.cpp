@@ -124,13 +124,7 @@ void DataCenter::readCarData()
 		carTask[i - 1][6] = 0;
 		carTask[i - 1][7] = SLEEPING;
 
-		car[i - 1].id = carTask[i - 1][0];
-		car[i - 1].idCrossFrom = carTask[i - 1][1];
-		car[i - 1].idCrossTo = carTask[i - 1][2];
-		car[i - 1].speed = carTask[i - 1][3];
-		car[i - 1].plantime = carTask[i - 1][4];
-		car[i - 1].status = SLEEPING;
-
+		car[i - 1] = Car(carTask[i - 1][0], carTask[i - 1][1], carTask[i - 1][2], carTask[i - 1][3], carTask[i - 1][4], SLEEPING);
 	}
 	printf("readCarData done!\n");
 }

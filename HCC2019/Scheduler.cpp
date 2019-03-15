@@ -55,7 +55,7 @@ int Scheduler::getSysTime()
 										Car car = roads[idRoad - 5000].lane[m].laneCar[0];
 										int dirConflict = 0;
 										int dirTarget = 0;
-										switch (roads[idRoad - 5000].lane[m].laneCar[0].dirCross)
+										switch (roads[idRoad - 5000].lane[m].laneCar[0].getDirCross())
 										{
 										case NONE:
 											break;
@@ -160,76 +160,76 @@ void Scheduler::driveCar(Car car, int indexCar)
 {
 	//这里假设AA：如果某辆车从路口驶入下一道路，不可能在一个时间片内驶完下一道路全程
 	//也就是说只有处于NONE状态WAITTING的车才有可能即将到达终点
-	if (car.dirCross == NONE)//该车不是在路口等待
+	if (car.getDirCross() == NONE)//该车不是在路口等待
 	{
 		if (indexCar == 0)//该车为该车道的第一辆车，且上个时间片不准备通过路口
 		{
 			//判断此车会不会通过路口
-			if (car.location + std::min(roads[car.idCurRoad].speed, car.speed) <= roads[car.idCurRoad].length)//不会驶出路口
+			if (car.getLocation + std::min(roads[car.getIdCurRoad()].speed, car.getSpeed()) <= roads[car.getIdCurRoad()].length)//不会驶出路口
 			{
-				car.location += std::min(roads[car.idCurRoad].speed, car.speed);//车正常行驶
-				car.status = FINESHED;//车标记为终止状态
+				car.putLocation ( car.getLocation() + std::min(roads[car.getIdCurRoad()].speed, car.getSpeed()) );//车正常行驶
+				car.putStatus(FINESHED);//车标记为终止状态
 			}
 			else
 			{
 				//此车也将行驶出路口，需要判断此车在路口的方向
-				int idNextCross = roads[car.idCurRoad - 5000].idTo;//此车即将驶入的路口
+				int idNextCross = roads[car.getIdCurRoad() - 5000].idTo;//此车即将驶入的路口
 				//根据假设AA，此时可能有车辆驶入终点
-				if (idNextCross = car.idCrossTo)//如果此车将要驶出出口
+				if (idNextCross = car.getIdTo())//如果此车将要驶出出口
 				{
 					num_CarsScheduling -= 1;//正在调度的车辆数减一
-					std::vector<Car>::iterator it = roads[car.idCurRoad].lane[car.idCurLane].laneCar.begin();
-					roads[car.idCurRoad].lane[car.idCurLane].laneCar.erase(it);//删除该道路第一辆车
+					std::vector<Car>::iterator it = roads[car.getIdCurRoad()].lane[car.getIdCurLane()].laneCar.begin();
+					roads[car.getIdCurRoad()].lane[car.getIdCurLane()].laneCar.erase(it);//删除该道路第一辆车
 				}
 				else
 				{
 					int idNextRoad = car.path[car.path.size() - 1];//此车即将驶入的道路
-					int idCurRoad = car.idCurRoad;//此车当前道路
-					car.dirCross = getCrossDir(idCurRoad, idNextRoad, idNextCross);//设置路口方向
-					car.status = WAITTING;//此车变为等待状态
+					int idCurRoad = car.getIdCurRoad();//此车当前道路
+					car.putDirCross(getCrossDir(idCurRoad, idNextRoad, idNextCross));//设置路口方向
+					car.putStatus(WAITTING);//此车变为等待状态
 				}
 			}
 		}
 		else//该车前面有车
 		{
-			Car carNext = roads[car.idCurRoad].lane[car.idCurLane].laneCar[indexCar - 1];
-			if (car.location + std::min(roads[car.idCurRoad].speed, car.speed) < carNext.location)
+			Car carNext = roads[car.getIdCurRoad()].lane[car.getIdCurLane()].laneCar[indexCar - 1];
+			if (car.getLocation() + std::min(roads[car.getIdCurRoad()].speed, car.getSpeed()) < carNext.getLocation())
 			{//前面的车不形成阻挡
-				car.location += std::min(roads[car.idCurRoad].speed, car.speed);//车正常行驶
-				car.status = FINESHED;//车标记为终止状态
+				car.putLocation( car.getLocation() + std::min(roads[car.getIdCurRoad()].speed, car.getSpeed()));//车正常行驶
+				car.putLocation(FINESHED);//车标记为终止状态
 			}
 			else
 			{//前面的车形成阻挡
 				//判断此车会不会通过路口
-				if (car.location + std::min(roads[car.idCurRoad].speed, car.speed) <= roads[car.idCurRoad].length)//不会驶出路口
+				if (car.getLocation() + std::min(roads[car.getIdCurRoad()].speed, car.getSpeed()) <= roads[car.getIdCurRoad()].length)//不会驶出路口
 				{
-					if (carNext.status == FINESHED)
+					if (carNext.getStatus() == FINESHED)
 					{
-						car.location = roads[car.idCurRoad].lane[car.idCurLane].laneCar[indexCar - 1].location - 1;//行驶到前车的后一个位置
-						car.status = FINESHED;//车标记为终止状态
+						car.putLocation(roads[car.getIdCurRoad()].lane[car.getIdCurLane()].laneCar[indexCar - 1].getLocation() - 1);//行驶到前车的后一个位置
+						car.putStatus(FINESHED);//车标记为终止状态
 					}
 					else
 					{
-						car.status = WAITTING;//车标记为WAITTING
+						car.putStatus(WAITTING);//车标记为WAITTING
 					}
 				}
 				else
 				{
 					//此车也将行驶出路口,那么判断此车在路口的方向
-					int idNextCross = roads[car.idCurRoad - 5000].idTo;//此车即将驶入的路口
+					int idNextCross = roads[car.getIdCurRoad() - 5000].idTo;//此车即将驶入的路口
 					//根据假设AA，此时可能有车辆驶入终点
-					if (idNextCross = car.idCrossTo)//如果此车将要驶出出口
+					if (idNextCross = car.getIdTo())//如果此车将要驶出出口
 					{
 						num_CarsScheduling -= 1;//正在调度的车辆数减一
-						std::vector<Car>::iterator it = roads[car.idCurRoad].lane[car.idCurLane].laneCar.begin();
-						roads[car.idCurRoad].lane[car.idCurLane].laneCar.erase(it);//删除该道路第一辆车
+						std::vector<Car>::iterator it = roads[car.getIdCurRoad()].lane[car.getIdCurLane()].laneCar.begin();
+						roads[car.getIdCurRoad()].lane[car.getIdCurLane()].laneCar.erase(it);//删除该道路第一辆车
 					}
 					else
 					{
 						int idNextRoad = car.path[car.path.size() - 1];//此车即将驶入的道路
-						int idCurRoad = car.idCurRoad;//此车当前道路
-						car.dirCross = getCrossDir(idCurRoad, idNextRoad, idNextCross);//设置路口方向
-						car.status = WAITTING;//此车变为等待状态
+						int idCurRoad = car.getIdCurRoad();//此车当前道路
+						car.putDirCross(getCrossDir(idCurRoad, idNextRoad, idNextCross));//设置路口方向
+						car.putStatus(WAITTING);//此车变为等待状态
 					}
 				}
 			}
