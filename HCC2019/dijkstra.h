@@ -6,21 +6,19 @@ using namespace std;
 
 
 struct Dis {
-	string path;
-	int value;
+	std::vector<int> path ;
+	float value;
 	bool visit;
 	Dis() {
 		visit = false;	//判断是否已经被访问
 		value = 0;		//路径的长度
-		path = "";		//路径的经过
+							//路径的经过
 	}
 };
 
 class Graph_DG {
 private:
 	int vexnum;		//图的顶点个数
-	int edge;		//图的边数
-	int **arc;		//邻接矩阵
 	Dis *dis;		//记录各个顶点的最短路径信息
 	
 public:

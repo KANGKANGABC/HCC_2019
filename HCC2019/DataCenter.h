@@ -5,6 +5,22 @@
 #include "define.h"
 #include "Road.h"
 
+class TimeGraph
+{
+public:
+	std ::vector < std :: vector< float> >timeGraph;  //时间邻接矩阵
+};
+
+struct Dis {
+	std::vector<int> path;
+	float value;
+	bool visit;
+	Dis() {
+		visit = false;	//判断是否已经被访问
+		value = 0;		//路径的长度
+	}
+};
+
 class DataCenter
 {
 public:
@@ -24,7 +40,15 @@ public:
 	void getCarSpeedType ();
 
 	//计算输入速度下时间邻接矩阵
-	void getTimeGraph (int speed );
+	void getTimeGraph (int order, int speed );
+
+	//计算得到所有速度下的时间邻接矩阵
+	void getAllTimeGraph();
+
+	//Dijkstra算法，输入点begin，输出点begin到各点的最短时间
+	std :: vector<int>  Dijkstra(int begin ,int end ,int speed );
+	//输出begin到其余点的最短时间路径信息
+	void print_path(int begin);
 
 	//计算当前路径的运行时间
 	int calSysTime();
@@ -65,13 +89,24 @@ private:
 	int m_car_num;//CAR数量
 	int m_cross_num;//CROSS数量
 
+	int car_speed_num; //car 的速度种类在getCarSpeedType()中被赋值
+
 	//道路有向图邻接矩阵
 	std::vector<std::vector<int> > graphRoad;	//距离邻接矩阵，不邻接的点用正无穷表示
 	std::vector<std::vector<int> > graphMaxSpeed;	//道路最大速度邻接矩阵，不邻接的点用0表示
-	std::vector<std::vector<float> > timeGraph;		// 时间邻接矩阵，不邻接的点用正无穷表示
+	//std::vector<std::vector<float> > timeGraph;		// 时间邻接矩阵，不邻接的点用正无穷表示
 
 	//存储车辆的速度种类的向量
 	std::vector<int> speedType;
+
+	//存储速度种类个时间邻接矩阵的指针
+	TimeGraph * timeGraphPoint;
+
+	//Dijkstra算法中记录各个顶点的最短路径信息
+	//Dijkstra算法里用到的结构体
+
+	Dis * dis;
+
 
 	//路口信息表
 	//(id,roadId,roadId,roadId,roadId)

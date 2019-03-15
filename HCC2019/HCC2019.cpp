@@ -5,7 +5,6 @@
 #include "define.h"
 #include "lib_io.h"
 #include "DataCenter.h"
-#include "dijkstra.h"
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -42,23 +41,15 @@ int main(int argc, char *argv[])
 
 	//dc.write_graph();
 	dc.getCarSpeedType();
-	dc.getTimeGraph(2);
+	dc.getAllTimeGraph();
+
+//dc.Dijkstra(1);
+//	dc.print_path(1);
 
 	// TODO:read input filebuf
 	// TODO:process
 	// TODO:write output file
 
-	//测试dijkstra算法
-	int vexnum, edge;
-	cout << "输入图的顶点个数和边的条数：" << endl;
-	cin >> vexnum >> edge;
-
-	Graph_DG graph(vexnum, edge);
-	graph.createGraph();
-	graph.print();
-	graph.Dijkstra(1);
-	graph.print_path(1);
-	system("pause");
 
 	return 0;
 }
