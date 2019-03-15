@@ -151,10 +151,10 @@ void DataCenter::readCrossData()
 
 		
 		cross[i - 1].id = std::stoi(sp[0].substr(1));//去除左括号
-		cross[i - 1].roadID_D = std::stoi(sp[1]);
-		cross[i - 1].roadID_L = std::stoi(sp[2]);
-		cross[i - 1].roadID_R = std::stoi(sp[3]);
-		cross[i - 1].roadID_T = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
+		cross[i - 1].roadID_T = std::stoi(sp[1]);
+		cross[i - 1].roadID_R = std::stoi(sp[2]);
+		cross[i - 1].roadID_D = std::stoi(sp[3]);
+		cross[i - 1].roadID_L = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
 		cross[i - 1].roadID.resize(4);
 		cross[i - 1].roadID = { cross[i - 1].roadID_D ,cross[i - 1].roadID_L ,cross[i - 1].roadID_R ,cross[i - 1].roadID_T };
 	}

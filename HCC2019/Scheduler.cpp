@@ -255,14 +255,14 @@ void Scheduler::driveCar(Car &car, int indexCar)
 				car.status = FINESHED;//该车调度完成，等待下一时间片再行驶
 
 				//此时比较特殊，因为没有发生Road变化，所以car依然在当前lane，但是其location需要更新
-				roads[car.idCurRoad].lane[car.idCurLane].laneCar[0].location = car.location;
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = car.location;
 			}
 			else
 			{
-				if (roads[idNextRoad].lane[idNextLane].laneCar.size() != 0)//如果该车道有车
+				if (roads[idNextRoad-5000].lane[idNextLane].laneCar.size() != 0)//如果该车道有车
 				{
 					//判断对应车道车的位置
-					Car carNext = roads[idNextRoad].lane[idNextLane].laneCar[roads[idNextRoad].lane[idNextLane].laneCar.size() - 1];
+					Car carNext = roads[idNextRoad - 5000].lane[idNextLane].laneCar[roads[idNextRoad - 5000].lane[idNextLane].laneCar.size() - 1];
 					if (disNextRoad < carNext.location)//不形成阻挡
 					{
 						driverToNextRoad(car, idNextRoad, idNextLane, disNextRoad);//行驶到下个路口
@@ -355,22 +355,22 @@ int Scheduler::getCrossDir(int idCurRoad, int idNextRoad, int idNextCross)
 {
 	int dirCurRoad = 0;//当前道路在路口的方向
 	int dirNextRoad = 0;//即将驶入道路在路口的方向
-	if (crosses[idNextCross].roadID_T == idCurRoad)
+	if (crosses[idNextCross - 1].roadID_T == idCurRoad)
 		dirCurRoad = 0;
-	else if (crosses[idNextCross].roadID_R == idCurRoad)
+	else if (crosses[idNextCross - 1].roadID_R == idCurRoad)
 		dirCurRoad = 1;
-	else if (crosses[idNextCross].roadID_D == idCurRoad)
+	else if (crosses[idNextCross - 1].roadID_D == idCurRoad)
 		dirCurRoad = 2;
-	else if (crosses[idNextCross].roadID_L == idCurRoad)
+	else if (crosses[idNextCross - 1].roadID_L == idCurRoad)
 		dirCurRoad = 3;
 
-	if (crosses[idNextCross].roadID_T == idNextRoad)
+	if (crosses[idNextCross - 1].roadID_T == idNextRoad)
 		dirNextRoad = 0;
-	else if (crosses[idNextCross].roadID_R == idNextRoad)
+	else if (crosses[idNextCross - 1].roadID_R == idNextRoad)
 		dirNextRoad = 1;
-	else if (crosses[idNextCross].roadID_D == idNextRoad)
+	else if (crosses[idNextCross - 1].roadID_D == idNextRoad)
 		dirNextRoad = 2;
-	else if (crosses[idNextCross].roadID_L == idNextRoad)
+	else if (crosses[idNextCross - 1].roadID_L == idNextRoad)
 		dirNextRoad = 3;
 
 	switch (dirNextRoad - dirCurRoad)
