@@ -18,7 +18,7 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 	inputCrossData = data_cross;
 	m_cross_num = cross_count - 1;//忽略第一行注释
 
-	//将邻接矩阵大小设置为36
+	//将邻接矩阵大小设置为36*36
 	graphRoad.resize(m_cross_num);
 	for (int i = 0; i < m_cross_num; ++i) {
 		graphRoad[i].resize(m_cross_num);
@@ -41,11 +41,14 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 
 	road = new Road[m_road_num];//创建所有道路的对象
 	cross = new Cross[m_cross_num];//创建所有路口的对象
+	car = new Car[m_car_num];//创建所有汽车的对象
 }
 
 DataCenter::~DataCenter()
 {
 	delete[] this->road;
+	delete[] this->cross;
+	delete[] this->car;
 }
 
 void DataCenter::readRoadData()
@@ -120,6 +123,14 @@ void DataCenter::readCarData()
 		carTask[i - 1][5] = 0;
 		carTask[i - 1][6] = 0;
 		carTask[i - 1][7] = SLEEPING;
+
+		car[i - 1].id = carTask[i - 1][0];
+		car[i - 1].idCrossFrom = carTask[i - 1][1];
+		car[i - 1].idCrossTo = carTask[i - 1][2];
+		car[i - 1].speed = carTask[i - 1][3];
+		car[i - 1].plantime = carTask[i - 1][4];
+		car[i - 1].status = SLEEPING;
+
 	}
 	printf("readCarData done!\n");
 }
@@ -143,10 +154,11 @@ void DataCenter::readCrossData()
 		cross[i - 1].roadID_L = std::stoi(sp[2]);
 		cross[i - 1].roadID_R = std::stoi(sp[3]);
 		cross[i - 1].roadID_T = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
+		cross[i - 1].roadID.resize(4);
+		cross[i - 1].roadID = { cross[i - 1].roadID_D ,cross[i - 1].roadID_L ,cross[i - 1].roadID_R ,cross[i - 1].roadID_T };
 	}
 	printf("readCrossData done!\n");
 }
-
 
 //获取点和边的数量
 int DataCenter::getRoadNum()
@@ -163,98 +175,4 @@ int DataCenter::getCrossNum()
 std::vector<std::vector<int> > DataCenter::getArc()
 {
 	return graphRoad;
-}
-
-
-int DataCenter::calSysTime()
-{
-	//新建一个car对象，对系统进行测试
-	Car *car = new Car;
-	car->id = 10000;
-	car->location = 0;
-	car->speed = 6;
-	car->status = SLEEPING;
-	car->path = { 5029, 5040, 5051, 5057, 5058 };//规划一个简单路径
-
-	timeSysMachine = 0;//系统调度时间初始化为0
-
-	while (1)//终止条件为所有车辆调度完成
-	{
-		//先调度在路上行驶的车辆
-		//第一步：先处理所有道路上的车辆，进行遍历扫描
-		for (int i = 0; i < m_road_num; ++i)//按道路ID升序进行调度
-		{
-			for (int j = 0; j < road[i].channel * (1 + road[i].isDuplex); ++j)
-			{
-				//先从正向开始
-				if (road[i].lane[j].laneCar.size() > 0)//该车道有车
-				{
-					for (int m = 0; m < road[i].lane[j].laneCar.size(); ++m)//遍历该车道的所有车辆
-					{
-						//判断该车前面有没有车
-						if (m == 0)//m==0 代表该车为该车道第一辆车
-						{
-							//该车行驶后是否还在相同路径上？
-							if (road[i].lane[j].laneCar[m].location + std::min(road[i].lane[j].laneCar[m].speed, road[i].speed) <= road[i].length)
-							{
-								road[i].lane[j].laneCar[m].location += std::min(road[i].lane[j].laneCar[m].speed, road[i].speed);
-								road[i].lane[j].laneCar[m].status = FINESHED;//该车行驶完成
-							}
-							else//如果不在该路径，那么该车设置为等待状态
-							{
-								road[i].lane[j].laneCar[m].status = WAITTING;//该车等待驶出路口
-								//如果该路口为车的终点
-								//那么此车调度完成
-
-							}
-						}
-						else
-						{
-							//判断能否完成行驶，前面的车是否形成阻挡？
-							if (road[i].lane[j].laneCar[m].location + std::min(road[i].lane[j].laneCar[m].speed, road[i].speed) < road[i].lane[j].laneCar[m - 1].location)
-							{
-								//前面的车不行成阻挡
-								road[i].lane[j].laneCar[m].location += std::min(road[i].lane[j].laneCar[m].speed, road[i].speed);
-								road[i].lane[j].laneCar[m].status = FINESHED;//该车行驶完成
-							}
-							else
-							{
-								//前面的车形成阻挡,则需要根据前面阻挡车的状态来决定
-								if (road[i].lane[j].laneCar[m - 1].status == FINESHED)//如果前车行驶完成，则行驶至前车后一位置
-								{
-									road[i].lane[j].laneCar[m].location = road[i].lane[j].laneCar[m - 1].location - 1;//行驶至前面车后
-									road[i].lane[j].laneCar[m].status = FINESHED;//该车行驶完成
-								}
-								else if(road[i].lane[j].laneCar[m - 1].status == WAITTING)//如果前车等待行驶，则此车也等待行驶
-								{
-									road[i].lane[j].laneCar[m].status = WAITTING;//该车等待
-								}
-								
-							}
-						}
-					}
-				}
-			}
-		}
-
-		//第二步：处理所有路口等待的车辆
-		
-		while (1)//循环调度，直到所有的车辆行驶一个单位，也就是说所有车辆必须为FINESHED状态？对的，论坛写到了这一点
-		{
-			//按照升序调度所有路口
-			for (int i = 0; i < m_cross_num; ++i)
-			{
-				;
-				//根据cross的顺序，遍历road，再遍历road的lane，调度在路口WAITTING的车（每次路口调度，只调度路口的一辆车）
-			}
-
-			//按照顺序调度所有道路
-			//再调度道路中WAITTING的车
-		}
-		
-		timeSysMachine ++;
-
-	}
-
-	return timeSysMachine;
 }
