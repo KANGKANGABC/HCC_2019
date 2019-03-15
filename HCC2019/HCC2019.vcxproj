@@ -153,13 +153,16 @@
   <ItemGroup>
     <ClInclude Include="DataCenter.h" />
     <ClInclude Include="define.h" />
+    <ClInclude Include="dijkstra.h" />
     <ClInclude Include="lib_io.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Road.h" />
+    <ClInclude Include="Scheduler.h" />
     <ClInclude Include="Tools.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DataCenter.cpp" />
+    <ClCompile Include="dijkstra.cpp" />
     <ClCompile Include="HCC2019.cpp" />
     <ClCompile Include="io.cpp" />
     <ClCompile Include="pch.cpp">
@@ -169,6 +172,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Road.cpp" />
+    <ClCompile Include="Scheduler.cpp" />
     <ClCompile Include="Tools.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

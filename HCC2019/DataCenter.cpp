@@ -18,10 +18,10 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 	inputCrossData = data_cross;
 	m_cross_num = cross_count - 1;//忽略第一行注释
 
-	//将邻接矩阵大小设置为36
-	graphRoad.resize(36);
-	for (int i = 0; i < 36; ++i) {
-		graphRoad[i].resize(36);
+	//将邻接矩阵大小设置为36*36
+	graphRoad.resize(m_cross_num);
+	for (int i = 0; i < m_cross_num; ++i) {
+		graphRoad[i].resize(m_cross_num);
 	}
 
 	//Car调度任务向量大小设置
@@ -40,11 +40,15 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 	}
 
 	road = new Road[m_road_num];//创建所有道路的对象
+	cross = new Cross[m_cross_num];//创建所有路口的对象
+	car = new Car[m_car_num];//创建所有汽车的对象
 }
 
 DataCenter::~DataCenter()
 {
 	delete[] this->road;
+	delete[] this->cross;
+	delete[] this->car;
 }
 
 void DataCenter::readRoadData()
@@ -119,6 +123,14 @@ void DataCenter::readCarData()
 		carTask[i - 1][5] = 0;
 		carTask[i - 1][6] = 0;
 		carTask[i - 1][7] = SLEEPING;
+
+		car[i - 1].id = carTask[i - 1][0];
+		car[i - 1].idCrossFrom = carTask[i - 1][1];
+		car[i - 1].idCrossTo = carTask[i - 1][2];
+		car[i - 1].speed = carTask[i - 1][3];
+		car[i - 1].plantime = carTask[i - 1][4];
+		car[i - 1].status = SLEEPING;
+
 	}
 	printf("readCarData done!\n");
 }
@@ -135,58 +147,32 @@ void DataCenter::readCrossData()
 		crossList[i - 1][2] = std::stoi(sp[2]);
 		crossList[i - 1][3] = std::stoi(sp[3]);
 		crossList[i - 1][4] = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
+
+		
+		cross[i - 1].id = std::stoi(sp[0].substr(1));//去除左括号
+		cross[i - 1].roadID_D = std::stoi(sp[1]);
+		cross[i - 1].roadID_L = std::stoi(sp[2]);
+		cross[i - 1].roadID_R = std::stoi(sp[3]);
+		cross[i - 1].roadID_T = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
+		cross[i - 1].roadID.resize(4);
+		cross[i - 1].roadID = { cross[i - 1].roadID_D ,cross[i - 1].roadID_L ,cross[i - 1].roadID_R ,cross[i - 1].roadID_T };
 	}
 	printf("readCrossData done!\n");
 }
 
-int DataCenter::calSysTime()
+//获取点和边的数量
+int DataCenter::getRoadNum()
 {
-	//这里将carPathList路径列表初始化为1条路径
-	std::vector<int> carPath { 1001, 1, 501, 502, 503, 516, 506, 505, 518, 508, 509, 524 };
-	carPathList.push_back(carPath);
-
-	//将carTask车辆调度任务列表初始化为1辆车
-	std::vector<std::vector<int>> carTaskTmp;//避免和私有变量重名
-	carTaskTmp.push_back({ 0, 1, 16, 6, 1, 0, 0, 0 });
-
-	timeSysMachine = 0;//系统调度时间初始化为0
-
-	while (carTaskTmp.size() != 0)
-	{
-		//先调度在路上行驶的车辆
-		//第一步：先处理所有道路上的车辆，进行遍历扫描
-
-
-		//第二步：处理所有路口等待的车辆
-		for (int i = 0; i < carTaskTmp.size(); ++i)
-		{
-			if (carTaskTmp[i][7] != SLEEPING)
-			{
-				//让该车行驶,同时判断是否到终点
-			}
-		}
-
-		//再调度等待上路行驶的车辆
-		for (int i = 0; i < carTaskTmp.size(); ++i)
-		{
-			if (carTaskTmp[i][7] == SLEEPING)
-			{
-				if (carTaskTmp[i][4] == timeSysMachine)
-				{
-					//尝试将该车加入道路，并修改车的状态
-					//如果加入道路失败，则修改该车启动时间
-				}
-			}
-		}
-		timeSysMachine ++;
-
-	}
-
-
-
-	return timeSysMachine;
+	return m_road_num;
 }
 
-void DataCenter::splitRoadData()
+int DataCenter::getCrossNum()
 {
+	return m_cross_num;
+}
+
+//获取邻接矩阵
+std::vector<std::vector<int> > DataCenter::getArc()
+{
+	return graphRoad;
 }
