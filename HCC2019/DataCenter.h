@@ -32,9 +32,6 @@ public:
 	//获得邻接矩阵
 	std::vector<std::vector<int> > getArc();
 
-	//计算当前路径的运行时间
-	int calSysTime();
-
 	enum
 	{// 车辆运行状态 //请参考论坛中关于任务调度的解释
 		SLEEPING,	// 等待出发（车库中）

@@ -9,9 +9,17 @@
 #include <vector>
 #include <assert.h>
 
+#include "lib_io.h"
+
 #define MAX_ROAD_NUM    100 //最大ROAD条数
 #define MAX_CAR_NUM    150 //最大CAR条数
 #define MAX_CROSS_NUM    100 //最大CROSS条数
+
+#ifdef _DEBUG
+#define PRINT   printf
+#else
+#define PRINT(...)
+#endif
 
 enum
 {// 车道方向

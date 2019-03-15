@@ -129,7 +129,8 @@ void DataCenter::readCarData()
 		car[i - 1].idCrossTo = carTask[i - 1][2];
 		car[i - 1].speed = carTask[i - 1][3];
 		car[i - 1].plantime = carTask[i - 1][4];
-		car[i - 1].status = SLEEPING;
+		car[i - 1].status = SLEEPING;//车的初始状态为SLEEPING
+		car[i - 1].dirCross = NONE;//车的过路口状态为NONE
 
 	}
 	printf("readCarData done!\n");

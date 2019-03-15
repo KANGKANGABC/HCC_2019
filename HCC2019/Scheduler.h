@@ -27,10 +27,10 @@ private:
 	void driveAllCarsJustOnRoadToEndState();
 	
 	/*让该车前进*/
-	void driveCar(Car car, int indexCar);//indexCar为该车在车道的位置
+	void driveCar(Car &car, int indexCar);//indexCar为该车在车道的位置
 
 	/*将该车加入道路行驶*/
-	void addCar(Car car);
+	void addCar(Car &car);
 
 	//判断某cross的某road是否可以行驶进入
 	int isCanEnter(int idRoad, int idCross);//如果返回值-1，代表不可加入，否则返回可驶入的lane ID
@@ -46,19 +46,22 @@ private:
 
 	//如果车辆从当前道路驶向下一路口，因为道路限速可能与区别，这里根据官方的规则计算车辆能行驶的最大距离
 	//如果能行驶的最大距离为0，那么只能停在路口，等待下一次调度
-	int getCrossDistance(Car car, int idCurRoad, int idNextRoad);
+	int getCrossDistance(Car &car, int idCurRoad, int idNextRoad);
 
 	//将该车行驶到下个road 根据假设AA:此时不存在有车到达终点
-	void driverToNextRoad(Car car, int idNextRoad, int idNextLane, int location);
+	void driverToNextRoad(Car &car, int idNextRoad, int idNextLane, int location);
 
 	//判断该车能否在某路口转向并行驶
-	bool isCanDriveToNextRoad(Car car, int dir, int idCross);//dir为目标行驶方向
+	bool isCanDriveToNextRoad(Car &car, int dir, int idCross);//dir为目标行驶方向
 
 	//某个road上的车辆行进，直到该车辆行驶变成等待状态或者终止状态
 	void driveAllCarsJustOnOneRoadToEndState(int idRoad, int idCross);
 
 	//车库中的车辆上路行驶
 	void driverCarInGarage();
+
+	//打印车辆状态
+	void putCarStatus(Car car);
 
 };
 

@@ -7,16 +7,12 @@
 #include <sys/timeb.h>
 #include <errno.h>
 #include <signal.h>
+#include <signal.h>
+#include "define.h"
 
 #define MAX_LINE_LEN 55000
 
 #define INLINE  static __inline
-#ifdef _DEBUG
-#define PRINT   printf
-#else
-#define PRINT(...)
-#endif
-
 
 INLINE void write_file(const bool cover, const char * const buff, const char * const filename);
 
