@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
 	dc.readCarData();
 	dc.readCrossData();
 	Scheduler sd(dc);
+	sd.getPath();
 	int time = sd.getSysTime();
 
 	//dc.write_graph();

@@ -11,7 +11,8 @@ public:
 	Scheduler(DataCenter &dc);
 	~Scheduler();
 	int getSysTime();
-
+	//获得路径,为每辆车规划路径
+	void getPath();
 private:
 	int num_CarsScheduling;//正在调度的car数量
 	int num_Roads;//道路数量
@@ -58,5 +59,6 @@ private:
 
 	//车库中的车辆上路行驶
 	void driverCarInGarage();
+
 };
 

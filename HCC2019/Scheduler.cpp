@@ -463,3 +463,15 @@ void Scheduler::driverCarInGarage()
 			addCar(cars[i]);
 	}
 }
+
+void Scheduler::getPath()
+{
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (i == 0)//为了便于测试调度器逻辑，给第一辆车规划一个简单路径
+		{
+			cars[i].path = { 5029,5040,5051,5057,5058,5059 };
+		}
+
+	}
+}
