@@ -63,5 +63,8 @@ private:
 	//打印车辆状态
 	void putCarStatus(Car car);
 
+	//输出所有车辆状态
+	void putAllCarStatus();
+
 };
 
