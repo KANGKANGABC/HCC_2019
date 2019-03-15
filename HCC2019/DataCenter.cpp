@@ -19,9 +19,9 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 	m_cross_num = cross_count - 1;//忽略第一行注释
 
 	//将邻接矩阵大小设置为36*36
-	graphRoad.resize(36);
-	for (int i = 0; i < 36; ++i) {
-		graphRoad[i].resize(36);
+	graphRoad.resize(m_cross_num);
+	for (int i = 0; i < m_cross_num; ++i) {
+		graphRoad[i].resize(m_cross_num);
 	}
 
 	//Car调度任务向量大小设置
@@ -158,4 +158,21 @@ void DataCenter::readCrossData()
 		cross[i - 1].roadID = { cross[i - 1].roadID_D ,cross[i - 1].roadID_L ,cross[i - 1].roadID_R ,cross[i - 1].roadID_T };
 	}
 	printf("readCrossData done!\n");
+}
+
+//获取点和边的数量
+int DataCenter::getRoadNum()
+{
+	return m_road_num;
+}
+
+int DataCenter::getCrossNum()
+{
+	return m_cross_num;
+}
+
+//获取邻接矩阵
+std::vector<std::vector<int> > DataCenter::getArc()
+{
+	return graphRoad;
 }

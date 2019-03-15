@@ -45,22 +45,28 @@ int main(int argc, char *argv[])
 	sd.getPath();
 	int time = sd.getSysTime();
 
-	//dc.write_graph();
 
 	// TODO:read input filebuf
 	// TODO:process
 	// TODO:write output file
 
+
 	//测试dijkstra算法
 	int vexnum, edge;
-	cout << "输入图的顶点个数和边的条数：" << endl;
-	cin >> vexnum >> edge;
+	std::vector<std::vector<int> > tmp = dc.getArc(); //得到邻接矩阵
+	vexnum = dc.getCrossNum();
+	edge = dc.getRoadNum();
 
 	Graph_DG graph(vexnum, edge);
-	graph.createGraph();
-	graph.print();
-	graph.Dijkstra(1);
-	graph.print_path(1);
+	graph.createGraph(tmp);
+	//graph.print();
+	//graph.Dijkstra(1);
+	vector<int> path = graph.Dijkstra(1, 30);
+	cout << "路径为";
+	for (int i = 0; i < path.size(); i++)
+		cout << path.at(i) << " ";
+	//graph.print_path(1);
+	//graph.print_path(1, 30);
 	system("pause");
 
 	return 0;
