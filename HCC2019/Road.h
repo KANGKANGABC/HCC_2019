@@ -36,6 +36,10 @@ public:
 	int getIdCurLane() { return idCurLane; };
 	int getDirCross() { return dirCross; };
 	int getPathSize() { return path.size(); };
+	int getPathFirstNode() { 
+		int goal = path.at(0);
+		path
+	};
 	//修改car的数据
 	void putID(int n_id) { id = n_id; };
 	void putIdForm(int n_idfrom) { idCrossFrom = n_idfrom; };
