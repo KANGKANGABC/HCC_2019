@@ -57,6 +57,11 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < path.size(); i++)
 		cout << path.at(i) << " ";
 
+	path = graph.Dijkstra(15, 35);
+	cout << "路径为";
+	for (int i = 0; i < path.size(); i++)
+		cout << path.at(i) << " ";
+
 	Scheduler sd(dc);
 	sd.getPath();
 	int time = sd.getSysTime();
