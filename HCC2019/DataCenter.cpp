@@ -24,6 +24,12 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 		graphRoad[i].resize(m_cross_num);
 	}
 
+	//将graphC2R大小设置为36*36
+	graphC2R.resize(m_cross_num);
+	for (int i = 0; i < m_cross_num; ++i) {
+		graphC2R[i].resize(m_cross_num);
+	}
+
 	//Car调度任务向量大小设置
 	//Car任务数量为所有需要调度的Car数
 	carTask.resize(m_car_num);
@@ -74,12 +80,15 @@ void DataCenter::readRoadData()
 		{
 			graphRoad[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[1]);
 			graphRoad[std::stoi(sp[5]) - 1][std::stoi(sp[4]) - 1] = std::stoi(sp[1]);
+			graphC2R[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = this->road[i - 1].id;
+			graphC2R[std::stoi(sp[5]) - 1][std::stoi(sp[4]) - 1] = this->road[i - 1].id;
+
 		}
 		else
 		{
 			graphRoad[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[1]);
+			graphC2R[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = this->road[i - 1].id;
 		}
-
 	}
 	printf("readRoadData done!\n");
 }

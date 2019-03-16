@@ -41,15 +41,6 @@ int main(int argc, char *argv[])
 	dc.readRoadData();
 	dc.readCarData();
 	dc.readCrossData();
-	Scheduler sd(dc);
-	sd.getPath();
-	int time = sd.getSysTime();
-
-
-	// TODO:read input filebuf
-	// TODO:process
-	// TODO:write output file
-
 
 	//测试dijkstra算法
 	int vexnum, edge;
@@ -61,10 +52,22 @@ int main(int argc, char *argv[])
 	graph.createGraph(tmp);
 	//graph.print();
 	//graph.Dijkstra(1);
-	vector<int> path = graph.Dijkstra(1, 30);
+	vector<int> path = graph.Dijkstra(16, 34);
 	cout << "路径为";
 	for (int i = 0; i < path.size(); i++)
 		cout << path.at(i) << " ";
+
+	Scheduler sd(dc);
+	sd.getPath();
+	int time = sd.getSysTime();
+
+
+	// TODO:read input filebuf
+	// TODO:process
+	// TODO:write output file
+
+
+
 	//graph.print_path(1);
 	//graph.print_path(1, 30);
 	system("pause");

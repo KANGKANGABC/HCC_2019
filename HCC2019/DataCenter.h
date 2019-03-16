@@ -62,6 +62,9 @@ private:
 	//道路有向图邻接矩阵
 	std::vector<std::vector<int> > graphRoad;
 
+	//CrossToRoad转换表
+	std::vector<std::vector<int> > graphC2R;
+
 	//路口信息表
 	//(id,roadId,roadId,roadId,roadId)
 	std::vector<std::vector<int> > crossList;

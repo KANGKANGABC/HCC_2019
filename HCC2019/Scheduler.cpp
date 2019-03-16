@@ -10,6 +10,12 @@ Scheduler::Scheduler(DataCenter &dc)
 	crosses = dc.cross;
 	cars = dc.car;
 	time_Scheduler = 0;//调度器初始时间设置为0
+	vexnum = dc.getCrossNum();
+	edge = dc.getRoadNum();
+	tmp = dc.getArc(); //得到邻接矩阵
+	//将graphC2R大小设置为36*36
+	graphC2R = dc.graphC2R;
+
 }
 
 
@@ -550,16 +556,18 @@ void Scheduler::putAllCarStatus()
 
 void Scheduler::getPath()
 {
+	Graph_DG graph(vexnum, edge);
+	graph.createGraph(tmp);
+
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		if (i == 0)//为了便于测试调度器逻辑，给第一辆车规划一个简单路径
+		vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo);
+		vector<int> pathRoad(pathCross.size() - 1);
+		for (int j = 0; j < pathRoad.size(); ++j)
 		{
-			cars[i].path = { 5029,5040,5051,5057,5058 };//path第一项作为即将行驶的路径
+			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+			//assert(pathRoad[j] != 0);
 		}
-		if (i == 1)//为了便于测试调度器逻辑，给第一辆车规划一个简单路径
-		{
-			cars[i].path = { 5030,5041,5052 };//path第一项作为即将行驶的路径
-		}
-		cars[2].path = { 5058, 5057,5051,5040,5029 };//path第一项作为即将行驶的路径
+		cars[i].path = pathRoad;
 	}
 }
