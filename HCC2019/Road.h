@@ -8,7 +8,8 @@ public:
 	int location;
 	int status;
 	int speed;
-	int plantime;
+	int plantime;//计划驶出时间
+	int starttime;//真实驶出时间
 	int idCurRoad;//当前车所在的道路ID
 	int idCurLane;//当前车所在的车道ID
 	int dirCross;//标志在路口的状态 

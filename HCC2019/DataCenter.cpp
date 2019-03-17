@@ -138,6 +138,7 @@ void DataCenter::readCarData()
 		car[i - 1].idCrossTo = carTask[i - 1][2];
 		car[i - 1].speed = carTask[i - 1][3];
 		car[i - 1].plantime = carTask[i - 1][4];
+		car[i - 1].starttime = carTask[i - 1][4];//这里给自己挖了一个坑
 		car[i - 1].status = SLEEPING;//车的初始状态为SLEEPING
 		car[i - 1].dirCross = NONE;//车的过路口状态为NONE
 
@@ -186,3 +187,24 @@ std::vector<std::vector<int> > DataCenter::getArc()
 {
 	return graphRoad;
 }
+
+void DataCenter::writeResult(char *filename)
+{
+	result += "#(carId,StartTime,RoadId...)\n";
+	for (int i = 0; i < m_car_num; ++i)
+	{
+		std::string line = "(" + std::to_string(car[i].id);
+		line += ", ";
+		line += std::to_string(car[i].starttime);
+		for (int j = 0; j < car[i].path.size(); ++j)
+		{
+			line += ", ";
+			line += std::to_string(car[i].path[j]);
+		}
+		line += ")\n";
+		result += line;
+	}
+	const char *result_file = result.c_str();
+	write_result(result_file, filename);
+}
+

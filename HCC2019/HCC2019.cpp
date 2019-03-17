@@ -30,6 +30,8 @@ int main(int argc, char *argv[])
 	std::cout << "crossPath is " << crossPath << std::endl;
 	std::cout << "answerPath is " << answerPath << std::endl;
 
+	char *answer_file = argv[4];
+
 	char *data_road[MAX_ROAD_NUM];
 	char *data_car[MAX_CAR_NUM];
 	char *data_cross[MAX_CROSS_NUM];
@@ -63,8 +65,9 @@ int main(int argc, char *argv[])
 		cout << path.at(i) << " ";
 
 	Scheduler sd(dc);
-	sd.getPath();
-	int time = sd.getSysTime();
+	dc.car = sd.getPath();//获得车辆的路径信息
+	//int time = sd.getSysTime();
+	dc.writeResult(answer_file);
 
 
 	// TODO:read input filebuf

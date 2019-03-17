@@ -13,7 +13,7 @@ public:
 	~Scheduler();
 	int getSysTime();
 	//获得路径,为每辆车规划路径
-	void getPath();
+	Car * getPath();
 	int vexnum, edge;
 	std::vector<std::vector<int> > tmp;
 private:
@@ -70,6 +70,7 @@ private:
 
 	//输出所有车辆状态
 	void putAllCarStatus();
+
 
 };
 

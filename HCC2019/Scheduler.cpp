@@ -328,6 +328,9 @@ void Scheduler::addCar(Car car)
 		int indexCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size();//该车为末尾
 		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.push_back(car);//将该车加入对应道路,对应车道,加入队尾
 		driveCar(car, indexCar);//car行驶 indexCar为-1，表示该车在lane中还没有位置
+		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1].starttime = time_Scheduler;
+		//记录实际出发时间
+
 	}
 }
 
@@ -554,7 +557,7 @@ void Scheduler::putAllCarStatus()
 	}
 }
 
-void Scheduler::getPath()
+Car * Scheduler::getPath()
 {
 	Graph_DG graph(vexnum, edge);
 	graph.createGraph(tmp);
@@ -570,4 +573,5 @@ void Scheduler::getPath()
 		}
 		cars[i].path = pathRoad;
 	}
+	return cars;
 }

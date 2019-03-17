@@ -32,6 +32,9 @@ public:
 	//获得邻接矩阵
 	std::vector<std::vector<int> > getArc();
 
+	//将结果写出到result.txt
+	void writeResult(char *filename);
+
 	enum
 	{// 车辆运行状态 //请参考论坛中关于任务调度的解释
 		SLEEPING,	// 等待出发（车库中）
@@ -52,6 +55,8 @@ public:
 	int m_road_num;//ROAD数量
 	int m_car_num;//CAR数量
 	int m_cross_num;//CROSS数量
+
+	std::string result;//输出结果存储矩阵
 
 private:
 
@@ -74,6 +79,7 @@ private:
 
 	//路径列表
 	std::vector<std::vector<int> > carPathList;
+
 };
 
 
