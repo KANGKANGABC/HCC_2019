@@ -314,7 +314,7 @@ void Scheduler::driveCar(Car car, int indexCar)
 	}
 }
 
-void Scheduler::addCar(Car car)
+void Scheduler::addCar(Car car, int i)
 {
 	assert(car.status == SLEEPING);//只有SLEEPING状态的车可以加入地图行驶
 	int idRoadTarget = car.path[0];//获取目标道路
@@ -336,6 +336,10 @@ void Scheduler::addCar(Car car)
 		//roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1].starttime = time_Scheduler;
 		//记录实际出发时间
 
+	}
+	else//如果加入失败，则将出发时间延后一个1个时间片
+	{
+		cars[i].plantime += 1;
 	}
 }
 
@@ -372,9 +376,12 @@ int Scheduler::isCanEnter(int idRoad, int idCross)
 
 bool Scheduler::isBeDD(int idRoad, int idCross)
 {
+	if (idRoad == -1)//如果冲突方向无道路，则任务无冲突车辆
+		return true;
 	int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
 	if (roads[idRoad - 5000].idTo == crosses[idCross-1].id)//如果cross为道路的出方向
 		idStartLane = roads[idRoad - 5000].channel;
+	/*
 	for (int j = idStartLane; j < idStartLane + roads[idRoad - 5000].channel; ++j)//遍历所有lane
 	{
 		if (roads[idRoad - 5000].lane[j].laneCar.size() != 0)
@@ -383,14 +390,24 @@ bool Scheduler::isBeDD(int idRoad, int idCross)
 				return true;//存在直行车辆
 		}
 	}
+	*/
+	//原本以为需要判断所有车道，现在只判断优先级最高的车道
+	if (roads[idRoad - 5000].lane[idStartLane].laneCar.size() != 0)
+	{
+		if (roads[idRoad - 5000].lane[idStartLane].laneCar[0].dirCross == DD)
+			return true;//存在直行车辆
+	}
 	return false;
 }
 
 bool Scheduler::isBeLEFT(int idRoad, int idCross)
 {
+	if (idRoad == -1)//如果冲突方向无道路，则任务无冲突车辆
+		return true;
 	int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
 	if (roads[idRoad - 5000].idTo == crosses[idCross-1].id)//如果cross为道路的出方向
 		idStartLane = roads[idRoad - 5000].channel;
+	/*
 	for (int j = idStartLane; j < idStartLane + roads[idRoad - 5000].channel; ++j)//遍历所有lane
 	{
 		if (roads[idRoad - 5000].lane[j].laneCar.size() != 0)
@@ -398,6 +415,13 @@ bool Scheduler::isBeLEFT(int idRoad, int idCross)
 			if (roads[idRoad - 5000].lane[j].laneCar[0].dirCross == LEFT)
 				return true;//存在左转车辆
 		}
+	}
+	*/
+	//原本以为需要判断所有车道，现在只判断优先级最高的车道
+	if (roads[idRoad - 5000].lane[idStartLane].laneCar.size() != 0)
+	{
+		if (roads[idRoad - 5000].lane[idStartLane].laneCar[0].dirCross == LEFT)
+			return true;//存在左转车辆
 	}
 	return false;
 }
@@ -538,7 +562,7 @@ void Scheduler::driverCarInGarage()
 	for (int i = 0; i < num_Cars; ++i)
 	{
 		if (cars[i].plantime == time_Scheduler&&cars[i].status==SLEEPING)
-			addCar(cars[i]);
+			addCar(cars[i],i);
 	}
 }
 

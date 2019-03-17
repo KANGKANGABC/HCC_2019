@@ -35,7 +35,7 @@ private:
 	void driveCar(Car car, int indexCar);//indexCar为该车在车道的位置
 
 	/*将该车加入道路行驶*/
-	void addCar(Car car);
+	void addCar(Car car,int i);//i为该车在cars[]中的下标，便于加入车失败时延后时间片
 
 	//判断某cross的某road是否可以行驶进入//输入ID为修正前的ID
 	int isCanEnter(int idRoad, int idCross);//如果返回值-1，代表不可加入，否则返回可驶入的lane ID
