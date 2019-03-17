@@ -145,6 +145,7 @@ void DataCenter::readCarData()
 		car[i - 1].speed = carTask[i - 1][3];
 		car[i - 1].plantime = carTask[i - 1][4];
 		//car[i - 1].starttime = carTask[i - 1][4] + i%400;//这里给自己挖了一个坑
+		car[i - 1].plantime = carTask[i - 1][4] + (8 - car[i - 1].speed) * 80 + i % 160;//这里给自己挖了一个坑
 		car[i - 1].starttime = carTask[i - 1][4] + (8 - car[i - 1].speed )*80 + i % 160;//这里给自己挖了一个坑
 		car[i - 1].status = SLEEPING;//车的初始状态为SLEEPING
 		car[i - 1].dirCross = NONE;//车的过路口状态为NONE
@@ -200,7 +201,6 @@ void DataCenter::getCarSpeedType()
 			car_speed_num++;
 			speed = carSpeed[i];
 			speedType.push_back(carSpeed[i]);
-
 		}
 	}
 	printf("getCarSpeedType done!\n");

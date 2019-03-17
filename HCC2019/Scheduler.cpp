@@ -48,8 +48,12 @@ int Scheduler::getSysTime()
 						{
 							int idRoad = crosses[i].roadID[j];//被调度的道路id
 							int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
-							if (roads[idRoad - 5000].idTo == crosses[i].id)//如果cross为道路的出方向
+							if (roads[idRoad - 5000].idFrom == crosses[i].id)//如果cross为道路的入方向
+							{
 								idStartLane = roads[idRoad - 5000].channel;
+								if (roads[idRoad - 5000].isDuplex != 1)
+									continue;//如果非双车道，退出本次循环
+							}
 							while (1)
 							{
 								bool isWorkingLane = false;
@@ -355,8 +359,13 @@ int Scheduler::isCanEnter(int idRoad, int idCross)
 	//     1
 	//——————————
 	int idStartLane = 0;//如果cross为道路的入方向，需要调度 0 1 2车道，否则调度 3 4 5车道
-	if (roads[idRoad - 5000].idTo == crosses[idCross-1].id)//如果cross为道路的入方向
+	if (roads[idRoad - 5000].idTo == crosses[idCross - 1].id)//如果cross为道路的入方向
+	{
 		idStartLane = roads[idRoad - 5000].channel;
+		assert(roads[idRoad - 5000].isDuplex == 1);//如果cross为road的出方向，但是却不是双向道，那么很可能路径规划错误
+		if (roads[idRoad - 5000].isDuplex != 1)
+			return -1;
+	}
 	for (int j = idStartLane; j < idStartLane + roads[idRoad - 5000].channel; ++j)//遍历所有lane
 	{
 		if (roads[idRoad - 5000].lane[j].laneCar.size() < roads[idRoad - 5000].length)
@@ -500,9 +509,6 @@ void Scheduler::driverToNextRoad(Car car, int idNextRoad, int idNextLane, int lo
 	car.path.erase(itPath);//已经驶向下一个路口，所以删除path中第一项
 	int size = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size();
 	Lane lane = roads[car.idCurRoad - 5000].lane[car.idCurLane];
-	Lane lane1 = roads[29].lane[car.idCurLane];
-	Lane lane2 = roads[28].lane[car.idCurLane];
-	Lane lane3 = roads[30].lane[car.idCurLane];
 	roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.push_back(car);//将该车加入下一个lane,加入队尾
 }
 

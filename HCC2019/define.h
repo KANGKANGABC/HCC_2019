@@ -11,7 +11,7 @@
 
 #include "lib_io.h"
 
-#define MAX_ROAD_NUM    100 //最大ROAD条数
+#define MAX_ROAD_NUM    200 //最大ROAD条数
 #define MAX_CAR_NUM    20000 //最大CAR条数
 #define MAX_CROSS_NUM    100 //最大CROSS条数
 
