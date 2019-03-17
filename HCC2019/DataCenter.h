@@ -78,7 +78,7 @@ public:
 	int m_road_num;//ROAD数量
 	int m_car_num;//CAR数量
 	int m_cross_num;//CROSS数量
-	int car_speed_num; //car 的速度种类在getCarSpeedType()中被赋值
+	int car_speed_num; //car可能的速度类型
 
 	std::string result;//输出结果存储矩阵
 	int vexnum, edge;
