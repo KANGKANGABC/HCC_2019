@@ -5,6 +5,9 @@
 #include "define.h"
 #include "lib_io.h"
 #include "DataCenter.h"
+#include "dijkstra.h"
+#include "Scheduler.h"
+
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -27,6 +30,8 @@ int main(int argc, char *argv[])
 	std::cout << "crossPath is " << crossPath << std::endl;
 	std::cout << "answerPath is " << answerPath << std::endl;
 
+	char *answer_file = argv[4];
+
 	char *data_road[MAX_ROAD_NUM];
 	char *data_car[MAX_CAR_NUM];
 	char *data_cross[MAX_CROSS_NUM];
@@ -39,17 +44,19 @@ int main(int argc, char *argv[])
 	dc.readCarData();
 	dc.readCrossData();
 
-	//dc.write_graph();
 	dc.getCarSpeedType();
 	dc.getAllTimeGraph();
 
-//dc.Dijkstra(1);
-//	dc.print_path(1);
+	dc.getPath();
+	dc.writeResult(answer_file);
+
+	//Scheduler sd(dc);
+	//sd.getPath();//获得车辆的路径信息
+	//int time = sd.getSysTime();
 
 	// TODO:read input filebuf
 	// TODO:process
 	// TODO:write output file
-
 
 	return 0;
 }

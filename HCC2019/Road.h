@@ -8,7 +8,13 @@ public:
 	int location;
 	int status;
 	int speed;
+	int plantime;//计划驶出时间
+	int starttime;//真实驶出时间
+	int idCurRoad;//当前车所在的道路ID
+	int idCurLane;//当前车所在的车道ID
 	int dirCross;//标志在路口的状态 
+	int idCrossFrom;//车的出发路口
+	int idCrossTo;//车的终止路口
 	std::vector<int> path;
 }; 
 
@@ -20,6 +26,7 @@ public:
 	int roadID_R; //顺时针第2个 Right
 	int roadID_D; //顺时针第3个 Down
 	int roadID_L; //顺时针第4个 Left
+	std::vector<int> roadID;//按顺序存储上面四个方向，便于遍历
 
 };
 

@@ -263,3 +263,6 @@ paket-files/
 __pycache__/
 *.pyc
 /Data
+/HCC2019/config_test/result.txt
+/HCC2019/train1/answer.txt
+/HCC2019/train2/answer.txt

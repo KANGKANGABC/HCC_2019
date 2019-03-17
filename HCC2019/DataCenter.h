@@ -4,6 +4,7 @@
 #include "lib_io.h"
 #include "define.h"
 #include "Road.h"
+#include "dijkstra.h"
 
 class TimeGraph
 {
@@ -23,18 +24,24 @@ struct Dis {
 
 class DataCenter
 {
+
+	friend class Graph_DG;
 public:
 	DataCenter();
 	DataCenter(char *data_road[MAX_ROAD_NUM], int road_count, char *data_car[MAX_CAR_NUM], int car_count, char *data_cross[MAX_CROSS_NUM], int cross_count);
 	~DataCenter();
 
+
+	friend class Graph_DG;
+	friend class Scheduler;
+
+	//将邻接矩阵写出到文件
+	void write_graph();
+  
 	//读入数据
 	void readRoadData();
 	void readCarData();
 	void readCrossData();
-
-	//将邻接矩阵写出到文件
-	void write_graph();
 
 	//统计car.txt中的各车辆速度类型到Vector speedType中
 	void getCarSpeedType ();
@@ -47,23 +54,22 @@ public:
 
 	//Dijkstra算法，输入点begin，输出点begin到各点的最短时间
 	std :: vector<int>  Dijkstra(int begin ,int end ,int speed );
-	//输出begin到其余点的最短时间路径信息
-	void print_path(int begin);
 
 	//计算当前路径的运行时间
 	int calSysTime();
 
-	//判断某cross的某road是否存在需要直行的车
-	bool isBeDD(int idRoad,int idCross);
+	//获取点和边的数量
+	int getRoadNum();
+	int getCrossNum();
 
-	//判断某cross的某road是否存在需要左转的车
-	bool isBeLEFT(int idRoad, int idCross);
+	//获得邻接矩阵
+	std::vector<std::vector<int> > getArc();
 
-	//判断某cross的某road是否可以行驶进入
-	bool isCanEnter(int idRoad, int idCross);
+	//将结果写出到result.txt
+	void writeResult(char *filename);
 
-	//驱动某car行驶
-	void carRun(Car car);
+	//获得规划的路径
+	void getPath();
 
 	enum
 	{// 车辆运行状态 //请参考论坛中关于任务调度的解释
@@ -79,17 +85,23 @@ public:
 	//所有路口的指针
 	Cross * cross;
 
+	//所有Car的指针
+	Car * car;
+
+	int m_road_num;//ROAD数量
+	int m_car_num;//CAR数量
+	int m_cross_num;//CROSS数量
+  int car_speed_num; //car 的速度种类在getCarSpeedType()中被赋值
+
+	std::string result;//输出结果存储矩阵
+	int vexnum, edge;
+	std::vector<std::vector<int> > tmp;
+
 private:
 
 	char **inputRoadData;//输入道路数据
 	char **inputCarData;//输入道路数据
 	char **inputCrossData;//输入道路数据
-
-	int m_road_num;//ROAD数量
-	int m_car_num;//CAR数量
-	int m_cross_num;//CROSS数量
-
-	int car_speed_num; //car 的速度种类在getCarSpeedType()中被赋值
 
 	//道路有向图邻接矩阵
 	std::vector<std::vector<int> > graphRoad;	//距离邻接矩阵，不邻接的点用正无穷表示
@@ -108,6 +120,9 @@ private:
 	Dis * dis;
 
 
+	//CrossToRoad转换表
+	std::vector<std::vector<int> > graphC2R;
+
 	//路口信息表
 	//(id,roadId,roadId,roadId,roadId)
 	std::vector<std::vector<int> > crossList;
@@ -118,10 +133,6 @@ private:
 	//路径列表
 	std::vector<std::vector<int> > carPathList;
 
-	//系统时间
-	int timeSysMachine;
-
-	
 };
 
 

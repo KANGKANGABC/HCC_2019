@@ -18,24 +18,26 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 	inputCrossData = data_cross;
 	m_cross_num = cross_count - 1;//忽略第一行注释
 
-	//将距离邻接矩阵大小设置为36
-	graphRoad.resize(m_cross_num);
-	for (int i = 0; i < m_cross_num; ++i)
-	{
-		graphRoad[i].resize(m_cross_num);
-	}
-	//将距离矩阵初始化为正无穷
-	for (int i= 0; i < m_cross_num; ++i)
-		for (int j = 0; j < m_cross_num; ++j)
-		{
-			graphRoad[i][j] = INT_MAX;
-		}
-
 	//将速度邻接矩阵大小设置为36，不邻接的点初值为0
 	graphMaxSpeed.resize(m_cross_num);
 	for (int i = 0; i < m_cross_num; ++i)
 	{
 		graphMaxSpeed[i].resize(m_cross_num);
+  }
+  
+	vexnum = getCrossNum();
+	edge = getRoadNum();
+
+	//将邻接矩阵大小设置为36*36
+	graphRoad.resize(m_cross_num);
+	for (int i = 0; i < m_cross_num; ++i) {
+		graphRoad[i].resize(m_cross_num);
+	}
+
+	//将graphC2R大小设置为36*36
+	graphC2R.resize(m_cross_num);
+	for (int i = 0; i < m_cross_num; ++i) {
+		graphC2R[i].resize(m_cross_num);
 	}
 
 
@@ -59,11 +61,14 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 
 	road = new Road[m_road_num];//创建所有道路的对象
 	cross = new Cross[m_cross_num];//创建所有路口的对象
+	car = new Car[m_car_num];//创建所有汽车的对象
 }
 
 DataCenter::~DataCenter()
 {
 	delete[] this->road;
+	delete[] this->cross;
+	delete[] this->car;
 }
 
 /******************************************************** readRoadData() ,readCarData() ,readCrossData() ******************************************************************/
@@ -93,13 +98,16 @@ void DataCenter::readRoadData()
 
 			graphMaxSpeed[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[2]);
 			graphMaxSpeed[std::stoi(sp[5]) - 1][std::stoi(sp[4]) - 1] = std::stoi(sp[2]);
+      
+			graphC2R[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = this->road[i - 1].id;
+			graphC2R[std::stoi(sp[5]) - 1][std::stoi(sp[4]) - 1] = this->road[i - 1].id;
 		}
 		else
 		{
 			graphRoad[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[1]);
 			graphMaxSpeed[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[2]);
+			graphC2R[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = this->road[i - 1].id;
 		}
-
 	}
 	printf("readRoadData done!\n");
 }
@@ -122,6 +130,16 @@ void DataCenter::readCarData()
 		carTask[i - 1][5] = 0;
 		carTask[i - 1][6] = 0;
 		carTask[i - 1][7] = SLEEPING;
+
+		car[i - 1].id = carTask[i - 1][0];
+		car[i - 1].idCrossFrom = carTask[i - 1][1];
+		car[i - 1].idCrossTo = carTask[i - 1][2];
+		car[i - 1].speed = carTask[i - 1][3];
+		car[i - 1].plantime = carTask[i - 1][4];
+		car[i - 1].starttime = carTask[i - 1][4] + i%400;//这里给自己挖了一个坑
+		car[i - 1].status = SLEEPING;//车的初始状态为SLEEPING
+		car[i - 1].dirCross = NONE;//车的过路口状态为NONE
+
 	}
 	printf("readCarData done!\n");
 }
@@ -142,39 +160,14 @@ void DataCenter::readCrossData()
 
 		
 		cross[i - 1].id = std::stoi(sp[0].substr(1));//去除左括号
-		cross[i - 1].roadID_D = std::stoi(sp[1]);
-		cross[i - 1].roadID_L = std::stoi(sp[2]);
-		cross[i - 1].roadID_R = std::stoi(sp[3]);
-		cross[i - 1].roadID_T = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
+		cross[i - 1].roadID_T = std::stoi(sp[1]);
+		cross[i - 1].roadID_R = std::stoi(sp[2]);
+		cross[i - 1].roadID_D = std::stoi(sp[3]);
+		cross[i - 1].roadID_L = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
+		cross[i - 1].roadID.resize(4);
+		cross[i - 1].roadID = { cross[i - 1].roadID_T ,cross[i - 1].roadID_R ,cross[i - 1].roadID_D ,cross[i - 1].roadID_L };
 	}
 	printf("readCrossData done!\n");
-}
-
-/************************************************************************ 输出邻接矩阵到road_graph.txt *************************************************************************/
-void DataCenter::write_graph()
-{
-	printf("write_graph\n");
-
-	int rowCount = 0;
-	int columnCount = 0;
-	std::string graph;
-
-	for (rowCount = 0; rowCount < 36; ++rowCount)
-	{
-		for (columnCount = 0; columnCount < 36; ++columnCount)
-		{
-			graph += std::to_string(graphRoad[rowCount][columnCount]);
-			graph += " ";
-		}
-		graph += "\n";
-	}
-
-	const char *graph_file = graph.c_str();
-	const char * fileName = "road_graph.txt";
-
-	write_result(graph_file, fileName);
-
-	printf("write_graph done!\n");
 }
 
 /******************************统计car.txt中的各车辆速度数量到m_cross_num;，类型到Vector speedType中********此处有常数3！！是车辆速度种类****************/
@@ -318,254 +311,58 @@ std :: vector<int> DataCenter::Dijkstra(int begin, int end, int speed) {
 
 }
 
-/*
-void DataCenter::print_path(int begin)
+//获取点和边的数量
+int DataCenter::getRoadNum()
 {
-	printf("print_path\n");
-
-	std::string str;
-	str = "v" + std::to_string(begin);
-	std::cout << "from" << str << "shortestpath:" << std::endl;
-
-	for (int i = 0; i != m_cross_num; i++) {
-		if (dis[i].value != FLT_MAX)
-		{
-			for (int j = 0; j < dis[i].path.size(); j++)
-				std::cout << dis[i].path.at(j) << " ";
-			std::cout << "value= " << dis[i].value << std::endl;
-		}
-		else {
-			for (int j = 0; j < dis[i].path.size(); j++)
-				std::cout << dis[i].path.at(j) << " ";
-			std::cout << "noshortestpath" << std::endl;
-		}
-	}
-
-	printf("print_path!\n");
-
+	return m_road_num;
 }
-*/
 
-/******************************************************************************为调度部分代码*****************************************************************************************/
-int DataCenter::calSysTime()
+int DataCenter::getCrossNum()
 {
-	//新建一个car对象，对系统进行测试
-	Car *car = new Car;
-	car->id = 10000;
-	car->location = 0;
-	car->speed = 6;
-	car->status = SLEEPING;
-	car->path = { 5029, 5040, 5051, 5057, 5058 };//规划一个简单路径
+	return m_cross_num;
+}
 
-	timeSysMachine = 0;//系统调度时间初始化为0
+//获取邻接矩阵
+std::vector<std::vector<int> > DataCenter::getArc()
+{
+	return graphRoad;
+}
 
-	while (1)//终止条件为所有车辆调度完成
+void DataCenter::writeResult(char *filename)
+{
+	result += "#(carId,StartTime,RoadId...)\n";
+	for (int i = 0; i < m_car_num; ++i)
 	{
-		//先调度在路上行驶的车辆
-		//第一步：先处理所有道路上的车辆，进行遍历扫描
-		for (int i = 0; i < m_road_num; ++i)//按道路ID升序进行调度
+		std::string line = "(" + std::to_string(car[i].id);
+		line += ", ";
+		line += std::to_string(car[i].starttime);
+		for (int j = 0; j < car[i].path.size(); ++j)
 		{
-			for (int j = 0; j < road[i].channel * (1 + road[i].isDuplex); ++j)
-			{
-				//先从正向开始
-				if (road[i].lane[j].laneCar.size() > 0)//该车道有车
-				{
-					for (int m = 0; m < road[i].lane[j].laneCar.size(); ++m)//遍历该车道的所有车辆
-					{
-						//判断该车前面有没有车
-						if (m == 0)//m==0 代表该车为该车道第一辆车
-						{
-							//该车行驶后是否还在相同路径上？
-							if (road[i].lane[j].laneCar[m].location + std::min(road[i].lane[j].laneCar[m].speed, road[i].speed) <= road[i].length)
-							{
-								road[i].lane[j].laneCar[m].location += std::min(road[i].lane[j].laneCar[m].speed, road[i].speed);
-								road[i].lane[j].laneCar[m].status = FINESHED;//该车行驶完成
-							}
-							else//如果不在该路径，那么该车设置为等待状态
-							{
-								road[i].lane[j].laneCar[m].status = WAITTING;//该车等待驶出路口
-								//如果该路口为车的终点
-								//那么此车调度完成
-							}
-						}
-						else
-						{
-							//判断能否完成行驶，前面的车是否形成阻挡？
-							if (road[i].lane[j].laneCar[m].location + std::min(road[i].lane[j].laneCar[m].speed, road[i].speed) < road[i].lane[j].laneCar[m - 1].location)
-							{
-								//前面的车不行成阻挡
-								road[i].lane[j].laneCar[m].location += std::min(road[i].lane[j].laneCar[m].speed, road[i].speed);
-								road[i].lane[j].laneCar[m].status = FINESHED;//该车行驶完成
-							}
-							else
-							{
-								//前面的车形成阻挡,则需要根据前面阻挡车的状态来决定
-								if (road[i].lane[j].laneCar[m - 1].status == FINESHED)//如果前车行驶完成，则行驶至前车后一位置
-								{
-									road[i].lane[j].laneCar[m].location = road[i].lane[j].laneCar[m - 1].location - 1;//行驶至前面车后
-									road[i].lane[j].laneCar[m].status = FINESHED;//该车行驶完成
-								}
-								else if(road[i].lane[j].laneCar[m - 1].status == WAITTING)//如果前车等待行驶，则此车也等待行驶
-								{
-									road[i].lane[j].laneCar[m].status = WAITTING;//该车等待
-								}
-								
-							}
-						}
-					}
-				}
-			}
+			line += ", ";
+			line += std::to_string(car[i].path[j]);
 		}
-
-		//第二步：处理所有路口等待的车辆
-		
-		while (1)//循环调度，直到所有的车辆行驶一个单位，也就是说所有车辆必须为FINESHED状态？对的，论坛写到了这一点
-		{
-			//按照升序调度所有路口
-			for (int i = 0; i < m_cross_num; ++i)
-			{
-				int idCross = cross[i].id;//获得路口ID
-				while (1)//循环调度路口四个方向的车，直到全部车辆完成调度，或者阻塞
-				{
-					bool isWorkingCross = false;//标志变量，如果一个循环后没有任何一辆车被调度，则退出循环
-					if (cross[i].roadID_T != -1)//先调度直行路口
-					{
-						int idRoad = cross[i].roadID_T;//被调度的道路id
-						int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
-						if (road[idRoad - 5000].idTo == cross[i].id)//如果cross为道路的出方向
-							idStartLane = road[idRoad - 5000].channel;
-						while (1)
-						{
-							bool isWorkingRoad = false;
-							for (int j = idStartLane; j < idStartLane + road[idRoad - 5000].channel; ++j)//遍历所有lane
-							{
-								if (road[idRoad - 5000].lane[j].laneCar.size() != 0)//lane非空则调度
-								{
-									switch (road[idRoad - 5000].lane[j].laneCar[0].dirCross)
-									{
-									NONE:
-										break;
-									DD://直行>左转>右转
-										//判断转入的road是否可以行驶
-
-										break;
-									LEFT://左转>右转
-										//判断即将转入的方向是否有直行进入的车辆
-										if (!isBeDD(cross[i].roadID_L, i))
-										{
-											//判断转入的road是否可以行驶
-										}
-										break;
-									RIGHT://右转优先级最低
-										//判断即将转入的方向是否有直行进入的车辆
-										if (!isBeDD(cross[i].roadID_R, i))
-										{
-											//判断即将转入的方向是否有左转进入的车辆
-											if (!isBeLEFT(cross[i].roadID_D, i))
-											{
-												//判断转入的road是否可以行驶
-
-											}
-										}
-										break;
-									default:
-										break;
-									}
-								}
-							}
-							if (!isWorkingRoad)//如果本轮调度未调度任何车辆，则退出调度循环
-								break;
-						}
-
-					}
-
-
-					if (!isWorkingCross)//如果一个循环后没有任何一辆车被调度，则退出调度循环
-						break;
-				}
-
-				//
-				//路口ID
-				;
-				//根据cross的顺序，遍历road，再遍历road的lane，调度在路口WAITTING的车（每次路口调度，只调度路口的一辆车）
-			}
-
-
-
-
-			//按照顺序调度所有道路
-			//再调度道路中WAITTING的车
-		}
-		
-		timeSysMachine ++;
-
+		line += ")\n";
+		result += line;
 	}
-
-
-
-	return timeSysMachine;
+	const char *result_file = result.c_str();
+	write_result(result_file, filename);
 }
 
-bool DataCenter::isBeDD(int idRoad, int idCross)
+void DataCenter::getPath()
 {
-	int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
-	if (road[idRoad - 5000].idTo == cross[idCross].id)//如果cross为道路的出方向
-		idStartLane = road[idRoad - 5000].channel;
-	for (int j = idStartLane; j < idStartLane + road[idRoad - 5000].channel; ++j)//遍历所有lane
+	Graph_DG graph(vexnum, edge);
+	graph.createGraph(graphRoad);
+
+	for (int i = 0; i < m_car_num; ++i)
 	{
-		if (road[idRoad - 5000].lane[j].laneCar.size() != 0)
+		vector<int> pathCross = graph.Dijkstra(car[i].idCrossFrom, car[i].idCrossTo);
+		vector<int> pathRoad(pathCross.size() - 1);
+		for (int j = 0; j < pathRoad.size(); ++j)
 		{
-			if (road[idRoad - 5000].lane[j].laneCar[0].dirCross == DD)
-				return true;//存在直行车辆
+			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+			//assert(pathRoad[j] != 0);
 		}
+		car[i].path = pathRoad;
 	}
-
-	return false;
 }
 
-bool DataCenter::isBeLEFT(int idRoad, int idCross)
-{
-	int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
-	if (road[idRoad - 5000].idTo == cross[idCross].id)//如果cross为道路的出方向
-		idStartLane = road[idRoad - 5000].channel;
-	for (int j = idStartLane; j < idStartLane + road[idRoad - 5000].channel; ++j)//遍历所有lane
-	{
-		if (road[idRoad - 5000].lane[j].laneCar.size() != 0)
-		{
-			if (road[idRoad - 5000].lane[j].laneCar[0].dirCross == LEFT)
-				return true;//存在左转车辆
-		}
-	}
-	return false;
-}
-
-bool DataCenter::isCanEnter(int idRoad, int idCross)
-{
-	int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
-	if (road[idRoad - 5000].idFrom == cross[idCross].id)//如果cross为道路的入方向
-		idStartLane = road[idRoad - 5000].channel;
-	for (int j = idStartLane; j < idStartLane + road[idRoad - 5000].channel; ++j)//遍历所有lane
-	{
-		if (road[idRoad - 5000].lane[j].laneCar.size() < road[idRoad - 5000].length)
-		{
-			//将车辆加入新的road
-			//
-
-			return true;//存在空位，可加入
-		}
-	}
-	return false;
-}
-
-void DataCenter::carRun(Car car)
-{
-	//预设车的路径已经规划好，行驶过程中会更新path，path为将要进入的道路，如果进入下一条道路，
-	//将上一条道路从path中删除，便于编程（不用每次都查path自己接下来走那条路径）
-
-	//如果车处于SLEEP状态，将其加入对应道路
-		//如果加入道路失败，将Car的起始时间加1，等待下次调度
-
-	//如果车处于WAITTING/FINSHED状态
-		//判断该车是否在路口，如果不是在路口等待，那么正常行驶（WAITTING/FINSHED）
-		//判断该车是否在路口，如果已经在路口等待，那么将该车驶出到下一道路
-}
