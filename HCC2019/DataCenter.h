@@ -4,6 +4,7 @@
 #include "lib_io.h"
 #include "define.h"
 #include "Road.h"
+#include "dijkstra.h"
 
 class DataCenter
 {
@@ -35,6 +36,9 @@ public:
 	//将结果写出到result.txt
 	void writeResult(char *filename);
 
+	//获得规划的路径
+	void getPath();
+
 	enum
 	{// 车辆运行状态 //请参考论坛中关于任务调度的解释
 		SLEEPING,	// 等待出发（车库中）
@@ -57,6 +61,8 @@ public:
 	int m_cross_num;//CROSS数量
 
 	std::string result;//输出结果存储矩阵
+	int vexnum, edge;
+	std::vector<std::vector<int> > tmp;
 
 private:
 

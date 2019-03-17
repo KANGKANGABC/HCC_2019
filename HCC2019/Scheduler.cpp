@@ -295,7 +295,11 @@ void Scheduler::driveCar(Car car, int indexCar)
 					else//形成阻挡
 					{
 						if (carNext.status = FINESHED)
+						{
 							driverToNextRoad(car, idNextRoad, idNextLane, carNext.location - 1);//行驶到下个路口，前车之后
+							assert(carNext.location >= 1);
+						}
+
 						//如果前车处于等待状态，那么此车也不行驶，继续等待
 					}
 				}
@@ -328,7 +332,8 @@ void Scheduler::addCar(Car car)
 		int indexCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size();//该车为末尾
 		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.push_back(car);//将该车加入对应道路,对应车道,加入队尾
 		driveCar(car, indexCar);//car行驶 indexCar为-1，表示该车在lane中还没有位置
-		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1].starttime = time_Scheduler;
+		cars[car.id - 10000].starttime = time_Scheduler;
+		//roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1].starttime = time_Scheduler;
 		//记录实际出发时间
 
 	}
@@ -352,6 +357,13 @@ int Scheduler::isCanEnter(int idRoad, int idCross)
 	{
 		if (roads[idRoad - 5000].lane[j].laneCar.size() < roads[idRoad - 5000].length)
 		{
+			//这里有问题，车的数量可能小于车道长度，但是最后一辆车有可能堵在最后一位
+			if (roads[idRoad - 5000].lane[j].laneCar.size() > 0)
+			{
+				Car carNext = roads[idRoad - 5000].lane[j].laneCar[roads[idRoad - 5000].lane[j].laneCar.size() - 1];
+				if (carNext.location == 0)
+					return -1;
+			}
 			return j;//存在空位，可加入,返回车道id
 		}
 	}
@@ -443,6 +455,8 @@ int Scheduler::getCrossDistance(Car car, int idCurRoad, int idNextRoad)
 {
 	int disCurRoad = roads[car.idCurRoad - 5000].length - car.location;//当前道路可以行驶的距离
 	int disNextRoadMax = std::min(roads[idNextRoad - 5000].speed, car.speed);//下一道路可以行驶的最大距离
+	assert(disCurRoad >= 0);
+	assert(disNextRoadMax >= 0);
 	if (disCurRoad >= disNextRoadMax)
 		return 0;
 	else
@@ -557,7 +571,7 @@ void Scheduler::putAllCarStatus()
 	}
 }
 
-Car * Scheduler::getPath()
+void Scheduler::getPath()
 {
 	Graph_DG graph(vexnum, edge);
 	graph.createGraph(tmp);
@@ -573,5 +587,4 @@ Car * Scheduler::getPath()
 		}
 		cars[i].path = pathRoad;
 	}
-	return cars;
 }

@@ -18,6 +18,10 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 	inputCrossData = data_cross;
 	m_cross_num = cross_count - 1;//忽略第一行注释
 
+	vexnum = getCrossNum();
+	edge = getRoadNum();
+	tmp = getArc(); //得到邻接矩阵
+
 	//将邻接矩阵大小设置为36*36
 	graphRoad.resize(m_cross_num);
 	for (int i = 0; i < m_cross_num; ++i) {
@@ -206,5 +210,23 @@ void DataCenter::writeResult(char *filename)
 	}
 	const char *result_file = result.c_str();
 	write_result(result_file, filename);
+}
+
+void DataCenter::getPath()
+{
+	Graph_DG graph(vexnum, edge);
+	graph.createGraph(tmp);
+
+	for (int i = 0; i < m_car_num; ++i)
+	{
+		vector<int> pathCross = graph.Dijkstra(car[i].idCrossFrom, car[i].idCrossTo);
+		vector<int> pathRoad(pathCross.size() - 1);
+		for (int j = 0; j < pathRoad.size(); ++j)
+		{
+			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+			//assert(pathRoad[j] != 0);
+		}
+		car[i].path = pathRoad;
+	}
 }
 

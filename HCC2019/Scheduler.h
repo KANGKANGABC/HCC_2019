@@ -13,7 +13,7 @@ public:
 	~Scheduler();
 	int getSysTime();
 	//获得路径,为每辆车规划路径
-	Car * getPath();
+	void getPath();
 	int vexnum, edge;
 	std::vector<std::vector<int> > tmp;
 private:

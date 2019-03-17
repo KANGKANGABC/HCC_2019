@@ -44,41 +44,16 @@ int main(int argc, char *argv[])
 	dc.readCarData();
 	dc.readCrossData();
 
-	//测试dijkstra算法
-	int vexnum, edge;
-	std::vector<std::vector<int> > tmp = dc.getArc(); //得到邻接矩阵
-	vexnum = dc.getCrossNum();
-	edge = dc.getRoadNum();
-
-	Graph_DG graph(vexnum, edge);
-	graph.createGraph(tmp);
-	//graph.print();
-	//graph.Dijkstra(1);
-	vector<int> path = graph.Dijkstra(16, 34);
-	cout << "路径为";
-	for (int i = 0; i < path.size(); i++)
-		cout << path.at(i) << " ";
-
-	path = graph.Dijkstra(15, 35);
-	cout << "路径为";
-	for (int i = 0; i < path.size(); i++)
-		cout << path.at(i) << " ";
-
 	Scheduler sd(dc);
-	dc.car = sd.getPath();//获得车辆的路径信息
-	//int time = sd.getSysTime();
-	dc.writeResult(answer_file);
+	sd.getPath();//获得车辆的路径信息
+	int time = sd.getSysTime();
+	//dc.getPath();
+	//dc.writeResult(answer_file);
 
 
 	// TODO:read input filebuf
 	// TODO:process
 	// TODO:write output file
-
-
-
-	//graph.print_path(1);
-	//graph.print_path(1, 30);
-	//system("pause");
 
 	return 0;
 }
