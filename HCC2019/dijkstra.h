@@ -3,6 +3,7 @@
 #include<iostream>
 #include<string>
 #include<vector>
+#include "define.h"
 using namespace std;
 
 

@@ -15,6 +15,8 @@
 #define MAX_CAR_NUM    20000 //最大CAR条数
 #define MAX_CROSS_NUM    100 //最大CROSS条数
 
+#define INT_MAX 0x7fffffff
+
 #ifdef _DEBUG
 #define PRINT   printf
 #else

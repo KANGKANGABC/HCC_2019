@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 
 	//graph.print_path(1);
 	//graph.print_path(1, 30);
-	system("pause");
+	//system("pause");
 
 	return 0;
 }
