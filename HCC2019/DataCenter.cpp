@@ -20,7 +20,6 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 
 	vexnum = getCrossNum();
 	edge = getRoadNum();
-	tmp = getArc(); //得到邻接矩阵
 
 	//将邻接矩阵大小设置为36*36
 	graphRoad.resize(m_cross_num);
@@ -142,7 +141,7 @@ void DataCenter::readCarData()
 		car[i - 1].idCrossTo = carTask[i - 1][2];
 		car[i - 1].speed = carTask[i - 1][3];
 		car[i - 1].plantime = carTask[i - 1][4];
-		car[i - 1].starttime = carTask[i - 1][4] + i;//这里给自己挖了一个坑
+		car[i - 1].starttime = carTask[i - 1][4] + i%400;//这里给自己挖了一个坑
 		car[i - 1].status = SLEEPING;//车的初始状态为SLEEPING
 		car[i - 1].dirCross = NONE;//车的过路口状态为NONE
 
@@ -215,7 +214,7 @@ void DataCenter::writeResult(char *filename)
 void DataCenter::getPath()
 {
 	Graph_DG graph(vexnum, edge);
-	graph.createGraph(tmp);
+	graph.createGraph(graphRoad);
 
 	for (int i = 0; i < m_car_num; ++i)
 	{
