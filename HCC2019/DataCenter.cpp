@@ -124,7 +124,6 @@ void DataCenter::readRoadData()
 void DataCenter::readCarData()
 {
 	printf("readCarData\n");
-	vector<int> speedNum;
 	vector<int>::iterator flag;
 	// |   0     1    2     3       4        5           6         7   |
     // | 车辆ID 起点 终点 车辆速度 出发时间 当前道路ID 当前道路位置 当前状态|
@@ -145,16 +144,17 @@ void DataCenter::readCarData()
 		car[i - 1].idCrossFrom = carTask[i - 1][1];
 		car[i - 1].idCrossTo = carTask[i - 1][2];
 		car[i - 1].speed = carTask[i - 1][3];
-		flag = find(speedNum.begin(), speedNum.end(), car[i - 1].speed);
-		if (flag == speedNum.end())
-			speedNum.push_back(car[i - 1].speed);
+		flag = find(speedType.begin(), speedType.end(), car[i - 1].speed);
+		if (flag == speedType.end())
+			speedType.push_back(car[i - 1].speed);
 		car[i - 1].plantime = carTask[i - 1][4];
 		car[i - 1].starttime = carTask[i - 1][4] + i%1000;//这里给自己挖了一个坑
 		car[i - 1].status = SLEEPING;//车的初始状态为SLEEPING
 		car[i - 1].dirCross = NONE;//车的过路口状态为NONE
 
 	}
-	car_speed_num = speedNum.size();
+	sort(speedType.begin(), speedType.end());
+	car_speed_num = speedType.size();
 	printf("readCarData done!\n");
 }
 

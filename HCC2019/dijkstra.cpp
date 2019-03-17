@@ -29,14 +29,6 @@ Graph_DG::~Graph_DG() {
 	delete arc;
 }
 
-// 判断我们每次输入的的边的信息是否合法
-//顶点从1开始编号
-bool Graph_DG::check_edge_value(int start, int end, int weight) {
-	if (start<1 || end<1 || start>vexnum || end>vexnum || weight < 0) {
-		return false;
-	}
-	return true;
-}
 
 //创建图形，即建立邻接矩阵,需要手动输入
 void Graph_DG::createGraph(vector<std::vector<int> > graphRoad) {
@@ -52,6 +44,20 @@ void Graph_DG::createGraph(vector<std::vector<int> > graphRoad) {
 			}
 		}
 	}
+}
+
+
+//创建各种车速的邻接矩阵,输入参数（定点个数，车速种类数）
+void creatAllSpeedGraph(int vexnum, int car_speed_num, vector<int> speedType, vector<vector<int> > graphMaxSpeed) {
+	//初始化
+	vector<float>
+	
+	
+	for (int i = 0; i < vexnum; i++)
+		for (int j = 0; j < vexnum; j++)
+		{
+			graphMaxSpeed[i][j] = std::min(graphMaxSpeed[i][j], speed);
+		};
 }
 
 //打印邻接矩阵

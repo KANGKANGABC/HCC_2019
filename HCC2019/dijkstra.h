@@ -32,6 +32,7 @@ private:
 	int vexnum;		//图的顶点个数
 	int edge;		//图的边数
 	int **arc;		//邻接矩阵
+	vector<vector<float> > *speedarc;	//存放各车速在道路上对应的速度邻接矩阵
 	Dis *dis;		//记录各个顶点的最短路径信息
 	
 public:
@@ -39,9 +40,8 @@ public:
 	Graph_DG(int vexnum, int edge);
 	//析构函数
 	~Graph_DG();
-	// 判断我们每次输入的的边的信息是否合法
-	//顶点从1开始编号
-	bool check_edge_value(int start, int end, int weight);
+	//创建各种车速的邻接矩阵,输入参数（定点个数，车速种类数，道路的最大限速邻接矩阵）
+	void creatAllSpeedGraph(int vexnum, int car_speed_num, vector<int> speedType, vector<vector<int> > graphMaxSpeed);
 	//创建图
 	void createGraph(vector<std::vector<int> > graphRoad);
 	//打印邻接矩阵
