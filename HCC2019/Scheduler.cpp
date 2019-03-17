@@ -2,18 +2,18 @@
 
 Scheduler::Scheduler(DataCenter &dc)
 {
-	num_CarsScheduling = dc.m_car_num;//»ñµÃĞèÒªµ÷¶ÈµÄ³µÊıÁ¿
+	num_CarsScheduling = dc.m_car_num;//è·å¾—éœ€è¦è°ƒåº¦çš„è½¦æ•°é‡
 	num_Roads = dc.m_road_num;
 	num_Crosses = dc.m_cross_num;
 	num_Cars = dc.m_car_num;
 	roads = dc.road;
 	crosses = dc.cross;
 	cars = dc.car;
-	time_Scheduler = 0;//µ÷¶ÈÆ÷³õÊ¼Ê±¼äÉèÖÃÎª0
+	time_Scheduler = 0;//è°ƒåº¦å™¨åˆå§‹æ—¶é—´è®¾ç½®ä¸º0
 	vexnum = dc.getCrossNum();
 	edge = dc.getRoadNum();
-	tmp = dc.getArc(); //µÃµ½ÁÚ½Ó¾ØÕó
-	//½«graphC2R´óĞ¡ÉèÖÃÎª36*36
+	tmp = dc.getArc(); //å¾—åˆ°é‚»æ¥çŸ©é˜µ
+	//å°†graphC2Rå¤§å°è®¾ç½®ä¸º36*36
 	graphC2R = dc.graphC2R;
 
 }
@@ -27,67 +27,67 @@ int Scheduler::getSysTime()
 {
 	while (num_CarsScheduling > 0)
 	{
-		PRINT("***********time_Scheduler:%d************\n", time_Scheduler);//´òÓ¡ÏµÍ³Ê±¼ä
+		PRINT("***********time_Scheduler:%d************\n", time_Scheduler);//æ‰“å°ç³»ç»Ÿæ—¶é—´
 
-		/*µÚÒ»²½£ºÏÈ´¦ÀíËùÓĞµÀÂ·ÉÏµÄ³µÁ¾£¬½øĞĞ±éÀúÉ¨Ãè*/
+		/*ç¬¬ä¸€æ­¥ï¼šå…ˆå¤„ç†æ‰€æœ‰é“è·¯ä¸Šçš„è½¦è¾†ï¼Œè¿›è¡Œéå†æ‰«æ*/
 		driveAllCarsJustOnRoadToEndState();
 
-		/*µÚ¶ş²½£ºÏÈ´¦ÀíËùÓĞµÀÂ·ÉÏµÄ³µÁ¾£¬½øĞĞ±éÀúÉ¨Ãè*/
-		while (1)//ÖÕÖ¹Ìõ¼şÎª£ºÒ»¸öÑ­»·ºó£¬Ã»ÓĞÈÎºÎ³µ±»µ÷¶È
+		/*ç¬¬äºŒæ­¥ï¼šå…ˆå¤„ç†æ‰€æœ‰é“è·¯ä¸Šçš„è½¦è¾†ï¼Œè¿›è¡Œéå†æ‰«æ*/
+		while (1)//ç»ˆæ­¢æ¡ä»¶ä¸ºï¼šä¸€ä¸ªå¾ªç¯åï¼Œæ²¡æœ‰ä»»ä½•è½¦è¢«è°ƒåº¦
 		{
-			bool isWorkingCross = false;//±êÖ¾±äÁ¿£¬Èç¹ûÒ»¸öÑ­»·ºóÃ»ÓĞÈÎºÎÒ»Á¾³µ±»µ÷¶È£¬ÔòÍË³öÑ­»·
-			for (int i = 0; i < num_Crosses; ++i)////°´ÕÕÉıĞòµ÷¶ÈËùÓĞÂ·¿Ú
+			bool isWorkingCross = false;//æ ‡å¿—å˜é‡ï¼Œå¦‚æœä¸€ä¸ªå¾ªç¯åæ²¡æœ‰ä»»ä½•ä¸€è¾†è½¦è¢«è°ƒåº¦ï¼Œåˆ™é€€å‡ºå¾ªç¯
+			for (int i = 0; i < num_Crosses; ++i)////æŒ‰ç…§å‡åºè°ƒåº¦æ‰€æœ‰è·¯å£
 			{
-				int idCross = crosses[i].id;//»ñµÃÂ·¿ÚID
-				while (1)//Ñ­»·µ÷¶ÈÂ·¿ÚËÄ¸ö·½ÏòµÄ³µ£¬Ö±µ½È«²¿³µÁ¾Íê³Éµ÷¶È£¬»òÕß×èÈû
+				int idCross = crosses[i].id;//è·å¾—è·¯å£ID
+				while (1)//å¾ªç¯è°ƒåº¦è·¯å£å››ä¸ªæ–¹å‘çš„è½¦ï¼Œç›´åˆ°å…¨éƒ¨è½¦è¾†å®Œæˆè°ƒåº¦ï¼Œæˆ–è€…é˜»å¡
 				{
 					bool isWorkingRoad = false;
 					for (int j = 0; j < 4; ++j)
 					{
 						if (crosses[i].roadID[j] != -1)
 						{
-							int idRoad = crosses[i].roadID[j];//±»µ÷¶ÈµÄµÀÂ·id
-							int idStartLane = 0;//Èç¹ûcrossÎªµÀÂ·µÄ³ö·½Ïò£¬ĞèÒªµ÷¶È 0 1 2³µµÀ£¬·ñÔòµ÷¶È 3 4 5³µµÀ
-							if (roads[idRoad - 5000].idTo == crosses[i].id)//Èç¹ûcrossÎªµÀÂ·µÄ³ö·½Ïò
+							int idRoad = crosses[i].roadID[j];//è¢«è°ƒåº¦çš„é“è·¯id
+							int idStartLane = 0;//å¦‚æœcrossä¸ºé“è·¯çš„å‡ºæ–¹å‘ï¼Œéœ€è¦è°ƒåº¦ 0 1 2è½¦é“ï¼Œå¦åˆ™è°ƒåº¦ 3 4 5è½¦é“
+							if (roads[idRoad - 5000].idTo == crosses[i].id)//å¦‚æœcrossä¸ºé“è·¯çš„å‡ºæ–¹å‘
 								idStartLane = roads[idRoad - 5000].channel;
 							while (1)
 							{
 								bool isWorkingLane = false;
-								for (int m = idStartLane; m < idStartLane + roads[idRoad - 5000].channel; ++m)//±éÀúËùÓĞlane
+								for (int m = idStartLane; m < idStartLane + roads[idRoad - 5000].channel; ++m)//éå†æ‰€æœ‰lane
 								{
 									if (roads[idRoad - 5000].lane[m].laneCar.size() != 0)
 									{
 										Car car = roads[idRoad - 5000].lane[m].laneCar[0];
-										if (car.status == WAITTING)//Ö»´¦ÀíÔÚÂ·¿ÚÇÒÎªµÈ´ı×´Ì¬µÄ³µ
+										if (car.status == WAITTING)//åªå¤„ç†åœ¨è·¯å£ä¸”ä¸ºç­‰å¾…çŠ¶æ€çš„è½¦
 										{
-											assert(car.status == WAITTING);//³µÁ¾ÔÚÂ·¿Úµ÷¶ÈÊ±Ò»¶¨ÒªÊÇWAITTING×´Ì¬
+											assert(car.status == WAITTING);//è½¦è¾†åœ¨è·¯å£è°ƒåº¦æ—¶ä¸€å®šè¦æ˜¯WAITTINGçŠ¶æ€
 											int dirConflict = 0;
 											int dirTarget = 0;
 											switch (roads[idRoad - 5000].lane[m].laneCar[0].dirCross)
 											{
 											case NONE:
 												break;
-											case DD://Ö±ĞĞ>×ó×ª>ÓÒ×ª
-												dirTarget = j + 2;//Ä¿±ê·½Ïò
-												if (dirTarget > 3) dirTarget -= 4;//ĞŞÕı·½Ïò
+											case DD://ç›´è¡Œ>å·¦è½¬>å³è½¬
+												dirTarget = j + 2;//ç›®æ ‡æ–¹å‘
+												if (dirTarget > 3) dirTarget -= 4;//ä¿®æ­£æ–¹å‘
 												if (isCanDriveToNextRoad(car, dirTarget, idCross))
 												{
 													isWorkingCross = true;
 													isWorkingRoad = true;
 													isWorkingLane = true;
 												}
-												//ÅĞ¶Ï×ªÈëµÄroadÊÇ·ñ¿ÉÒÔĞĞÊ»
+												//åˆ¤æ–­è½¬å…¥çš„roadæ˜¯å¦å¯ä»¥è¡Œé©¶
 
 												break;
-											case LEFT://×ó×ª>ÓÒ×ª
-												//ÅĞ¶Ï¼´½«×ªÈëµÄ·½ÏòÊÇ·ñÓĞÖ±ĞĞ½øÈëµÄ³µÁ¾
-												dirConflict = j - 1;//³åÍ»·½Ïò
-												if (dirConflict < 0) dirConflict += 4;//ĞŞÕı·½Ïò
+											case LEFT://å·¦è½¬>å³è½¬
+												//åˆ¤æ–­å³å°†è½¬å…¥çš„æ–¹å‘æ˜¯å¦æœ‰ç›´è¡Œè¿›å…¥çš„è½¦è¾†
+												dirConflict = j - 1;//å†²çªæ–¹å‘
+												if (dirConflict < 0) dirConflict += 4;//ä¿®æ­£æ–¹å‘
 												if (!isBeDD(crosses[i].roadID[dirConflict], i))
 												{
-													dirTarget = j + 1;//Ä¿±ê·½Ïò
-													if (dirTarget > 3) dirTarget -= 4;//ĞŞÕı·½Ïò
-													if (isCanDriveToNextRoad(car, dirTarget, idCross))//ÅĞ¶Ï×ªÈëµÄroadÊÇ·ñ¿ÉÒÔĞĞÊ»
+													dirTarget = j + 1;//ç›®æ ‡æ–¹å‘
+													if (dirTarget > 3) dirTarget -= 4;//ä¿®æ­£æ–¹å‘
+													if (isCanDriveToNextRoad(car, dirTarget, idCross))//åˆ¤æ–­è½¬å…¥çš„roadæ˜¯å¦å¯ä»¥è¡Œé©¶
 													{
 														isWorkingCross = true;
 														isWorkingRoad = true;
@@ -95,20 +95,20 @@ int Scheduler::getSysTime()
 													}
 												}
 												break;
-											case RIGHT://ÓÒ×ªÓÅÏÈ¼¶×îµÍ
-												//ÅĞ¶Ï¼´½«×ªÈëµÄ·½ÏòÊÇ·ñÓĞÖ±ĞĞ½øÈëµÄ³µÁ¾
-												dirConflict = j + 1;//³åÍ»·½Ïò
-												if (dirConflict > 3) dirConflict -= 4;//ĞŞÕı·½Ïò
+											case RIGHT://å³è½¬ä¼˜å…ˆçº§æœ€ä½
+												//åˆ¤æ–­å³å°†è½¬å…¥çš„æ–¹å‘æ˜¯å¦æœ‰ç›´è¡Œè¿›å…¥çš„è½¦è¾†
+												dirConflict = j + 1;//å†²çªæ–¹å‘
+												if (dirConflict > 3) dirConflict -= 4;//ä¿®æ­£æ–¹å‘
 												if (!isBeDD(crosses[i].roadID[dirConflict], i))
 												{
-													dirConflict = j + 2;//³åÍ»·½Ïò
-													if (dirConflict > 3) dirConflict -= 4;//ĞŞÕı·½Ïò
-													//ÅĞ¶Ï¼´½«×ªÈëµÄ·½ÏòÊÇ·ñÓĞ×ó×ª½øÈëµÄ³µÁ¾
+													dirConflict = j + 2;//å†²çªæ–¹å‘
+													if (dirConflict > 3) dirConflict -= 4;//ä¿®æ­£æ–¹å‘
+													//åˆ¤æ–­å³å°†è½¬å…¥çš„æ–¹å‘æ˜¯å¦æœ‰å·¦è½¬è¿›å…¥çš„è½¦è¾†
 													if (!isBeLEFT(crosses[i].roadID[dirConflict], i))
 													{
-														dirTarget = j - 1;//Ä¿±ê·½Ïò
-														if (dirTarget < 0) dirTarget += 4;//ĞŞÕı·½Ïò
-														if (isCanDriveToNextRoad(car, dirTarget, idCross))//ÅĞ¶Ï×ªÈëµÄroadÊÇ·ñ¿ÉÒÔĞĞÊ»
+														dirTarget = j - 1;//ç›®æ ‡æ–¹å‘
+														if (dirTarget < 0) dirTarget += 4;//ä¿®æ­£æ–¹å‘
+														if (isCanDriveToNextRoad(car, dirTarget, idCross))//åˆ¤æ–­è½¬å…¥çš„roadæ˜¯å¦å¯ä»¥è¡Œé©¶
 														{
 															isWorkingCross = true;
 															isWorkingRoad = true;
@@ -127,7 +127,7 @@ int Scheduler::getSysTime()
 									break;
 								else
 								{
-									//Èç¹û¸Ã´Ëµ÷¶ÈÓĞ³µ³öÂ·¿Ú£¬ÄÇÃ´ÈÃ¸ÃRoadµÄËùÓĞlaneĞĞÊ»
+									//å¦‚æœè¯¥æ­¤è°ƒåº¦æœ‰è½¦å‡ºè·¯å£ï¼Œé‚£ä¹ˆè®©è¯¥Roadçš„æ‰€æœ‰laneè¡Œé©¶
 									driveAllCarsJustOnOneRoadToEndState(idRoad, idCross);
 								}
 							}
@@ -137,32 +137,32 @@ int Scheduler::getSysTime()
 						break;
 				}
 			}
-			if (!isWorkingCross)//Èç¹ûÒ»¸öÑ­»·ºóÃ»ÓĞÈÎºÎÒ»Á¾³µ±»µ÷¶È£¬ÔòÍË³öµ÷¶ÈÑ­»·
+			if (!isWorkingCross)//å¦‚æœä¸€ä¸ªå¾ªç¯åæ²¡æœ‰ä»»ä½•ä¸€è¾†è½¦è¢«è°ƒåº¦ï¼Œåˆ™é€€å‡ºè°ƒåº¦å¾ªç¯
 				break;
 		}
-		driverCarInGarage();//³µ¿âÖĞµÄÉÏÂ·ĞĞÊ»
-		putAllCarStatus();//Êä³öËùÓĞ³µµÄ×´Ì¬
-		time_Scheduler++;//¸üĞÂµ÷¶ÈÆ÷Ê±¼ä
+		driverCarInGarage();//è½¦åº“ä¸­çš„ä¸Šè·¯è¡Œé©¶
+		putAllCarStatus();//è¾“å‡ºæ‰€æœ‰è½¦çš„çŠ¶æ€
+		time_Scheduler++;//æ›´æ–°è°ƒåº¦å™¨æ—¶é—´
 	}
 	return time_Scheduler;
 }
 
 void Scheduler::driveAllCarsJustOnRoadToEndState()
 {
-	for (int i = 0; i < num_Roads; ++i)//°´µÀÂ·IDÉıĞò½øĞĞµ÷¶È
+	for (int i = 0; i < num_Roads; ++i)//æŒ‰é“è·¯IDå‡åºè¿›è¡Œè°ƒåº¦
 	{
 		for (int j = 0; j < roads[i].channel * (1 + roads[i].isDuplex); ++j)
 		{
 			Lane lane = roads[i].lane[j];
-			if (roads[i].lane[j].laneCar.size() != 0)//ÏÈÅĞ¶Ï¸Ã³µµÀÊÇ·ñÓĞ³µ
+			if (roads[i].lane[j].laneCar.size() != 0)//å…ˆåˆ¤æ–­è¯¥è½¦é“æ˜¯å¦æœ‰è½¦
 			{
 				for (int m = 0; m < roads[i].lane[j].laneCar.size(); ++m)
 				{
 					driveCar(roads[i].lane[j].laneCar[m], m);
-					//roads[i].lane[j] = lane;//ÕâÀïÒ»¶¨Òª½«laneĞ´»Ø£¬·ñÔò³µÁ¾µ÷¶ÈÎŞĞ§
-					//ÕâÀï²»ÒªĞ´»Ø£¬Ğ´»ØÈİÒ×Îó²Ù×÷£¬Ö»ĞèÒª±£Ö¤¸üĞÂcarµÄ×´Ì¬ÊÇÍ¨¹ıroad->lane->carµÄ·½Ê½Ë÷Òı¼´¿É
-					//´Ë´¦ÓĞÎÊÌâ£¬Èç¹ûÒ»¸ö³µµÀÓĞÁ½Á¾³µ£¬µ«ÊÇµÚÒ»Á¾³µ±»¿ªµ½ÏÂÒ»³µµÀ£¬Èç¹û³µµÀĞÅÏ¢Ã»ÓĞ¼°Ê±¸üĞÂ
-					//»á³öÏÖÎó²Ù×÷£¬Ë÷Òıµ½²¢²»´æÔÚµÄµÚ¶şÁ¾³µ
+					//roads[i].lane[j] = lane;//è¿™é‡Œä¸€å®šè¦å°†laneå†™å›ï¼Œå¦åˆ™è½¦è¾†è°ƒåº¦æ— æ•ˆ
+					//è¿™é‡Œä¸è¦å†™å›ï¼Œå†™å›å®¹æ˜“è¯¯æ“ä½œï¼Œåªéœ€è¦ä¿è¯æ›´æ–°carçš„çŠ¶æ€æ˜¯é€šè¿‡road->lane->carçš„æ–¹å¼ç´¢å¼•å³å¯
+					//æ­¤å¤„æœ‰é—®é¢˜ï¼Œå¦‚æœä¸€ä¸ªè½¦é“æœ‰ä¸¤è¾†è½¦ï¼Œä½†æ˜¯ç¬¬ä¸€è¾†è½¦è¢«å¼€åˆ°ä¸‹ä¸€è½¦é“ï¼Œå¦‚æœè½¦é“ä¿¡æ¯æ²¡æœ‰åŠæ—¶æ›´æ–°
+					//ä¼šå‡ºç°è¯¯æ“ä½œï¼Œç´¢å¼•åˆ°å¹¶ä¸å­˜åœ¨çš„ç¬¬äºŒè¾†è½¦
 					
 				}
 			}
@@ -173,214 +173,214 @@ void Scheduler::driveAllCarsJustOnRoadToEndState()
 
 void Scheduler::driveCar(Car car, int indexCar)
 {
-	//ÕâÀï¼ÙÉèAA£ºÈç¹ûÄ³Á¾³µ´ÓÂ·¿ÚÊ»ÈëÏÂÒ»µÀÂ·£¬²»¿ÉÄÜÔÚÒ»¸öÊ±¼äÆ¬ÄÚÊ»ÍêÏÂÒ»µÀÂ·È«³Ì
-	//Ò²¾ÍÊÇËµÖ»ÓĞ´¦ÓÚNONE×´Ì¬WAITTINGµÄ³µ²ÅÓĞ¿ÉÄÜ¼´½«µ½´ïÖÕµã
-	if (car.dirCross == NONE)//¸Ã³µ²»ÊÇÔÚÂ·¿ÚµÈ´ı
+	//è¿™é‡Œå‡è®¾AAï¼šå¦‚æœæŸè¾†è½¦ä»è·¯å£é©¶å…¥ä¸‹ä¸€é“è·¯ï¼Œä¸å¯èƒ½åœ¨ä¸€ä¸ªæ—¶é—´ç‰‡å†…é©¶å®Œä¸‹ä¸€é“è·¯å…¨ç¨‹
+	//ä¹Ÿå°±æ˜¯è¯´åªæœ‰å¤„äºNONEçŠ¶æ€WAITTINGçš„è½¦æ‰æœ‰å¯èƒ½å³å°†åˆ°è¾¾ç»ˆç‚¹
+	if (car.getDirCross() == NONE)//è¯¥è½¦ä¸æ˜¯åœ¨è·¯å£ç­‰å¾…
 	{
-		assert(indexCar != -1);//´ËÇé¿öÏÂindexCar²»ÄÜÎª-1
-		assert(roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size()!=0);//¶ÏÑÔ¸Ã³µµÀÉÏÖÁÉÙÓĞ×Ô¼ºÒ»Á¾³µ
-		assert(indexCar < roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size());//¶ÏÑÔ³µµÄĞòºÅĞ¡ÓÚ³µµÀÉÏ³µÊıÁ¿
-		if (indexCar == 0 || roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size()== 1)//¸Ã³µÎª¸Ã³µµÀµÄµÚÒ»Á¾³µ£¬ÇÒÉÏ¸öÊ±¼äÆ¬²»×¼±¸Í¨¹ıÂ·¿Ú
+		assert(indexCar != -1);//æ­¤æƒ…å†µä¸‹indexCarä¸èƒ½ä¸º-1
+		assert(roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size()!=0);//æ–­è¨€è¯¥è½¦é“ä¸Šè‡³å°‘æœ‰è‡ªå·±ä¸€è¾†è½¦
+		assert(indexCar < roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size());//æ–­è¨€è½¦çš„åºå·å°äºè½¦é“ä¸Šè½¦æ•°é‡
+		if (indexCar == 0 || roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size()== 1)//è¯¥è½¦ä¸ºè¯¥è½¦é“çš„ç¬¬ä¸€è¾†è½¦ï¼Œä¸”ä¸Šä¸ªæ—¶é—´ç‰‡ä¸å‡†å¤‡é€šè¿‡è·¯å£
 		{
-			//ÅĞ¶Ï´Ë³µ»á²»»áÍ¨¹ıÂ·¿Ú
-			if (car.location + std::min(roads[car.idCurRoad - 5000].speed, car.speed) <= roads[car.idCurRoad - 5000].length)//²»»áÊ»³öÂ·¿Ú
+			//åˆ¤æ–­æ­¤è½¦ä¼šä¸ä¼šé€šè¿‡è·¯å£
+			if (car.location + std::min(roads[car.idCurRoad - 5000].speed, car.speed) <= roads[car.idCurRoad - 5000].length)//ä¸ä¼šé©¶å‡ºè·¯å£
 			{
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location += std::min(roads[car.idCurRoad - 5000].speed, car.speed);//³µÕı³£ĞĞÊ»
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//³µ±ê¼ÇÎªÖÕÖ¹×´Ì¬
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location += std::min(roads[car.idCurRoad - 5000].speed, car.speed);//è½¦æ­£å¸¸è¡Œé©¶
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//è½¦æ ‡è®°ä¸ºç»ˆæ­¢çŠ¶æ€
 			}
 			else
 			{
-				//´Ë³µÒ²½«ĞĞÊ»³öÂ·¿Ú£¬ĞèÒªÅĞ¶Ï´Ë³µÔÚÂ·¿ÚµÄ·½Ïò
-				//ÅĞ¶Ï³µµÄ·½Ïò
+				//æ­¤è½¦ä¹Ÿå°†è¡Œé©¶å‡ºè·¯å£ï¼Œéœ€è¦åˆ¤æ–­æ­¤è½¦åœ¨è·¯å£çš„æ–¹å‘
+				//åˆ¤æ–­è½¦çš„æ–¹å‘
 				int idNextCross = 0;
-				if(car.idCurLane >= roads[car.idCurRoad - 5000].channel)//ÄæÏò
-					idNextCross = roads[car.idCurRoad - 5000].idFrom;//´Ë³µ¼´½«Ê»ÈëµÄÂ·¿Ú
+				if(car.idCurLane >= roads[car.idCurRoad - 5000].channel)//é€†å‘
+					idNextCross = roads[car.idCurRoad - 5000].idFrom;//æ­¤è½¦å³å°†é©¶å…¥çš„è·¯å£
 				else
-					idNextCross = roads[car.idCurRoad - 5000].idTo;//´Ë³µ¼´½«Ê»ÈëµÄÂ·¿Ú
-				//¸ù¾İ¼ÙÉèAA£¬´ËÊ±¿ÉÄÜÓĞ³µÁ¾Ê»ÈëÖÕµã
-				if (idNextCross == car.idCrossTo)//Èç¹û´Ë³µ½«ÒªÊ»³ö³ö¿Ú
+					idNextCross = roads[car.idCurRoad - 5000].idTo;//æ­¤è½¦å³å°†é©¶å…¥çš„è·¯å£
+				//æ ¹æ®å‡è®¾AAï¼Œæ­¤æ—¶å¯èƒ½æœ‰è½¦è¾†é©¶å…¥ç»ˆç‚¹
+				if (idNextCross == car.idCrossTo)//å¦‚æœæ­¤è½¦å°†è¦é©¶å‡ºå‡ºå£
 				{
-					num_CarsScheduling -= 1;//ÕıÔÚµ÷¶ÈµÄ³µÁ¾Êı¼õÒ»
+					num_CarsScheduling -= 1;//æ­£åœ¨è°ƒåº¦çš„è½¦è¾†æ•°å‡ä¸€
 					std::vector<Car>::iterator it = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.begin();
-					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.erase(it);//É¾³ı¸ÃµÀÂ·µÚÒ»Á¾³µ
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.erase(it);//åˆ é™¤è¯¥é“è·¯ç¬¬ä¸€è¾†è½¦
 				}
 				else
 				{
-					int idNextRoad = car.path[0];//´Ë³µ¼´½«Ê»ÈëµÄµÀÂ·
-					int idCurRoad = car.idCurRoad;//´Ë³µµ±Ç°µÀÂ·
-					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = getCrossDir(idCurRoad, idNextRoad, idNextCross);//ÉèÖÃÂ·¿Ú·½Ïò
-					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;//´Ë³µ±äÎªµÈ´ı×´Ì¬
+					int idNextRoad = car.path[0];//æ­¤è½¦å³å°†é©¶å…¥çš„é“è·¯
+					int idCurRoad = car.idCurRoad;//æ­¤è½¦å½“å‰é“è·¯
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = getCrossDir(idCurRoad, idNextRoad, idNextCross);//è®¾ç½®è·¯å£æ–¹å‘
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;//æ­¤è½¦å˜ä¸ºç­‰å¾…çŠ¶æ€
 				}
 			}
 		}
-		else//¸Ã³µÇ°ÃæÓĞ³µ
+		else//è¯¥è½¦å‰é¢æœ‰è½¦
 		{
 			Car carNext = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1];
 			if (car.location + std::min(roads[car.idCurRoad - 5000].speed, car.speed) < carNext.location)
-			{//Ç°ÃæµÄ³µ²»ĞÎ³É×èµ²
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location += std::min(roads[car.idCurRoad - 5000].speed, car.speed);//³µÕı³£ĞĞÊ»
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//³µ±ê¼ÇÎªÖÕÖ¹×´Ì¬
+			{//å‰é¢çš„è½¦ä¸å½¢æˆé˜»æŒ¡
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location += std::min(roads[car.idCurRoad - 5000].speed, car.speed);//è½¦æ­£å¸¸è¡Œé©¶
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//è½¦æ ‡è®°ä¸ºç»ˆæ­¢çŠ¶æ€
 			}
 			else
-			{//Ç°ÃæµÄ³µĞÎ³É×èµ²
-				//ÅĞ¶Ï´Ë³µ»á²»»áÍ¨¹ıÂ·¿Ú
-				if (car.location + std::min(roads[car.idCurRoad - 5000].speed, car.speed) <= roads[car.idCurRoad - 5000].length)//²»»áÊ»³öÂ·¿Ú
+			{//å‰é¢çš„è½¦å½¢æˆé˜»æŒ¡
+				//åˆ¤æ–­æ­¤è½¦ä¼šä¸ä¼šé€šè¿‡è·¯å£
+				if (car.location + std::min(roads[car.idCurRoad - 5000].speed, car.speed) <= roads[car.idCurRoad - 5000].length)//ä¸ä¼šé©¶å‡ºè·¯å£
 				{
-					if (carNext.status == FINESHED)
+					if (carNext.getStatus() == FINESHED)
 					{
-						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1].location - 1;//ĞĞÊ»µ½Ç°³µµÄºóÒ»¸öÎ»ÖÃ
-						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//³µ±ê¼ÇÎªÖÕÖ¹×´Ì¬
+						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1].location - 1;//è¡Œé©¶åˆ°å‰è½¦çš„åä¸€ä¸ªä½ç½®
+						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//è½¦æ ‡è®°ä¸ºç»ˆæ­¢çŠ¶æ€
 					}
 					else
 					{
-						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;//³µ±ê¼ÇÎªWAITTING
+						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;//è½¦æ ‡è®°ä¸ºWAITTING
 					}
 				}
 				else
 				{
-					//´Ë³µÒ²½«ĞĞÊ»³öÂ·¿Ú,ÄÇÃ´ÅĞ¶Ï´Ë³µÔÚÂ·¿ÚµÄ·½Ïò
+					//æ­¤è½¦ä¹Ÿå°†è¡Œé©¶å‡ºè·¯å£,é‚£ä¹ˆåˆ¤æ–­æ­¤è½¦åœ¨è·¯å£çš„æ–¹å‘
 					int idNextCross = 0;
-					if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//ÄæÏò
-						idNextCross = roads[car.idCurRoad - 5000].idFrom;//´Ë³µ¼´½«Ê»ÈëµÄÂ·¿Ú
+					if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//é€†å‘
+						idNextCross = roads[car.idCurRoad - 5000].idFrom;//æ­¤è½¦å³å°†é©¶å…¥çš„è·¯å£
 					else
-						idNextCross = roads[car.idCurRoad - 5000].idTo;//´Ë³µ¼´½«Ê»ÈëµÄÂ·¿Ú
-					//¸ù¾İ¼ÙÉèAA£¬´ËÊ±¿ÉÄÜÓĞ³µÁ¾Ê»ÈëÖÕµã
-					if (idNextCross == car.idCrossTo)//Èç¹û´Ë³µ½«ÒªÊ»³ö³ö¿Ú
+						idNextCross = roads[car.idCurRoad - 5000].idTo;//æ­¤è½¦å³å°†é©¶å…¥çš„è·¯å£
+					//æ ¹æ®å‡è®¾AAï¼Œæ­¤æ—¶å¯èƒ½æœ‰è½¦è¾†é©¶å…¥ç»ˆç‚¹
+					if (idNextCross == car.idCrossTo)//å¦‚æœæ­¤è½¦å°†è¦é©¶å‡ºå‡ºå£
 					{
-						num_CarsScheduling -= 1;//ÕıÔÚµ÷¶ÈµÄ³µÁ¾Êı¼õÒ»
+						num_CarsScheduling -= 1;//æ­£åœ¨è°ƒåº¦çš„è½¦è¾†æ•°å‡ä¸€
 						std::vector<Car>::iterator it = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.begin();
-						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.erase(it);//É¾³ı¸ÃµÀÂ·µÚÒ»Á¾³µ
+						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.erase(it);//åˆ é™¤è¯¥é“è·¯ç¬¬ä¸€è¾†è½¦
 					}
 					else
 					{
-						int idNextRoad = car.path[0];//´Ë³µ¼´½«Ê»ÈëµÄµÀÂ·
-						int idCurRoad = car.idCurRoad;//´Ë³µµ±Ç°µÀÂ·
-						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = getCrossDir(idCurRoad, idNextRoad, idNextCross);//ÉèÖÃÂ·¿Ú·½Ïò
-						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;//´Ë³µ±äÎªµÈ´ı×´Ì¬
+						int idNextRoad = car.path[0];//æ­¤è½¦å³å°†é©¶å…¥çš„é“è·¯
+						int idCurRoad = car.idCurRoad;//æ­¤è½¦å½“å‰é“è·¯
+						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = getCrossDir(idCurRoad, idNextRoad, idNextCross);//è®¾ç½®è·¯å£æ–¹å‘
+						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;//æ­¤è½¦å˜ä¸ºç­‰å¾…çŠ¶æ€
 					}
 				}
 			}
 		}
 	}
-	else//¸Ã³µ×¼±¸Ê»³öÂ·¿Ú
+	else//è¯¥è½¦å‡†å¤‡é©¶å‡ºè·¯å£
 	{
 		int idNextCross = 0;
-		if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//ÄæÏò
-			idNextCross = roads[car.idCurRoad - 5000].idFrom;//´Ë³µ¼´½«Ê»ÈëµÄÂ·¿Ú
+		if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//é€†å‘
+			idNextCross = roads[car.idCurRoad - 5000].idFrom;//æ­¤è½¦å³å°†é©¶å…¥çš„è·¯å£
 		else
-			idNextCross = roads[car.idCurRoad - 5000].idTo;//´Ë³µ¼´½«Ê»ÈëµÄÂ·¿Ú
+			idNextCross = roads[car.idCurRoad - 5000].idTo;//æ­¤è½¦å³å°†é©¶å…¥çš„è·¯å£
 		if (idNextCross == car.idCrossTo)
 			PRINT("DONE!");
-		int idNextRoad = car.path[0];//»ñÈ¡Ä¿±êµÀÂ·
+		int idNextRoad = car.path[0];//è·å–ç›®æ ‡é“è·¯
 		int idNextLane = isCanEnter(idNextRoad, idNextCross);
-		if (idNextLane != -1)//Èç¹û¸ÃµÀÂ·¿É¼ÓÈë³µ
+		if (idNextLane != -1)//å¦‚æœè¯¥é“è·¯å¯åŠ å…¥è½¦
 		{
 			int disNextRoad = getCrossDistance(car, car.idCurRoad, idNextRoad);
-			if (disNextRoad == 0)//¿ÉĞĞÊ»¾àÀëÎª0£¬ÔòÍ£ÔÚµ±Ç°Â·¿Ú
+			if (disNextRoad == 0)//å¯è¡Œé©¶è·ç¦»ä¸º0ï¼Œåˆ™åœåœ¨å½“å‰è·¯å£
 			{
-				//´ËÊ±±È½ÏÌØÊâ£¬ÒòÎªÃ»ÓĞ·¢ÉúRoad±ä»¯£¬ËùÒÔcarÒÀÈ»ÔÚµ±Ç°lane£¬µ«ÊÇÆälocationĞèÒª¸üĞÂ
+				//æ­¤æ—¶æ¯”è¾ƒç‰¹æ®Šï¼Œå› ä¸ºæ²¡æœ‰å‘ç”ŸRoadå˜åŒ–ï¼Œæ‰€ä»¥carä¾ç„¶åœ¨å½“å‰laneï¼Œä½†æ˜¯å…¶locationéœ€è¦æ›´æ–°
 				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = roads[car.idCurRoad - 5000].length;
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//¸Ã³µµ÷¶ÈÍê³É£¬µÈ´ıÏÂÒ»Ê±¼äÆ¬ÔÙĞĞÊ»
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//è¯¥è½¦è°ƒåº¦å®Œæˆï¼Œç­‰å¾…ä¸‹ä¸€æ—¶é—´ç‰‡å†è¡Œé©¶
 			}
 			else
 			{
-				if (roads[idNextRoad-5000].lane[idNextLane].laneCar.size() != 0)//Èç¹û¸Ã³µµÀÓĞ³µ
+				if (roads[idNextRoad-5000].lane[idNextLane].laneCar.size() != 0)//å¦‚æœè¯¥è½¦é“æœ‰è½¦
 				{
-					//ÅĞ¶Ï¶ÔÓ¦³µµÀ³µµÄÎ»ÖÃ
+					//åˆ¤æ–­å¯¹åº”è½¦é“è½¦çš„ä½ç½®
 					Car carNext = roads[idNextRoad - 5000].lane[idNextLane].laneCar[roads[idNextRoad - 5000].lane[idNextLane].laneCar.size() - 1];
-					if (disNextRoad < carNext.location)//²»ĞÎ³É×èµ²
+					if (disNextRoad < carNext.location)//ä¸å½¢æˆé˜»æŒ¡
 					{
-						driverToNextRoad(car, idNextRoad, idNextLane, disNextRoad);//ĞĞÊ»µ½ÏÂ¸öÂ·¿Ú
+						driverToNextRoad(car, idNextRoad, idNextLane, disNextRoad);//è¡Œé©¶åˆ°ä¸‹ä¸ªè·¯å£
 					}
-					else//ĞÎ³É×èµ²
+					else//å½¢æˆé˜»æŒ¡
 					{
 						if (carNext.status = FINESHED)
 						{
-							driverToNextRoad(car, idNextRoad, idNextLane, carNext.location - 1);//ĞĞÊ»µ½ÏÂ¸öÂ·¿Ú£¬Ç°³µÖ®ºó
+							driverToNextRoad(car, idNextRoad, idNextLane, carNext.location - 1);//è¡Œé©¶åˆ°ä¸‹ä¸ªè·¯å£ï¼Œå‰è½¦ä¹‹å
 							assert(carNext.location >= 1);
 						}
 
-						//Èç¹ûÇ°³µ´¦ÓÚµÈ´ı×´Ì¬£¬ÄÇÃ´´Ë³µÒ²²»ĞĞÊ»£¬¼ÌĞøµÈ´ı
+						//å¦‚æœå‰è½¦å¤„äºç­‰å¾…çŠ¶æ€ï¼Œé‚£ä¹ˆæ­¤è½¦ä¹Ÿä¸è¡Œé©¶ï¼Œç»§ç»­ç­‰å¾…
 					}
 				}
-				else//Èç¹û¸Ã³µµÀÃ»ÓĞ×èµ²
+				else//å¦‚æœè¯¥è½¦é“æ²¡æœ‰é˜»æŒ¡
 				{
 					int disNextRoad = getCrossDistance(car, car.idCurRoad, idNextRoad);
-					driverToNextRoad(car, idNextRoad, idNextLane, disNextRoad);//ĞĞÊ»µ½ÏÂ¸öÂ·¿Ú
+					driverToNextRoad(car, idNextRoad, idNextLane, disNextRoad);//è¡Œé©¶åˆ°ä¸‹ä¸ªè·¯å£
 				}
 			}
 		}
-		//Èç¹ûÄ¿±ê³µµÀÎŞ·¨Ê»Èë£¬±£³ÖWAITTING×´Ì¬
+		//å¦‚æœç›®æ ‡è½¦é“æ— æ³•é©¶å…¥ï¼Œä¿æŒWAITTINGçŠ¶æ€
 	}
 }
 
 void Scheduler::addCar(Car car)
 {
-	assert(car.status == SLEEPING);//Ö»ÓĞSLEEPING×´Ì¬µÄ³µ¿ÉÒÔ¼ÓÈëµØÍ¼ĞĞÊ»
-	int idRoadTarget = car.path[0];//»ñÈ¡Ä¿±êµÀÂ·
-	int idCrossTarget = car.idCrossFrom;//»ñµÃ¸Ã³µ³ö·¢Â·¿Ú
+	assert(car.status == SLEEPING);//åªæœ‰SLEEPINGçŠ¶æ€çš„è½¦å¯ä»¥åŠ å…¥åœ°å›¾è¡Œé©¶
+	int idRoadTarget = car.path[0];//è·å–ç›®æ ‡é“è·¯
+	int idCrossTarget = car.idCrossFrom;//è·å¾—è¯¥è½¦å‡ºå‘è·¯å£
 	int idLaneTarget = isCanEnter(idRoadTarget, idCrossTarget);
-	if (idLaneTarget != -1)//Èç¹û¸ÃµÀÂ·¿É¼ÓÈë³µ
+	if (idLaneTarget != -1)//å¦‚æœè¯¥é“è·¯å¯åŠ å…¥è½¦
 	{
-		car.status = WAITTING;//ÇĞ»»carµÄ×´Ì¬
+		car.status = WAITTING;//åˆ‡æ¢carçš„çŠ¶æ€
 		car.idCurRoad = idRoadTarget;
 		car.idCurLane = idLaneTarget;
 		car.location = 0;
 		car.dirCross = NONE;
 		std::vector<int>::iterator itPath = car.path.begin();
-		car.path.erase(itPath);//ÒÑ¾­Ê»ÏòÏÂÒ»¸öÂ·¿Ú£¬ËùÒÔÉ¾³ıpathÖĞµÚÒ»Ïî
-		int indexCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size();//¸Ã³µÎªÄ©Î²
-		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.push_back(car);//½«¸Ã³µ¼ÓÈë¶ÔÓ¦µÀÂ·,¶ÔÓ¦³µµÀ,¼ÓÈë¶ÓÎ²
-		driveCar(car, indexCar);//carĞĞÊ» indexCarÎª-1£¬±íÊ¾¸Ã³µÔÚlaneÖĞ»¹Ã»ÓĞÎ»ÖÃ
+		car.path.erase(itPath);//å·²ç»é©¶å‘ä¸‹ä¸€ä¸ªè·¯å£ï¼Œæ‰€ä»¥åˆ é™¤pathä¸­ç¬¬ä¸€é¡¹
+		int indexCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size();//è¯¥è½¦ä¸ºæœ«å°¾
+		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.push_back(car);//å°†è¯¥è½¦åŠ å…¥å¯¹åº”é“è·¯,å¯¹åº”è½¦é“,åŠ å…¥é˜Ÿå°¾
+		driveCar(car, indexCar);//carè¡Œé©¶ indexCarä¸º-1ï¼Œè¡¨ç¤ºè¯¥è½¦åœ¨laneä¸­è¿˜æ²¡æœ‰ä½ç½®
 		cars[car.id - 10000].starttime = time_Scheduler;
 		//roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1].starttime = time_Scheduler;
-		//¼ÇÂ¼Êµ¼Ê³ö·¢Ê±¼ä
+		//è®°å½•å®é™…å‡ºå‘æ—¶é—´
 
 	}
 }
 
 int Scheduler::isCanEnter(int idRoad, int idCross)
 {
-	// ¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª
+	// â€”â€”â€”â€”â€”â€”â€”â€”
 	//     3
-	//  <¡ª ¡ª ¡ª ¡ª
+	//  <â€” â€” â€” â€”
 	//     2
-	//¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª
+	//â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
 	//     0
-	//  ¡ª ¡ª ¡ª ¡ª>
+	//  â€” â€” â€” â€”>
 	//     1
-	//¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª
-	int idStartLane = 0;//Èç¹ûcrossÎªµÀÂ·µÄÈë·½Ïò£¬ĞèÒªµ÷¶È 0 1 2³µµÀ£¬·ñÔòµ÷¶È 3 4 5³µµÀ
-	if (roads[idRoad - 5000].idTo == crosses[idCross-1].id)//Èç¹ûcrossÎªµÀÂ·µÄÈë·½Ïò
+	//â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
+	int idStartLane = 0;//å¦‚æœcrossä¸ºé“è·¯çš„å…¥æ–¹å‘ï¼Œéœ€è¦è°ƒåº¦ 0 1 2è½¦é“ï¼Œå¦åˆ™è°ƒåº¦ 3 4 5è½¦é“
+	if (roads[idRoad - 5000].idTo == crosses[idCross-1].id)//å¦‚æœcrossä¸ºé“è·¯çš„å…¥æ–¹å‘
 		idStartLane = roads[idRoad - 5000].channel;
-	for (int j = idStartLane; j < idStartLane + roads[idRoad - 5000].channel; ++j)//±éÀúËùÓĞlane
+	for (int j = idStartLane; j < idStartLane + roads[idRoad - 5000].channel; ++j)//éå†æ‰€æœ‰lane
 	{
 		if (roads[idRoad - 5000].lane[j].laneCar.size() < roads[idRoad - 5000].length)
 		{
-			//ÕâÀïÓĞÎÊÌâ£¬³µµÄÊıÁ¿¿ÉÄÜĞ¡ÓÚ³µµÀ³¤¶È£¬µ«ÊÇ×îºóÒ»Á¾³µÓĞ¿ÉÄÜ¶ÂÔÚ×îºóÒ»Î»
+			//è¿™é‡Œæœ‰é—®é¢˜ï¼Œè½¦çš„æ•°é‡å¯èƒ½å°äºè½¦é“é•¿åº¦ï¼Œä½†æ˜¯æœ€åä¸€è¾†è½¦æœ‰å¯èƒ½å µåœ¨æœ€åä¸€ä½
 			if (roads[idRoad - 5000].lane[j].laneCar.size() > 0)
 			{
 				Car carNext = roads[idRoad - 5000].lane[j].laneCar[roads[idRoad - 5000].lane[j].laneCar.size() - 1];
 				if (carNext.location == 0)
 					return -1;
 			}
-			return j;//´æÔÚ¿ÕÎ»£¬¿É¼ÓÈë,·µ»Ø³µµÀid
+			return j;//å­˜åœ¨ç©ºä½ï¼Œå¯åŠ å…¥,è¿”å›è½¦é“id
 		}
 	}
-	return -1;//²»´æÔÚ¿ÕÎ»
+	return -1;//ä¸å­˜åœ¨ç©ºä½
 }
 
 bool Scheduler::isBeDD(int idRoad, int idCross)
 {
-	int idStartLane = 0;//Èç¹ûcrossÎªµÀÂ·µÄ³ö·½Ïò£¬ĞèÒªµ÷¶È 0 1 2³µµÀ£¬·ñÔòµ÷¶È 3 4 5³µµÀ
-	if (roads[idRoad - 5000].idTo == crosses[idCross-1].id)//Èç¹ûcrossÎªµÀÂ·µÄ³ö·½Ïò
+	int idStartLane = 0;//å¦‚æœcrossä¸ºé“è·¯çš„å‡ºæ–¹å‘ï¼Œéœ€è¦è°ƒåº¦ 0 1 2è½¦é“ï¼Œå¦åˆ™è°ƒåº¦ 3 4 5è½¦é“
+	if (roads[idRoad - 5000].idTo == crosses[idCross-1].id)//å¦‚æœcrossä¸ºé“è·¯çš„å‡ºæ–¹å‘
 		idStartLane = roads[idRoad - 5000].channel;
-	for (int j = idStartLane; j < idStartLane + roads[idRoad - 5000].channel; ++j)//±éÀúËùÓĞlane
+	for (int j = idStartLane; j < idStartLane + roads[idRoad - 5000].channel; ++j)//éå†æ‰€æœ‰lane
 	{
 		if (roads[idRoad - 5000].lane[j].laneCar.size() != 0)
 		{
 			if (roads[idRoad - 5000].lane[j].laneCar[0].dirCross == DD)
-				return true;//´æÔÚÖ±ĞĞ³µÁ¾
+				return true;//å­˜åœ¨ç›´è¡Œè½¦è¾†
 		}
 	}
 	return false;
@@ -388,15 +388,15 @@ bool Scheduler::isBeDD(int idRoad, int idCross)
 
 bool Scheduler::isBeLEFT(int idRoad, int idCross)
 {
-	int idStartLane = 0;//Èç¹ûcrossÎªµÀÂ·µÄ³ö·½Ïò£¬ĞèÒªµ÷¶È 0 1 2³µµÀ£¬·ñÔòµ÷¶È 3 4 5³µµÀ
-	if (roads[idRoad - 5000].idTo == crosses[idCross-1].id)//Èç¹ûcrossÎªµÀÂ·µÄ³ö·½Ïò
+	int idStartLane = 0;//å¦‚æœcrossä¸ºé“è·¯çš„å‡ºæ–¹å‘ï¼Œéœ€è¦è°ƒåº¦ 0 1 2è½¦é“ï¼Œå¦åˆ™è°ƒåº¦ 3 4 5è½¦é“
+	if (roads[idRoad - 5000].idTo == crosses[idCross-1].id)//å¦‚æœcrossä¸ºé“è·¯çš„å‡ºæ–¹å‘
 		idStartLane = roads[idRoad - 5000].channel;
-	for (int j = idStartLane; j < idStartLane + roads[idRoad - 5000].channel; ++j)//±éÀúËùÓĞlane
+	for (int j = idStartLane; j < idStartLane + roads[idRoad - 5000].channel; ++j)//éå†æ‰€æœ‰lane
 	{
 		if (roads[idRoad - 5000].lane[j].laneCar.size() != 0)
 		{
 			if (roads[idRoad - 5000].lane[j].laneCar[0].dirCross == LEFT)
-				return true;//´æÔÚ×ó×ª³µÁ¾
+				return true;//å­˜åœ¨å·¦è½¬è½¦è¾†
 		}
 	}
 	return false;
@@ -404,8 +404,8 @@ bool Scheduler::isBeLEFT(int idRoad, int idCross)
 
 int Scheduler::getCrossDir(int idCurRoad, int idNextRoad, int idNextCross)
 {
-	int dirCurRoad = 0;//µ±Ç°µÀÂ·ÔÚÂ·¿ÚµÄ·½Ïò
-	int dirNextRoad = 0;//¼´½«Ê»ÈëµÀÂ·ÔÚÂ·¿ÚµÄ·½Ïò
+	int dirCurRoad = 0;//å½“å‰é“è·¯åœ¨è·¯å£çš„æ–¹å‘
+	int dirNextRoad = 0;//å³å°†é©¶å…¥é“è·¯åœ¨è·¯å£çš„æ–¹å‘
 	if (crosses[idNextCross - 1].roadID_T == idCurRoad)
 		dirCurRoad = 0;
 	else if (crosses[idNextCross - 1].roadID_R == idCurRoad)
@@ -453,8 +453,8 @@ int Scheduler::getCrossDir(int idCurRoad, int idNextRoad, int idNextCross)
 
 int Scheduler::getCrossDistance(Car car, int idCurRoad, int idNextRoad)
 {
-	int disCurRoad = roads[car.idCurRoad - 5000].length - car.location;//µ±Ç°µÀÂ·¿ÉÒÔĞĞÊ»µÄ¾àÀë
-	int disNextRoadMax = std::min(roads[idNextRoad - 5000].speed, car.speed);//ÏÂÒ»µÀÂ·¿ÉÒÔĞĞÊ»µÄ×î´ó¾àÀë
+	int disCurRoad = roads[car.idCurRoad - 5000].length - car.location;//å½“å‰é“è·¯å¯ä»¥è¡Œé©¶çš„è·ç¦»
+	int disNextRoadMax = std::min(roads[idNextRoad - 5000].speed, car.speed);//ä¸‹ä¸€é“è·¯å¯ä»¥è¡Œé©¶çš„æœ€å¤§è·ç¦»
 	assert(disCurRoad >= 0);
 	assert(disNextRoadMax >= 0);
 	if (disCurRoad >= disNextRoadMax)
@@ -466,20 +466,20 @@ int Scheduler::getCrossDistance(Car car, int idCurRoad, int idNextRoad)
 void Scheduler::driverToNextRoad(Car car, int idNextRoad, int idNextLane, int location)
 {
 	std::vector<Car>::iterator it = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.begin();
-	roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.erase(it);	//½«¸Ã³µ´Óµ±Ç°laneÉ¾³ı,¸Ã³µ¿Ï¶¨ÊÇµ±Ç°laneµÄµÚÒ»Á¾³µ
+	roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.erase(it);	//å°†è¯¥è½¦ä»å½“å‰laneåˆ é™¤,è¯¥è½¦è‚¯å®šæ˜¯å½“å‰laneçš„ç¬¬ä¸€è¾†è½¦
 	car.idCurRoad = idNextRoad;
 	car.idCurLane = idNextLane;
 	car.location = location;
-	car.dirCross = NONE;//¸Ã³µÂ·¿Ú×´Ì¬ÉèÖÃÎªNONE,´ú±íÒÑ¾­Ê»ÀëÂ·¿Ú
-	car.status = FINESHED;//¸Ã³µµ÷¶ÈÍê³É£¬µÈ´ıÏÂÒ»Ê±¼äÆ¬ÔÙĞĞÊ»
+	car.dirCross = NONE;//è¯¥è½¦è·¯å£çŠ¶æ€è®¾ç½®ä¸ºNONE,ä»£è¡¨å·²ç»é©¶ç¦»è·¯å£
+	car.status = FINESHED;//è¯¥è½¦è°ƒåº¦å®Œæˆï¼Œç­‰å¾…ä¸‹ä¸€æ—¶é—´ç‰‡å†è¡Œé©¶
 	std::vector<int>::iterator itPath = car.path.begin();
-	car.path.erase(itPath);//ÒÑ¾­Ê»ÏòÏÂÒ»¸öÂ·¿Ú£¬ËùÒÔÉ¾³ıpathÖĞµÚÒ»Ïî
+	car.path.erase(itPath);//å·²ç»é©¶å‘ä¸‹ä¸€ä¸ªè·¯å£ï¼Œæ‰€ä»¥åˆ é™¤pathä¸­ç¬¬ä¸€é¡¹
 	int size = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size();
 	Lane lane = roads[car.idCurRoad - 5000].lane[car.idCurLane];
 	Lane lane1 = roads[29].lane[car.idCurLane];
 	Lane lane2 = roads[28].lane[car.idCurLane];
 	Lane lane3 = roads[30].lane[car.idCurLane];
-	roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.push_back(car);//½«¸Ã³µ¼ÓÈëÏÂÒ»¸ölane,¼ÓÈë¶ÓÎ²
+	roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.push_back(car);//å°†è¯¥è½¦åŠ å…¥ä¸‹ä¸€ä¸ªlane,åŠ å…¥é˜Ÿå°¾
 }
 
 bool Scheduler::isCanDriveToNextRoad(Car car, int dir, int idCross)
@@ -489,15 +489,15 @@ bool Scheduler::isCanDriveToNextRoad(Car car, int dir, int idCross)
 		int idNextLane = isCanEnter(crosses[idCross - 1].roadID[dir], idCross);
 		if (idNextLane != -1)
 		{
-			Car car_original= car;//¼ÇÂ¼car×ªÏòÖ®Ç°µÄ×´Ì¬
-			driveCar(car, -1);//¸Ã³µ¿ÉÒÔ×ªÏò£¬µ«ÊÇ²»´ú±í¸Ã³µ×ªÏòºó²»»áÒòÎªÓĞ³µ×èµ²È»ºóWAITTING
-			//Êµ¼ÊÉÏdriverCarºó¿ÉÄÜÓĞÈçÏÂÈıÖÖÇé¿ö
-			//1.³É¹¦ĞĞÊ»µ½ÏÂ¸öÂ·¿Ú
-			//2.ÒòÎªÏÂ¸öÂ·¿ÚÓĞ³µwaitting,´Ë³µÎŞ·¨ĞĞÊ»
-			//3.ÒòÎªĞĞÊ»Àï³Ì²»¹»£¬Ö»ÄÜ¼ÌĞøµÈÔÚÂ·¿Ú
-			if (car_original.idCurRoad != car.idCurRoad || car_original.location != car.location)//road·¢Éú±ä»¯»òÕßlocation·¢Éú±ä»¯£¬ÊÓÎª×ªÏò³É¹¦
+			Car car_original= car;//è®°å½•carè½¬å‘ä¹‹å‰çš„çŠ¶æ€
+			driveCar(car, -1);//è¯¥è½¦å¯ä»¥è½¬å‘ï¼Œä½†æ˜¯ä¸ä»£è¡¨è¯¥è½¦è½¬å‘åä¸ä¼šå› ä¸ºæœ‰è½¦é˜»æŒ¡ç„¶åWAITTING
+			//å®é™…ä¸ŠdriverCaråå¯èƒ½æœ‰å¦‚ä¸‹ä¸‰ç§æƒ…å†µ
+			//1.æˆåŠŸè¡Œé©¶åˆ°ä¸‹ä¸ªè·¯å£
+			//2.å› ä¸ºä¸‹ä¸ªè·¯å£æœ‰è½¦waitting,æ­¤è½¦æ— æ³•è¡Œé©¶
+			//3.å› ä¸ºè¡Œé©¶é‡Œç¨‹ä¸å¤Ÿï¼Œåªèƒ½ç»§ç»­ç­‰åœ¨è·¯å£
+			if (car_original.idCurRoad != car.idCurRoad || car_original.location != car.location)//roadå‘ç”Ÿå˜åŒ–æˆ–è€…locationå‘ç”Ÿå˜åŒ–ï¼Œè§†ä¸ºè½¬å‘æˆåŠŸ
 				return true;
-			//µÚÈıÖÖÇé¿öÊÓÎª³É¹¦»òÕß²»³É¹¦£¬¶Ô½á¹ûÓ¦¸ÃÓ°Ïì²»´ó
+			//ç¬¬ä¸‰ç§æƒ…å†µè§†ä¸ºæˆåŠŸæˆ–è€…ä¸æˆåŠŸï¼Œå¯¹ç»“æœåº”è¯¥å½±å“ä¸å¤§
 		}
 	}
 	return false;
@@ -506,7 +506,7 @@ bool Scheduler::isCanDriveToNextRoad(Car car, int dir, int idCross)
 void Scheduler::driveAllCarsJustOnOneRoadToEndState(int idRoad, int idCross)
 {
 	Road road = roads[idRoad - 5000];
-	if (road.idTo = idCross)//Èç¹û¸ÃÂ·¿ÚÊÇroadµÄ³ö·½Ïò£¬ÄÇÃ´±éÀúroadµÄÕı·½Ïò
+	if (road.idTo = idCross)//å¦‚æœè¯¥è·¯å£æ˜¯roadçš„å‡ºæ–¹å‘ï¼Œé‚£ä¹ˆéå†roadçš„æ­£æ–¹å‘
 	{
 		for (int j = 0; j < road.channel; ++j)
 		{
@@ -517,7 +517,7 @@ void Scheduler::driveAllCarsJustOnOneRoadToEndState(int idRoad, int idCross)
 			}
 		}
 	}
-	else //±éÀúroadµÄ·´·½Ïò
+	else //éå†roadçš„åæ–¹å‘
 	{
 		if (road.isDuplex)
 		{
@@ -546,21 +546,21 @@ void Scheduler::putCarStatus(Car car)
 {
 	if(car.path.size()!=0)
 		PRINT("CarID:%d  idFrom:%d  idTo:%d idCurRoad:%d  idCurLane:%d  location:%d  NextRoad:%d  Status:%d\n",
-		car.id,car.idCrossFrom,car.idCrossTo,car.idCurRoad,car.idCurLane,car.location,car.path[0], car.status);//´òÓ¡ÏµÍ³Ê±¼ä
+		car.id,car.idCrossFrom,car.idCrossTo,car.idCurRoad,car.idCurLane,car.location,car.path[0], car.status);//æ‰“å°ç³»ç»Ÿæ—¶é—´
 	else
 		PRINT("CarID:%d  idFrom:%d  idTo:%d idCurRoad:%d  idCurLane:%d  location:%d  Status:%d\n",
-			car.id, car.idCrossFrom, car.idCrossTo, car.idCurRoad, car.idCurLane, car.location, car.status);//´òÓ¡ÏµÍ³Ê±¼ä
+			car.id, car.idCrossFrom, car.idCrossTo, car.idCurRoad, car.idCurLane, car.location, car.status);//æ‰“å°ç³»ç»Ÿæ—¶é—´
 }
 
 void Scheduler::putAllCarStatus()
 {
-	for (int i = 0; i < num_Roads; ++i)//°´µÀÂ·IDÉıĞò½øĞĞµ÷¶È
+	for (int i = 0; i < num_Roads; ++i)//æŒ‰é“è·¯IDå‡åºè¿›è¡Œè°ƒåº¦
 	{
 		for (int j = 0; j < roads[i].channel * (1 + roads[i].isDuplex); ++j)
 		{
 			Lane lane = roads[i].lane[j];
 			
-			if (lane.laneCar.size() != 0)//ÏÈÅĞ¶Ï¸Ã³µµÀÊÇ·ñÓĞ³µ
+			if (lane.laneCar.size() != 0)//å…ˆåˆ¤æ–­è¯¥è½¦é“æ˜¯å¦æœ‰è½¦
 			{
 				for (int m = 0; m < lane.laneCar.size(); ++m)
 				{
