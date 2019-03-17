@@ -8,40 +8,38 @@ using namespace std;
 
 
 struct Dis {
-	vector<int> path;//Â·¾¶µÄ¾­¹ı
+	vector<int> path;//è·¯å¾„çš„ç»è¿‡
 	int value;
 	bool visit;
 	Dis() {
-		visit = false;	//ÅĞ¶ÏÊÇ·ñÒÑ¾­±»·ÃÎÊ
-		value = 0;		//Â·¾¶µÄ³¤¶È
+		visit = false;	//åˆ¤æ–­æ˜¯å¦å·²ç»è¢«è®¿é—®
+		value = 0;		//è·¯å¾„çš„é•¿åº¦
 	}
 };
 
 class Graph_DG {
 private:
-	int vexnum;		//Í¼µÄ¶¥µã¸öÊı
-	int edge;		//Í¼µÄ±ßÊı
-	int **arc;		//ÁÚ½Ó¾ØÕó
-	Dis *dis;		//¼ÇÂ¼¸÷¸ö¶¥µãµÄ×î¶ÌÂ·¾¶ĞÅÏ¢
+	int vexnum;		//å›¾çš„é¡¶ç‚¹ä¸ªæ•°
+	Dis *dis;		//è®°å½•å„ä¸ªé¡¶ç‚¹çš„æœ€çŸ­è·¯å¾„ä¿¡æ¯
 	
 public:
-	//¹¹Ôìº¯Êı£¨²ÎÊı±í£ºÁÚ½Ó¾ØÕó£¬¶¥µãÊı£¨crossÊıÁ¿£©£¬±ßÊı£¨roadÊıÁ¿£©£©
+	//æ„é€ å‡½æ•°ï¼ˆå‚æ•°è¡¨ï¼šé‚»æ¥çŸ©é˜µï¼Œé¡¶ç‚¹æ•°ï¼ˆcrossæ•°é‡ï¼‰ï¼Œè¾¹æ•°ï¼ˆroadæ•°é‡ï¼‰ï¼‰
 	Graph_DG(int vexnum, int edge);
-	//Îö¹¹º¯Êı
+	//ææ„å‡½æ•°
 	~Graph_DG();
-	// ÅĞ¶ÏÎÒÃÇÃ¿´ÎÊäÈëµÄµÄ±ßµÄĞÅÏ¢ÊÇ·ñºÏ·¨
-	//¶¥µã´Ó1¿ªÊ¼±àºÅ
+	// åˆ¤æ–­æˆ‘ä»¬æ¯æ¬¡è¾“å…¥çš„çš„è¾¹çš„ä¿¡æ¯æ˜¯å¦åˆæ³•
+	//é¡¶ç‚¹ä»1å¼€å§‹ç¼–å·
 	bool check_edge_value(int start, int end, int weight);
-	//´´½¨Í¼
+	//åˆ›å»ºå›¾
 	void createGraph(vector<std::vector<int> > graphRoad);
-	//´òÓ¡ÁÚ½Ó¾ØÕó
+	//æ‰“å°é‚»æ¥çŸ©é˜µ
 	void print();
-	//ÀûÓÃdijkstraËã·¨Çó×î¶ÌÂ·¾¶£¬ÊäÈëÆğµã
+	//åˆ©ç”¨dijkstraç®—æ³•æ±‚æœ€çŸ­è·¯å¾„ï¼Œè¾“å…¥èµ·ç‚¹
 	void Dijkstra(int begin);
-	//dijkstraËã·¨£¬·µ»Ø´Óstartµ½endµÄÂ·¾¶
+	//dijkstraç®—æ³•ï¼Œè¿”å›ä»startåˆ°endçš„è·¯å¾„
 	vector<int> Dijkstra(int begin, int end);
-	//´òÓ¡beginµ½ËùÓĞ¶¥µãµÄ×î¶ÌÂ·¾¶
+	//æ‰“å°beginåˆ°æ‰€æœ‰é¡¶ç‚¹çš„æœ€çŸ­è·¯å¾„
 	void print_path(int begin);
-	//´òÓ¡beginµ½endÖ®¼äµÄ×î¶Ì¾àÀë
+	//æ‰“å°beginåˆ°endä¹‹é—´çš„æœ€çŸ­è·ç¦»
 	vector<int> print_path(int begin, int end);
 };

@@ -18,6 +18,13 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 	inputCrossData = data_cross;
 	m_cross_num = cross_count - 1;//忽略第一行注释
 
+	//将速度邻接矩阵大小设置为36，不邻接的点初值为0
+	graphMaxSpeed.resize(m_cross_num);
+	for (int i = 0; i < m_cross_num; ++i)
+	{
+		graphMaxSpeed[i].resize(m_cross_num);
+  }
+  
 	vexnum = getCrossNum();
 	edge = getRoadNum();
 
@@ -32,6 +39,10 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 	for (int i = 0; i < m_cross_num; ++i) {
 		graphC2R[i].resize(m_cross_num);
 	}
+
+
+	//为dis申请空间
+	dis = new Dis[36];
 
 	//Car调度任务向量大小设置
 	//Car任务数量为所有需要调度的Car数
@@ -60,6 +71,7 @@ DataCenter::~DataCenter()
 	delete[] this->car;
 }
 
+/******************************************************** readRoadData() ,readCarData() ,readCrossData() ******************************************************************/
 void DataCenter::readRoadData()
 {
 	printf("readRoadData\n");
@@ -83,40 +95,23 @@ void DataCenter::readRoadData()
 		{
 			graphRoad[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[1]);
 			graphRoad[std::stoi(sp[5]) - 1][std::stoi(sp[4]) - 1] = std::stoi(sp[1]);
+
+			graphMaxSpeed[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[2]);
+			graphMaxSpeed[std::stoi(sp[5]) - 1][std::stoi(sp[4]) - 1] = std::stoi(sp[2]);
+      
 			graphC2R[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = this->road[i - 1].id;
 			graphC2R[std::stoi(sp[5]) - 1][std::stoi(sp[4]) - 1] = this->road[i - 1].id;
-
 		}
 		else
 		{
 			graphRoad[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[1]);
+			graphMaxSpeed[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[2]);
 			graphC2R[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = this->road[i - 1].id;
 		}
 	}
 	printf("readRoadData done!\n");
 }
 
-void DataCenter::write_graph()
-{
-	int rowCount = 0;
-	int columnCount = 0;
-	std::string graph;
-
-	for (rowCount = 0; rowCount < 36; ++rowCount)
-	{
-		for (columnCount = 0; columnCount < 36; ++columnCount)
-		{
-			graph += std::to_string(graphRoad[rowCount][columnCount]);
-			graph += " ";
-		}
-		graph += "\n";
-	}
-
-	const char *graph_file = graph.c_str();
-	const char * fileName = "road_graph.txt";
-
-	write_result(graph_file, fileName);
-}
 
 void DataCenter::readCarData()
 {
@@ -131,7 +126,7 @@ void DataCenter::readCarData()
 		carTask[i - 1][1] = std::stoi(sp[1]);
 		carTask[i - 1][2] = std::stoi(sp[2]);
 		carTask[i - 1][3] = std::stoi(sp[3]);
-		carTask[i - 1][4] = std::stoi(sp[4].substr(0, sp[4].size()-1));//去除右括号
+		carTask[i - 1][4] = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
 		carTask[i - 1][5] = 0;
 		carTask[i - 1][6] = 0;
 		carTask[i - 1][7] = SLEEPING;
@@ -148,6 +143,7 @@ void DataCenter::readCarData()
 	}
 	printf("readCarData done!\n");
 }
+
 
 void DataCenter::readCrossData()
 {
@@ -172,6 +168,147 @@ void DataCenter::readCrossData()
 		cross[i - 1].roadID = { cross[i - 1].roadID_T ,cross[i - 1].roadID_R ,cross[i - 1].roadID_D ,cross[i - 1].roadID_L };
 	}
 	printf("readCrossData done!\n");
+}
+
+/******************************统计car.txt中的各车辆速度数量到m_cross_num;，类型到Vector speedType中********此处有常数3！！是车辆速度种类****************/
+void DataCenter::getCarSpeedType()
+{
+	printf("getCarSpeedType\n");
+	//统计车辆速度数量
+	std :: vector<int> carSpeed;
+	for (int i = 0; i < m_car_num ; ++i)
+	{
+		carSpeed.push_back(carTask[i][3]);		//将carTask中的速度一列存到carspeed向量中
+	}
+	sort(carSpeed.begin(),carSpeed.end());           //将速度排序
+
+	car_speed_num = 1;
+	speedType.push_back(carSpeed[0]);
+	int speed = carSpeed[0];
+	for (int i = 0; i < m_car_num; ++i)
+	{
+		if (speed != carSpeed[i])
+		{
+			car_speed_num++;
+			speed = carSpeed[i];
+			speedType.push_back(carSpeed[i]);
+
+		}
+	}
+	printf("getCarSpeedType done!\n");
+}
+
+/***************根据输入的车辆速度计算时间邻接矩阵的getTimeGraph（） 和得到所有速度下时间邻接矩阵的getAllTimeGraph（）******************************************/
+void DataCenter::getTimeGraph(int order,int speed)
+{
+	printf("getTimeGraph\n");
+	//根据输入速度和道路限速邻接矩阵，得到车辆行驶过程中最大速度邻接矩阵
+	for(int i=0; i< m_cross_num; i++)
+		for (int j = 0; j < m_cross_num; j++)
+		{
+			graphMaxSpeed[i][j] = std:: min(graphMaxSpeed[i][j] , speed);
+		}
+
+	//根据距离邻接矩阵和车辆行驶最大速度邻接矩阵得到时间邻接矩阵
+	for (int i = 0; i < m_cross_num; i++)
+		for (int j = 0; j < m_cross_num; j++)
+		{
+			if (graphRoad[i][j] != INT_MAX)
+			{
+				timeGraphPoint[order]. timeGraph[i][j] = graphRoad[i][j] / float(graphMaxSpeed[i][j]); 
+			}
+		}
+	printf("getTimeGraph done!\n");
+}
+
+void DataCenter::getAllTimeGraph()
+{
+	printf("getAllTimeGraph\n");
+
+	//声明存储不同速度邻接矩阵的容量
+	//存储速度种类个时间邻接矩阵的指针
+	timeGraphPoint = new TimeGraph[car_speed_num];
+
+	//将时间邻接矩阵大小设置为36，不邻接的点初值设为正无穷
+	for (int i = 0; i < car_speed_num; i++)
+	{
+		timeGraphPoint[i].timeGraph.resize(m_cross_num);
+		for (int j = 0; j < m_cross_num; ++j)
+		{
+			timeGraphPoint[i].timeGraph[j].resize(m_cross_num);
+		}
+	}
+	for (int i = 0; i < car_speed_num; i++)
+		for (int j = 0; j < m_cross_num; ++j)
+			for (int k = 0; k < m_cross_num; ++k)
+			{
+				timeGraphPoint[i].timeGraph[j][k] = FLT_MAX;
+			}
+
+//调用getTimegraph矩阵
+	for (int i = 0; i < car_speed_num; i++)
+		getTimeGraph( i, speedType[i]);
+	printf("getAllTimeGraph done!\n");
+}
+
+/************************************* Dijkstra 算法  和输出路径的函数 print_path(int begin)*****************************************************/
+
+std :: vector<int> DataCenter::Dijkstra(int begin, int end, int speed) {
+
+	printf("Dijkstra\n");
+
+	//根据speed确定调用时间矩阵的序号
+	int order = 0;  //表示调用timeGraphPoint的下标
+	for (int i = 0; i < car_speed_num; i++)
+	{
+		if (speedType[i] == speed)
+			order = i;
+	}
+
+	//初始化dis数组
+	int i;
+	for (i = 0; i < m_cross_num; i++) {
+		//设置当前的路径
+		dis[i].path.push_back(begin);
+		dis[i].path.push_back( i+1 );
+		dis[i].value = timeGraphPoint[order].timeGraph[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
+	}
+
+	//设置起点到起点自己的路径为0
+	dis[begin - 1].value = 0;
+	dis[begin - 1].visit = true;
+
+	int count = 1;
+	//计算到其他各顶点的最短路径
+	while (count != m_cross_num) {
+		//temp用于保存当前dis数组中最小的那个下标
+		//min记录当前的最小值
+		int temp = 0;
+		float min = FLT_MAX;
+		//这里的for循环我的理解就是算法中优先队列的作用（找目前最短的点），选择准备进行松弛的点，给下一步的for循环进行松弛操作
+		for (i = 0; i < m_cross_num; i++) {
+			if (!dis[i].visit && dis[i].value < min) {
+				min = dis[i].value;
+				temp = i;
+			}
+		}
+
+		dis[temp].visit = true;		//把上一步找到的准备进行松弛操作的点加入已找到的最短路径集合（实际上就是下次不再入优先队列，每个点至进行一次入队）
+		++count;
+		//下面这个for循环这么理解（更新的是temp指向的点的值），它是将所有的点都进行了一次松弛更新的操作，如果满足条件则更新否则不更新，在算法中写的是值操作相邻的点进行操作，因为不相邻的没有意义（这里就用无穷达来表达了这种情况！因此它直接所有点遍历，如果可以只存邻接的点那会更好！）
+		for (i = 0; i < m_cross_num; i++) {
+			if (!dis[i].visit && timeGraphPoint[order].timeGraph[temp][i] != FLT_MAX && (dis[temp].value + timeGraphPoint[order].timeGraph[temp][i]) < dis[i].value)
+			{
+				dis[i].value = dis[temp].value + timeGraphPoint[order].timeGraph[temp][i];
+				dis[i].path.assign (dis[temp].path.begin(), dis[temp].path.end());
+				dis[i].path.push_back(i + 1);
+			}
+		}
+	}
+	
+	printf("Dijkstra!\n");
+	return dis[end - 1].path;
+
 }
 
 //获取点和边的数量

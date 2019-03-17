@@ -44,14 +44,15 @@ int main(int argc, char *argv[])
 	dc.readCarData();
 	dc.readCrossData();
 
+	dc.getCarSpeedType();
+	dc.getAllTimeGraph();
+
 	dc.getPath();
 	dc.writeResult(answer_file);
 
 	//Scheduler sd(dc);
 	//sd.getPath();//获得车辆的路径信息
 	//int time = sd.getSysTime();
-
-
 
 	// TODO:read input filebuf
 	// TODO:process
