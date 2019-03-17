@@ -58,6 +58,9 @@ public:
 	//获得规划的路径
 	void getPathBytime();
 
+	//根据速度存储所有的车辆
+	void saveCarsBySpeed();
+
 	enum
 	{// 车辆运行状态 //请参考论坛中关于任务调度的解释
 		SLEEPING,	// 等待出发（车库中）
@@ -83,6 +86,9 @@ public:
 	std::string result;//输出结果存储矩阵
 	int vexnum, edge;
 	std::vector<std::vector<int> > tmp;
+
+	//根据速度存储车辆
+	std::vector<std::vector<Car> > carsBySpeed;
 
 private:
 

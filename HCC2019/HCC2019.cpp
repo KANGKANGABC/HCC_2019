@@ -44,7 +44,9 @@ int main(int argc, char *argv[])
 	dc.readCarData();
 	dc.readCrossData();
 
-	dc.getPathBytime();
+	//dc.saveCarsBySpeed();
+	dc.getPath();
+	//dc.getPathBytime();
 	dc.writeResult(answer_file);
 
 
