@@ -17,9 +17,21 @@ struct Dis {
 	}
 };
 
+struct DisFloat {
+	vector<int> path;//路径的经过
+	float value;
+	bool visit;
+	DisFloat() {
+		visit = false;	//判断是否已经被访问
+		value = 0;		//路径的长度
+	}
+};
+
 class Graph_DG {
 private:
 	int vexnum;		//图的顶点个数
+	int edge;		//图的边数
+	int **arc;		//邻接矩阵
 	Dis *dis;		//记录各个顶点的最短路径信息
 	
 public:

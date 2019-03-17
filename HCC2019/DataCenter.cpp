@@ -23,7 +23,7 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 	for (int i = 0; i < m_cross_num; ++i)
 	{
 		graphMaxSpeed[i].resize(m_cross_num);
-  }
+	}
   
 	vexnum = getCrossNum();
 	edge = getRoadNum();
@@ -34,6 +34,14 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 		graphRoad[i].resize(m_cross_num);
 	}
 
+	for (int i = 0; i < m_cross_num; ++i)
+	{
+		for (int j = 0; j < m_cross_num; ++j)
+		{
+			graphRoad[i][j] = INT_MAX;
+		}
+	}
+
 	//将graphC2R大小设置为36*36
 	graphC2R.resize(m_cross_num);
 	for (int i = 0; i < m_cross_num; ++i) {
@@ -42,7 +50,7 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 
 
 	//为dis申请空间
-	dis = new Dis[36];
+	dis = new DisFloat[m_cross_num];
 
 	//Car调度任务向量大小设置
 	//Car任务数量为所有需要调度的Car数
@@ -69,6 +77,7 @@ DataCenter::~DataCenter()
 	delete[] this->road;
 	delete[] this->cross;
 	delete[] this->car;
+	delete[] this->dis;
 }
 
 /******************************************************** readRoadData() ,readCarData() ,readCrossData() ******************************************************************/
@@ -112,7 +121,6 @@ void DataCenter::readRoadData()
 	printf("readRoadData done!\n");
 }
 
-
 void DataCenter::readCarData()
 {
 	printf("readCarData\n");
@@ -143,7 +151,6 @@ void DataCenter::readCarData()
 	}
 	printf("readCarData done!\n");
 }
-
 
 void DataCenter::readCrossData()
 {
@@ -254,9 +261,7 @@ void DataCenter::getAllTimeGraph()
 /************************************* Dijkstra 算法  和输出路径的函数 print_path(int begin)*****************************************************/
 
 std :: vector<int> DataCenter::Dijkstra(int begin, int end, int speed) {
-
-	printf("Dijkstra\n");
-
+	dis = new DisFloat[m_cross_num];
 	//根据speed确定调用时间矩阵的序号
 	int order = 0;  //表示调用timeGraphPoint的下标
 	for (int i = 0; i < car_speed_num; i++)
@@ -306,7 +311,6 @@ std :: vector<int> DataCenter::Dijkstra(int begin, int end, int speed) {
 		}
 	}
 	
-	printf("Dijkstra!\n");
 	return dis[end - 1].path;
 
 }
@@ -356,6 +360,23 @@ void DataCenter::getPath()
 	for (int i = 0; i < m_car_num; ++i)
 	{
 		vector<int> pathCross = graph.Dijkstra(car[i].idCrossFrom, car[i].idCrossTo);
+		vector<int> pathRoad(pathCross.size() - 1);
+		for (int j = 0; j < pathRoad.size(); ++j)
+		{
+			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+			//assert(pathRoad[j] != 0);
+		}
+		car[i].path = pathRoad;
+	}
+}
+
+void DataCenter::getPathBytime()
+{
+	getCarSpeedType();
+	getAllTimeGraph();
+	for (int i = 0; i < m_car_num; ++i)
+	{
+		vector<int> pathCross = Dijkstra(car[i].idCrossFrom, car[i].idCrossTo, car[i].speed);
 		vector<int> pathRoad(pathCross.size() - 1);
 		for (int j = 0; j < pathRoad.size(); ++j)
 		{

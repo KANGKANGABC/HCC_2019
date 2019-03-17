@@ -16,6 +16,7 @@
 #define MAX_CROSS_NUM    100 //最大CROSS条数
 
 #define INT_MAX 0x7fffffff
+#define FLT_MAX 3.402823466e+38F
 
 #ifdef _DEBUG
 #define PRINT   printf

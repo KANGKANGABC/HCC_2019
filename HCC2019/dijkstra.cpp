@@ -18,7 +18,6 @@ Graph_DG::Graph_DG(int vexnum, int edge) {
 			arc[i][k] = INT_MAX;
 		}
 	}
-
 }
 
 //Îö¹¹º¯Êý

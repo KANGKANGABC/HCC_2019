@@ -12,16 +12,6 @@ public:
 	std ::vector < std :: vector< float> >timeGraph;  //时间邻接矩阵
 };
 
-struct Dis {
-	std::vector<int> path;
-	float value;
-	bool visit;
-	Dis() {
-		visit = false;	//判断是否已经被访问
-		value = 0;		//路径的长度
-	}
-};
-
 class DataCenter
 {
 
@@ -35,9 +25,6 @@ public:
 	friend class Graph_DG;
 	friend class Scheduler;
 
-	//将邻接矩阵写出到文件
-	void write_graph();
-  
 	//读入数据
 	void readRoadData();
 	void readCarData();
@@ -55,9 +42,6 @@ public:
 	//Dijkstra算法，输入点begin，输出点begin到各点的最短时间
 	std :: vector<int>  Dijkstra(int begin ,int end ,int speed );
 
-	//计算当前路径的运行时间
-	int calSysTime();
-
 	//获取点和边的数量
 	int getRoadNum();
 	int getCrossNum();
@@ -70,6 +54,9 @@ public:
 
 	//获得规划的路径
 	void getPath();
+
+	//获得规划的路径
+	void getPathBytime();
 
 	enum
 	{// 车辆运行状态 //请参考论坛中关于任务调度的解释
@@ -91,7 +78,7 @@ public:
 	int m_road_num;//ROAD数量
 	int m_car_num;//CAR数量
 	int m_cross_num;//CROSS数量
-  int car_speed_num; //car 的速度种类在getCarSpeedType()中被赋值
+	int car_speed_num; //car 的速度种类在getCarSpeedType()中被赋值
 
 	std::string result;//输出结果存储矩阵
 	int vexnum, edge;
@@ -117,8 +104,7 @@ private:
 	//Dijkstra算法中记录各个顶点的最短路径信息
 	//Dijkstra算法里用到的结构体
 
-	Dis * dis;
-
+	DisFloat * dis;
 
 	//CrossToRoad转换表
 	std::vector<std::vector<int> > graphC2R;
