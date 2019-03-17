@@ -30,6 +30,8 @@ int main(int argc, char *argv[])
 	std::cout << "crossPath is " << crossPath << std::endl;
 	std::cout << "answerPath is " << answerPath << std::endl;
 
+	char *answer_file = argv[4];
+
 	char *data_road[MAX_ROAD_NUM];
 	char *data_car[MAX_CAR_NUM];
 	char *data_cross[MAX_CROSS_NUM];
@@ -41,33 +43,18 @@ int main(int argc, char *argv[])
 	dc.readRoadData();
 	dc.readCarData();
 	dc.readCrossData();
-	Scheduler sd(dc);
-	sd.getPath();
-	int time = sd.getSysTime();
 
+	dc.getPathBytime();
+	dc.writeResult(answer_file);
+
+
+	//Scheduler sd(dc);
+	//sd.getPath();//获得车辆的路径信息
+	//int time = sd.getSysTime();
 
 	// TODO:read input filebuf
 	// TODO:process
 	// TODO:write output file
-
-
-	//测试dijkstra算法
-	int vexnum, edge;
-	std::vector<std::vector<int> > tmp = dc.getArc(); //得到邻接矩阵
-	vexnum = dc.getCrossNum();
-	edge = dc.getRoadNum();
-
-	Graph_DG graph(vexnum, edge);
-	graph.createGraph(tmp);
-	//graph.print();
-	//graph.Dijkstra(1);
-	vector<int> path = graph.Dijkstra(1, 30);
-	cout << "路径为";
-	for (int i = 0; i < path.size(); i++)
-		cout << path.at(i) << " ";
-	//graph.print_path(1);
-	//graph.print_path(1, 30);
-	system("pause");
 
 	return 0;
 }

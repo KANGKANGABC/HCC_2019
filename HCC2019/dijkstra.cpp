@@ -10,7 +10,7 @@ Graph_DG::Graph_DG(int vexnum, int edge) {
 	this->edge = edge;
 	//为邻接矩阵开辟空间和赋初值
 	arc = new int*[this->vexnum];		//指向指针的数组，实际就是一个二维的数组（矩阵）
-	dis = new Dis[this->vexnum];		//Dis型的一维数组
+	//dis = new Dis[this->vexnum];		//Dis型的一维数组
 	for (int i = 0; i < this->vexnum; i++) {
 		arc[i] = new int[this->vexnum];
 		for (int k = 0; k < this->vexnum; k++) {
@@ -18,12 +18,11 @@ Graph_DG::Graph_DG(int vexnum, int edge) {
 			arc[i][k] = INT_MAX;
 		}
 	}
-
 }
 
 //析构函数
 Graph_DG::~Graph_DG() {
-	delete[] dis;
+	//delete[] dis;
 	for (int i = 0; i < this->vexnum; i++) {
 		delete this->arc[i];
 	}
@@ -45,7 +44,7 @@ void Graph_DG::createGraph(vector<std::vector<int> > graphRoad) {
 	{
 		for (int j = 0; j < graphRoad[0].size(); j++)
 		{
-			if(graphRoad[i][j] == 0)
+			if (graphRoad[i][j] == 0)
 				arc[i][j] = INT_MAX;
 			else
 			{
@@ -105,7 +104,7 @@ void Graph_DG::Dijkstra(int begin) {
 				temp = i;
 			}
 		}
-		
+
 		dis[temp].visit = true;		//把上一步找到的准备进行松弛操作的点加入已找到的最短路径集合（实际上就是下次不再入优先队列，每个点至进行一次入队）
 		++count;
 		//下面这个for循环这么理解（更新的是temp指向的点的值），它是将所有的点都进行了一次松弛更新的操作，如果满足条件则更新否则不更新，在算法中写的是值操作相邻的点进行操作，因为不相邻的没有意义（这里就用无穷达来表达了这种情况！因此它直接所有点遍历，如果可以只存邻接的点那会更好！）
@@ -124,6 +123,7 @@ void Graph_DG::Dijkstra(int begin) {
 //带返回值，返回start到end的路径值
 vector<int> Graph_DG::Dijkstra(int begin, int end) {
 	//首先初始化dis数组
+	dis = new Dis[this->vexnum];
 	int i;
 	for (i = 0; i < this->vexnum; i++) {
 		//设置当前的路径
@@ -166,7 +166,9 @@ vector<int> Graph_DG::Dijkstra(int begin, int end) {
 			}
 		}
 	}
-	return dis[end - 1].path;
+	vector<int> path_tmp = dis[end - 1].path;
+	delete[] dis;
+	return path_tmp;
 }
 
 
@@ -179,7 +181,7 @@ void Graph_DG::print_path(int begin) {
 		{
 			for (int j = 0; j < dis[i].path.size(); j++)
 				cout << dis[i].path.at(j) << " ";
-			cout << "value= "<< dis[i].value << endl;
+			cout << "value= " << dis[i].value << endl;
 		}
 		else {
 			for (int j = 0; j < dis[i].path.size(); j++)
@@ -193,7 +195,7 @@ void Graph_DG::print_path(int begin) {
 vector<int> Graph_DG::print_path(int begin, int end) {
 	end = end - 1;
 	cout << "点" << begin << "->点" << end << "的路径为";
-	for(int i = 0; i< dis[end].path.size(); i++)
+	for (int i = 0; i < dis[end].path.size(); i++)
 		cout << dis[end].path.at(i) << " ";
 	cout << "长度 " << dis[end].value << endl;
 
