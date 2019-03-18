@@ -44,8 +44,25 @@ int main(int argc, char *argv[])
 	dc.readCarData();
 	dc.readCrossData();
 
-	//dc.saveCarsBySpeed();
-	//dc.getPath();
+	//测试dijkstra算法
+	int vexnum, edge;
+	std::vector<std::vector<int> > tmp1 = dc.getRoadvArc(); //得到道路限速邻接矩阵
+	std::vector<std::vector<int> > tmp = dc.getArc(); //得到路长邻接矩阵
+	vexnum = dc.getCrossNum();
+	edge = dc.getRoadNum();
+
+	Graph_DG graph(vexnum, edge);
+	graph.createArcGraph(tmp);
+	graph.createArcRoadvGraph(tmp1);
+	vector<int> path = graph.Dijkstra(16, 34, 3);
+	graph.print();
+	graph.printRoadv();
+	graph.printTimeArc();
+
+	cout << "最短路径为";
+	for (int i = 0; i < path.size(); i++)
+		cout << path.at(i) << " ";
+	cout << endl;
 	//dc.getPathBytime();
 	//dc.writeResult(answer_file);
 
