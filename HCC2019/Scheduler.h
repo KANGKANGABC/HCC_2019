@@ -18,6 +18,7 @@ public:
 	std::vector<std::vector<int> > tmp;
 private:
 	int num_CarsScheduling;//正在调度的car数量
+	int num_CarsPut;//已经发车的car数量
 	int num_Roads;//道路数量
 	int num_Crosses;//路口数量
 	int num_Cars;//车数量
@@ -35,7 +36,7 @@ private:
 	void driveCar(Car car, int indexCar);//indexCar为该车在车道的位置
 
 	/*将该车加入道路行驶*/
-	void addCar(Car car);
+	void addCar(Car car,int i);//i为该车在cars[]中的下标，便于加入车失败时延后时间片
 
 	//判断某cross的某road是否可以行驶进入//输入ID为修正前的ID
 	int isCanEnter(int idRoad, int idCross);//如果返回值-1，代表不可加入，否则返回可驶入的lane ID
@@ -71,6 +72,14 @@ private:
 	//输出所有车辆状态
 	void putAllCarStatus();
 
+	//获得该cross的对应优先级道路ID，如果道路ID为-1则返回-1
+	int getFirstRoadFromCross(int idCross,int index);
+
+	//获得某road在某cross的某方向
+	int getDirByRoadCrossDir(int idCross,int idRoad);
+
+	//某个road上的某个channel车辆行进，仅处理该车道上行驶且能到达终止状态的车
+	void driveAllCarsJustOnOneChannelToEndState(int idRoad, int idCross, int idChannel);
 
 };
 

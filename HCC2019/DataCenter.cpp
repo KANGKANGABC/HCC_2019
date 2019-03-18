@@ -140,7 +140,9 @@ void DataCenter::readCarData()
 		car[i - 1].idCrossTo = carTask[i - 1][2];
 		car[i - 1].speed = carTask[i - 1][3];
 		car[i - 1].plantime = carTask[i - 1][4];
-		car[i - 1].starttime = carTask[i - 1][4] + i%1000;//这里给自己挖了一个坑
+		//car[i - 1].starttime = carTask[i - 1][4] + i%400;//这里给自己挖了一个坑
+		car[i - 1].plantime = carTask[i - 1][4] + (8 - car[i - 1].speed) * 200 + i % 400;//这里给自己挖了一个坑
+		car[i - 1].starttime = carTask[i - 1][4] + (8 - car[i - 1].speed )*80 + i % 160;//这里给自己挖了一个坑
 		car[i - 1].status = SLEEPING;//车的初始状态为SLEEPING
 		car[i - 1].dirCross = NONE;//车的过路口状态为NONE
 
@@ -174,7 +176,6 @@ void DataCenter::readCrossData()
 	}
 	printf("readCrossData done!\n");
 }
-
 
 //获取点和边的数量
 int DataCenter::getRoadNum()
@@ -237,4 +238,29 @@ void DataCenter::getPath()
 	}
 }
 
+
+void DataCenter::saveCarsBySpeed()
+{
+	getCarSpeedType();
+	carsBySpeed.resize(car_speed_num);
+	Graph_DG graph(vexnum, edge);
+	graph.createGraph(graphRoad);
+	for (int i = 0; i < m_car_num; ++i)
+	{
+		for (int j = 0; j < car_speed_num; ++j)
+		{
+			if (car[i].speed == speedType[j])
+			{
+				vector<int> pathCross = graph.Dijkstra(car[i].idCrossFrom, car[i].idCrossTo);
+				vector<int> pathRoad(pathCross.size() - 1);
+				for (int m = 0; m < pathRoad.size(); ++m)
+				{
+					pathRoad[m] = graphC2R[pathCross[m] - 1][pathCross[m + 1] - 1];
+				}
+				car[i].path = pathRoad;
+				carsBySpeed[j].push_back(car[i]);
+			}
+		}
+	}
+}
 

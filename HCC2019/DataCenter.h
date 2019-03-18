@@ -66,6 +66,9 @@ public:
 	int vexnum, edge;
 	std::vector<std::vector<int> > tmp;
 
+	//根据速度存储车辆
+	std::vector<std::vector<Car> > carsBySpeed;
+
 private:
 
 	char **inputRoadData;//输入道路数据
