@@ -1,6 +1,7 @@
 #include "dijkstra.h"
 #include "iostream"
 #include "DataCenter.h"
+#include "fstream"
 using namespace std;
 
 //构造函数定义
@@ -250,6 +251,10 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 	//首先初始化dis数组
 	disfloat = new DisFloat[this->vexnum];
 
+	//统计分析：flag[]数组负责统计cross的规划使用情况，可以得到道路的使用率（拥堵情况）；flagnum负责记录统计的次数，每100次记录一次
+	static int flag[100] = { 0 };
+	static int flagnum = 0;
+
 	//计算时间的邻接矩阵
 	for (int i = 0; i < this->vexnum; i++)
 	{
@@ -310,6 +315,44 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 		}
 	}
 	vector<int> path_tmp = disfloat[end - 1].path;
+
+/********************************统计道路车辆通过率测试**********************************/
+	for (int i = 0; i < path_tmp.size(); i++) {
+		//cout << path_tmp.size() <<" " << path_tmp.at(i) <<  endl;
+		flag[path_tmp.at(i)]++;//记录64个cross的使用情况
+	}
+	flagnum++;
+	/*写出前100辆车的统计情况*/
+	if (flagnum == 100)
+	{
+		ofstream oFile;
+		oFile.open("test.csv", ios::out | ios::trunc);
+		for (int i=0; i < 100; i++)
+		{
+			oFile << flag[i] << endl;
+		}
+		
+		for (int i = 0; i < 100; i++)
+		{
+			flag[i] = 0;
+		}
+		oFile.close();
+	}
+
+	/*写出100~200辆车的统计情况*/
+	if (flagnum == 200)
+	{
+		ofstream oFile;
+		oFile.open("test2.csv", ios::out | ios::trunc);
+		for (int i = 0; i < 100; i++)
+		{
+			oFile << flag[i] << endl;
+		}
+
+		oFile.close();
+	}
+/********************************统计道路车辆通过率测试**********************************/
+
 	delete[] disfloat;//释放动态申请的disfloat数组
 	return path_tmp;
 }

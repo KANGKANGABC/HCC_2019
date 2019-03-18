@@ -6,7 +6,6 @@
 #include "define.h"
 using namespace std;
 
-
 struct Dis {
 	vector<int> path;//路径的经过
 	int value;
