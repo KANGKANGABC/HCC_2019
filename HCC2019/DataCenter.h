@@ -6,11 +6,6 @@
 #include "Road.h"
 #include "dijkstra.h"
 
-class TimeGraph
-{
-public:
-	std ::vector < std :: vector< float> >timeGraph;  //时间邻接矩阵
-};
 
 class DataCenter
 {
@@ -30,33 +25,20 @@ public:
 	void readCarData();
 	void readCrossData();
 
-	//统计car.txt中的各车辆速度类型到Vector speedType中
-	void getCarSpeedType ();
-
-	//计算输入速度下时间邻接矩阵
-	void getTimeGraph (int order, int speed );
-
-	//计算得到所有速度下的时间邻接矩阵
-	void getAllTimeGraph();
-
-	//Dijkstra算法，输入点begin，输出点begin到各点的最短时间
-	std :: vector<int>  Dijkstra(int begin ,int end ,int speed );
-
 	//获取点和边的数量
 	int getRoadNum();
 	int getCrossNum();
 
-	//获得邻接矩阵
+	//获得路长邻接矩阵
 	std::vector<std::vector<int> > getArc();
+	//获得道路限速邻接矩阵
+	std::vector<std::vector<int> > getRoadvArc();
 
 	//将结果写出到result.txt
 	void writeResult(char *filename);
 
 	//获得规划的路径
 	void getPath();
-
-	//获得规划的路径
-	void getPathBytime();
 
 	enum
 	{// 车辆运行状态 //请参考论坛中关于任务调度的解释
@@ -97,14 +79,6 @@ private:
 
 	//存储车辆的速度种类的向量
 	std::vector<int> speedType;
-
-	//存储速度种类个时间邻接矩阵的指针
-	TimeGraph * timeGraphPoint;
-
-	//Dijkstra算法中记录各个顶点的最短路径信息
-	//Dijkstra算法里用到的结构体
-
-	DisFloat * dis;
 
 	//CrossToRoad转换表
 	std::vector<std::vector<int> > graphC2R;

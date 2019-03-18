@@ -574,7 +574,7 @@ void Scheduler::putAllCarStatus()
 void Scheduler::getPath()
 {
 	Graph_DG graph(vexnum, edge);
-	graph.createGraph(tmp);
+	graph.createArcGraph(tmp);
 
 	for (int i = 0; i < num_Cars; ++i)
 	{
