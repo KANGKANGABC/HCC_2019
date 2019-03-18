@@ -6,6 +6,8 @@
 #include "define.h"
 using namespace std;
 
+static int jamDegree[64][64] = { 0 };//定义全局变量数组，存放堵塞程度的统计值
+
 struct Dis {
 	vector<int> path;//路径的经过
 	int value;

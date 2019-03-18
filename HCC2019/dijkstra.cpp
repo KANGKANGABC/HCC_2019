@@ -332,11 +332,21 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 			oFile << flag[i] << endl;
 		}
 		
-		for (int i = 0; i < 100; i++)
+		for (int i = 0; i < 64; i++)
 		{
 			flag[i] = 0;
 		}
 		oFile.close();
+		//打印统计矩阵 jamDegree
+		for(int i = 0; i < 64; i++)
+		{
+			for (int j = 0; j < 64; j++)
+			{
+				cout << jamDegree[i][j] << " ";
+			}
+			cout << endl;
+		}
+		getchar();
 	}
 
 	/*写出100~200辆车的统计情况*/
@@ -351,6 +361,12 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 
 		oFile.close();
 	}
+
+	for (int i = 0, j = 1; j < path_tmp.size(); i++, j++)
+	{
+		jamDegree[path_tmp.at(i)][path_tmp.at(j)]++;
+	}
+
 /********************************统计道路车辆通过率测试**********************************/
 
 	delete[] disfloat;//释放动态申请的disfloat数组
