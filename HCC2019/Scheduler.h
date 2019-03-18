@@ -18,6 +18,7 @@ public:
 	std::vector<std::vector<int> > tmp;
 private:
 	int num_CarsScheduling;//正在调度的car数量
+	int num_CarsPut;//已经发车的car数量
 	int num_Roads;//道路数量
 	int num_Crosses;//路口数量
 	int num_Cars;//车数量
@@ -76,6 +77,9 @@ private:
 
 	//获得某road在某cross的某方向
 	int getDirByRoadCrossDir(int idCross,int idRoad);
+
+	//某个road上的某个channel车辆行进，仅处理该车道上行驶且能到达终止状态的车
+	void driveAllCarsJustOnOneChannelToEndState(int idRoad, int idCross, int idChannel);
 
 };
 
