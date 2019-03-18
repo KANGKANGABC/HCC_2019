@@ -237,30 +237,3 @@ void DataCenter::getPath()
 		car[i].path = pathRoad;
 	}
 }
-
-
-void DataCenter::saveCarsBySpeed()
-{
-	getCarSpeedType();
-	carsBySpeed.resize(car_speed_num);
-	Graph_DG graph(vexnum, edge);
-	graph.createGraph(graphRoad);
-	for (int i = 0; i < m_car_num; ++i)
-	{
-		for (int j = 0; j < car_speed_num; ++j)
-		{
-			if (car[i].speed == speedType[j])
-			{
-				vector<int> pathCross = graph.Dijkstra(car[i].idCrossFrom, car[i].idCrossTo);
-				vector<int> pathRoad(pathCross.size() - 1);
-				for (int m = 0; m < pathRoad.size(); ++m)
-				{
-					pathRoad[m] = graphC2R[pathCross[m] - 1][pathCross[m + 1] - 1];
-				}
-				car[i].path = pathRoad;
-				carsBySpeed[j].push_back(car[i]);
-			}
-		}
-	}
-}
-

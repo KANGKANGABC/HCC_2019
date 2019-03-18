@@ -14,8 +14,11 @@ public:
 	int getSysTime();
 	//获得路径,为每辆车规划路径
 	void getPath();
+	//获得路径,为每辆车规划路径，基于时间
+	void getPathByTime();
 	int vexnum, edge;
 	std::vector<std::vector<int> > tmp;
+	std::vector<std::vector<int> > tmp1;
 private:
 	int num_CarsScheduling;//正在调度的car数量
 	int num_CarsPut;//已经发车的car数量

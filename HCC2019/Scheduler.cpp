@@ -13,6 +13,7 @@ Scheduler::Scheduler(DataCenter &dc)
 	vexnum = dc.getCrossNum();
 	edge = dc.getRoadNum();
 	tmp = dc.getArc(); //得到邻接矩阵
+	tmp1 = dc.getRoadvArc(); //得到道路限速邻接矩阵
 	//将graphC2R大小设置为36*36
 	graphC2R = dc.graphC2R;
 	num_CarsPut = 0;//已经发车的数量预置为0
@@ -706,4 +707,25 @@ void Scheduler::getPath()
 		}
 		cars[i].path = pathRoad;
 	}
+}
+
+void Scheduler::getPathByTime()
+{
+
+	Graph_DG graph(vexnum, edge);
+	graph.createArcGraph(tmp);
+	graph.createArcRoadvGraph(tmp1);
+
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed);
+		vector<int> pathRoad(pathCross.size() - 1);
+		for (int j = 0; j < pathRoad.size(); ++j)
+		{
+			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+			//assert(pathRoad[j] != 0);
+		}
+		cars[i].path = pathRoad;
+	}
+
 }
