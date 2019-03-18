@@ -42,11 +42,11 @@ int Scheduler::getSysTime()
 				while (1)//循环调度路口四个方向的车，直到全部车辆完成调度，或者阻塞
 				{
 					bool isWorkingRoad = false;
-					for (int j = 0; j < 4; ++j)
+					for (int j = 0; j < 4; ++j)//这里按要求是根据道路id进行升序调度
 					{
-						if (crosses[i].roadID[j] != -1)
+						int idRoad = getFirstRoadFromCross(idCross, j);
+						if (idRoad != -1)
 						{
-							int idRoad = crosses[i].roadID[j];//被调度的道路id
 							int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
 							if (roads[idRoad - 5000].idFrom == crosses[i].id)//如果cross为道路的入方向
 							{
@@ -72,7 +72,7 @@ int Scheduler::getSysTime()
 											case NONE:
 												break;
 											case DD://直行>左转>右转
-												dirTarget = j + 2;//目标方向
+												dirTarget = getDirByRoadCrossDir(idCross,idRoad) + 2;//目标方向
 												if (dirTarget > 3) dirTarget -= 4;//修正方向
 												if (isCanDriveToNextRoad(car, dirTarget, idCross))
 												{
@@ -85,11 +85,11 @@ int Scheduler::getSysTime()
 												break;
 											case LEFT://左转>右转
 												//判断即将转入的方向是否有直行进入的车辆
-												dirConflict = j - 1;//冲突方向
+												dirConflict = getDirByRoadCrossDir(idCross, idRoad) - 1;//冲突方向
 												if (dirConflict < 0) dirConflict += 4;//修正方向
 												if (!isBeDD(crosses[i].roadID[dirConflict], i))
 												{
-													dirTarget = j + 1;//目标方向
+													dirTarget = getDirByRoadCrossDir(idCross, idRoad) + 1;//目标方向
 													if (dirTarget > 3) dirTarget -= 4;//修正方向
 													if (isCanDriveToNextRoad(car, dirTarget, idCross))//判断转入的road是否可以行驶
 													{
@@ -101,16 +101,16 @@ int Scheduler::getSysTime()
 												break;
 											case RIGHT://右转优先级最低
 												//判断即将转入的方向是否有直行进入的车辆
-												dirConflict = j + 1;//冲突方向
+												dirConflict = getDirByRoadCrossDir(idCross, idRoad) + 1;//冲突方向
 												if (dirConflict > 3) dirConflict -= 4;//修正方向
 												if (!isBeDD(crosses[i].roadID[dirConflict], i))
 												{
-													dirConflict = j + 2;//冲突方向
+													dirConflict = getDirByRoadCrossDir(idCross, idRoad) + 2;//冲突方向
 													if (dirConflict > 3) dirConflict -= 4;//修正方向
 													//判断即将转入的方向是否有左转进入的车辆
 													if (!isBeLEFT(crosses[i].roadID[dirConflict], i))
 													{
-														dirTarget = j - 1;//目标方向
+														dirTarget = getDirByRoadCrossDir(idCross, idRoad) - 1;//目标方向
 														if (dirTarget < 0) dirTarget += 4;//修正方向
 														if (isCanDriveToNextRoad(car, dirTarget, idCross))//判断转入的road是否可以行驶
 														{
@@ -612,6 +612,38 @@ void Scheduler::putAllCarStatus()
 			}
 		}
 	}
+}
+
+int Scheduler::getFirstRoadFromCross(int idCross, int index)
+{
+	std::vector<int> idRoad;
+	for (int i = 0; i < 4; ++i)
+	{
+		if (crosses[idCross - 1].roadID[i] == -1)
+			idRoad.push_back(INT_MAX);
+		else
+			idRoad.push_back(crosses[idCross - 1].roadID[i]);
+	}
+	std::sort(idRoad.begin(),idRoad.end());
+	for (int i = 0; i < 4; ++i)
+	{
+		if (idRoad[i] == INT_MAX)
+			idRoad[i] = -1;
+	}
+	return idRoad[index];
+}
+
+int Scheduler::getDirByRoadCrossDir(int idCross, int idRoad)
+{
+	int dirFrom = -1;//设置初值为-1，便于后续错误检测
+	for (int i = 0; i < 4; ++i)
+	{
+		if (crosses[idCross - 1].roadID[i] == idRoad)
+			dirFrom = i;
+	}
+	assert(dirFrom != -1);//如果未在该cross找到该road，则报错
+
+	return dirFrom;
 }
 
 void Scheduler::getPath()
