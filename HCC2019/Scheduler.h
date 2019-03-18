@@ -75,6 +75,9 @@ private:
 	//输出所有车辆状态
 	void putAllCarStatus();
 
+	//输出所有道路状态
+	void putAllRoadStatus();
+
 	//获得该cross的对应优先级道路ID，如果道路ID为-1则返回-1
 	int getFirstRoadFromCross(int idCross,int index);
 

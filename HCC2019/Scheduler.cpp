@@ -151,6 +151,7 @@ int Scheduler::getSysTime()
 		}
 		driverCarInGarage();//车库中的上路行驶
 		putAllCarStatus();//输出所有车的状态
+		putAllRoadStatus();
 		time_Scheduler++;//更新调度器时间
 	}
 	return time_Scheduler;
@@ -248,6 +249,7 @@ void Scheduler::driveCar(Car car, int indexCar)
 						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;//车标记为WAITTING
 					}
 				}
+				/*
 				else
 				{
 					//此车也将行驶出路口,那么判断此车在路口的方向
@@ -271,6 +273,7 @@ void Scheduler::driveCar(Car car, int indexCar)
 						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;//此车变为等待状态
 					}
 				}
+				*/
 			}
 		}
 	}
@@ -335,7 +338,7 @@ void Scheduler::addCar(Car car, int i)
 	int idLaneTarget = isCanEnter(idRoadTarget, idCrossTarget);
 	if (idLaneTarget != -1)//如果该道路可加入车
 	{
-		car.status = WAITTING;//切换car的状态
+		car.status = FINESHED;//切换car的状态
 		car.idCurRoad = idRoadTarget;
 		car.idCurLane = idLaneTarget;
 		car.location = 0;
@@ -616,6 +619,18 @@ void Scheduler::putAllCarStatus()
 					putCarStatus(lane.laneCar[m]);
 				}
 			}
+		}
+	}
+}
+
+void Scheduler::putAllRoadStatus()
+{
+	for (int i = 0; i < num_Roads; ++i)
+	{
+		for (int j = 0; j < roads[i].channel * (1 + roads[i].isDuplex); ++j)
+		{
+			float per = (float)roads[i].lane[j].laneCar.size() / (float)roads[i].length;
+			PRINT("ROAD ID:%d  CHANNEL ID:%d  PERCENT:%f\n",roads[i].id,j,per);
 		}
 	}
 }
