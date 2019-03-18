@@ -191,6 +191,7 @@ void Scheduler::driveCar(Car car, int indexCar)
 			{
 				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location += std::min(roads[car.idCurRoad - 5000].speed, car.speed);//车正常行驶
 				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//车标记为终止状态
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = NONE;
 			}
 			else
 			{
@@ -224,6 +225,7 @@ void Scheduler::driveCar(Car car, int indexCar)
 			{//前面的车不形成阻挡
 				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location += std::min(roads[car.idCurRoad - 5000].speed, car.speed);//车正常行驶
 				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//车标记为终止状态
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = NONE;
 			}
 			else
 			{//前面的车形成阻挡
@@ -234,6 +236,7 @@ void Scheduler::driveCar(Car car, int indexCar)
 					{
 						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1].location - 1;//行驶到前车的后一个位置
 						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//车标记为终止状态
+						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = NONE;
 					}
 					else
 					{
@@ -285,6 +288,7 @@ void Scheduler::driveCar(Car car, int indexCar)
 				//此时比较特殊，因为没有发生Road变化，所以car依然在当前lane，但是其location需要更新
 				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = roads[car.idCurRoad - 5000].length;
 				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//该车调度完成，等待下一时间片再行驶
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = NONE;
 			}
 			else
 			{
@@ -404,7 +408,12 @@ bool Scheduler::isBeDD(int idRoad, int idCross)
 	if (roads[idRoad - 5000].lane[idStartLane].laneCar.size() != 0)
 	{
 		if (roads[idRoad - 5000].lane[idStartLane].laneCar[0].dirCross == DD)
+		{
+			//此时车一定处于等待状态
+			assert(roads[idRoad - 5000].lane[idStartLane].laneCar[0].status == WAITTING);
 			return true;//存在直行车辆
+		}
+
 	}
 	return false;
 }
@@ -430,7 +439,11 @@ bool Scheduler::isBeLEFT(int idRoad, int idCross)
 	if (roads[idRoad - 5000].lane[idStartLane].laneCar.size() != 0)
 	{
 		if (roads[idRoad - 5000].lane[idStartLane].laneCar[0].dirCross == LEFT)
+		{
+			//此时车一定处于等待状态
+			assert(roads[idRoad - 5000].lane[idStartLane].laneCar[0].status == WAITTING);
 			return true;//存在左转车辆
+		}
 	}
 	return false;
 }
