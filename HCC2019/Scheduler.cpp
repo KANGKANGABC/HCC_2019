@@ -640,7 +640,8 @@ void Scheduler::putAllRoadStatus()
 		for (int j = 0; j < roads[i].channel * (1 + roads[i].isDuplex); ++j)
 		{
 			float per = (float)roads[i].lane[j].laneCar.size() / (float)roads[i].length;
-			PRINT("ROAD ID:%d  CHANNEL ID:%d  PERCENT:%f\n",roads[i].id,j,per);
+			if(per > 0.5)
+				PRINT("ROAD ID:%d  CHANNEL ID:%d  PERCENT:%f\n",roads[i].id,j,per);
 		}
 	}
 }
@@ -679,37 +680,40 @@ int Scheduler::getDirByRoadCrossDir(int idCross, int idRoad)
 
 void Scheduler::driveAllCarsJustOnOneChannelToEndState(int idRoad, int idCross, int idChannel)
 {
-	for (int i = 0; i < roads[idRoad].lane[idChannel].laneCar.size();++i)
+	if (roads[idRoad - 5000].lane[idChannel].laneCar.size() != 0)
 	{
-		if (roads[idRoad].lane[idChannel].laneCar[i].status == WAITTING)//只处理等待状态的车
+		for (int i = 0; i < roads[idRoad - 5000].lane[idChannel].laneCar.size(); ++i)
 		{
-			Car car = roads[idRoad].lane[idChannel].laneCar[i];
-			if (car.location + std::min(roads[idRoad - 5000].speed, car.speed) <= roads[idRoad - 5000].length)//不会驶出路口
+			if (roads[idRoad - 5000].lane[idChannel].laneCar[i].status == WAITTING)//只处理等待状态的车
 			{
-				//只处理行驶后不通过路口的车
-				if (i != 0)//如果该车不是第一辆车
+				Car car = roads[idRoad - 5000].lane[idChannel].laneCar[i];
+				if (car.location + std::min(roads[idRoad - 5000].speed, car.speed) <= roads[idRoad - 5000].length)//不会驶出路口
 				{
-					Car carNext = roads[idRoad].lane[idChannel].laneCar[i - 1];
-					if (car.location + std::min(roads[idRoad - 5000].speed, car.speed) < carNext.location)
+					//只处理行驶后不通过路口的车
+					if (i != 0)//如果该车不是第一辆车
+					{
+						Car carNext = roads[idRoad - 5000].lane[idChannel].laneCar[i - 1];
+						if (car.location + std::min(roads[idRoad - 5000].speed, car.speed) < carNext.location)
+						{
+							//前车不形成阻挡
+							roads[idRoad - 5000].lane[idChannel].laneCar[i].location += std::min(roads[idRoad - 5000].speed, car.speed);//车正常行驶
+							roads[idRoad - 5000].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
+							roads[idRoad - 5000].lane[idChannel].laneCar[i].dirCross = NONE;
+						}
+						else if (carNext.status == FINESHED)
+						{
+							roads[idRoad - 5000].lane[idChannel].laneCar[i].location = carNext.location - 1;//车正常行驶
+							roads[idRoad - 5000].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
+							roads[idRoad - 5000].lane[idChannel].laneCar[i].dirCross = NONE;
+						}
+					}
+					else
 					{
 						//前车不形成阻挡
 						roads[idRoad - 5000].lane[idChannel].laneCar[i].location += std::min(roads[idRoad - 5000].speed, car.speed);//车正常行驶
 						roads[idRoad - 5000].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
 						roads[idRoad - 5000].lane[idChannel].laneCar[i].dirCross = NONE;
 					}
-					else if (carNext.status == FINESHED)
-					{
-						roads[idRoad - 5000].lane[idChannel].laneCar[i].location = carNext.location - 1;//车正常行驶
-						roads[idRoad - 5000].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
-						roads[idRoad - 5000].lane[idChannel].laneCar[i].dirCross = NONE;
-					}
-				}
-				else
-				{
-					//前车不形成阻挡
-					roads[idRoad - 5000].lane[idChannel].laneCar[i].location += std::min(roads[idRoad - 5000].speed, car.speed);//车正常行驶
-					roads[idRoad - 5000].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
-					roads[idRoad - 5000].lane[idChannel].laneCar[i].dirCross = NONE;
 				}
 			}
 		}
