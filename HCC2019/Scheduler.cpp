@@ -728,7 +728,7 @@ void Scheduler::getPathByTime()
 		//统计车辆情况，每100辆车更新一次jamDegree的矩阵
 		num++;
 		flagnum++;
-		if (num == 100)
+		if (num == 200)
 		{
 			num = 0;
 			graph.upDateJam();
@@ -759,7 +759,7 @@ void Scheduler::getPathByTime()
 
 
 		//统计cross的情况
-		if (flagnum == 100)
+		if (flagnum == 200)
 		{
 			ofstream oFile;
 			oFile.open("testcross100.csv", ios::out | ios::trunc);
@@ -790,7 +790,7 @@ void Scheduler::getPathByTime()
 		}
 
 		/*写出100~200辆车的统计情况*/
-		if (flagnum == 200)
+		if (flagnum == 400)
 		{
 			ofstream oFile2;
 			oFile2.open("testcross200.csv", ios::out | ios::trunc);
