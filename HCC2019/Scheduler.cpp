@@ -732,14 +732,6 @@ void Scheduler::getPathByTime()
 		{
 			num = 0;
 			graph.upDateJam();
-			//for (int i = 0; i < vexnum; i++)
-			//{
-			//	flag[i] = 0;
-			//}
-			//for (int i = 0; i < 150; i++)
-			//{
-			//	flag_road[i] = 0;
-			//}
 		}
 		for (int i = 0; i < pathCross.size(); i++) 
 		{
@@ -775,12 +767,13 @@ void Scheduler::getPathByTime()
 			{
 				oFile << flag[i] << endl;
 			}
-			
+
+			oFile.close();
+
 			for (int i = 0; i < 100; i++)
 			{
 				flag[i] = 0;
 			}
-			oFile.close();
 
 			ofstream oFile1;
 			oFile1.open("testroad100.csv", ios::out | ios::trunc);
@@ -788,13 +781,12 @@ void Scheduler::getPathByTime()
 			{
 				oFile1 << flag_road[i] << endl;
 			}
+			oFile1.close();
 
 			for (int i = 0; i < 120; i++)
 			{
 				flag_road[i] = 0;
 			}
-
-			oFile1.close();
 		}
 
 		/*写出100~200辆车的统计情况*/
