@@ -713,7 +713,9 @@ void Scheduler::getPath()
 void Scheduler::getPathByTime()
 {
 	static int num = 0;
+	static int flagnum = 0;
 	static int flag[100] = { 0 };
+	static int flag_road[120] = { 0 };
 
 	Graph_DG graph(vexnum, edge);
 	graph.createArcGraph(tmp);
@@ -725,14 +727,19 @@ void Scheduler::getPathByTime()
 
 		//统计车辆情况，每100辆车更新一次jamDegree的矩阵
 		num++;
+		flagnum++;
 		if (num == 100)
 		{
 			num = 0;
 			graph.upDateJam();
-			for (int i = 0; i < vexnum; i++)
-			{
-				flag[i] = 0;
-			}
+			//for (int i = 0; i < vexnum; i++)
+			//{
+			//	flag[i] = 0;
+			//}
+			//for (int i = 0; i < 150; i++)
+			//{
+			//	flag_road[i] = 0;
+			//}
 		}
 		for (int i = 0; i < pathCross.size(); i++) 
 		{
@@ -744,42 +751,75 @@ void Scheduler::getPathByTime()
 			graph.jamDegreeTmp[pathCross.at(i) - 1][pathCross.at(j) - 1]++;
 		}
 
-		//if (num == 100)
-		//{
-		//	ofstream oFile;
-		//	oFile.open("test.csv", ios::out | ios::trunc);
-		//	for (int i=0; i < 100; i++)
-		//	{
-		//		oFile << flag[i] << endl;
-		//	}
-		//	
-		//	for (int i = 0; i < 64; i++)
-		//	{
-		//		flag[i] = 0;
-		//	}
-		//	graph.upDateJam();
-		//	oFile.close();
-		//}
-
-		///*写出100~200辆车的统计情况*/
-		//if (num == 200)
-		//{
-		//	ofstream oFile;
-		//	oFile.open("test2.csv", ios::out | ios::trunc);
-		//	for (int i = 0; i < 100; i++)
-		//	{
-		//		oFile << flag[i] << endl;
-		//	}
-
-		//	oFile.close();
-		//}
-
+		//cross矩阵转road矩阵
 		vector<int> pathRoad(pathCross.size() - 1);
 		for (int j = 0; j < pathRoad.size(); ++j)
 		{
 			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
 			//assert(pathRoad[j] != 0);
 		}
+
+		//统计road的情况
+		for (int i = 0; i < pathRoad.size(); i++)
+		{
+			flag_road[pathRoad.at(i) - 5000]++;//记录road的使用情况
+		}
+
+
+		//统计cross的情况
+		if (flagnum == 100)
+		{
+			ofstream oFile;
+			oFile.open("testcross100.csv", ios::out | ios::trunc);
+			for (int i=0; i < 100; i++)
+			{
+				oFile << flag[i] << endl;
+			}
+			
+			for (int i = 0; i < 100; i++)
+			{
+				flag[i] = 0;
+			}
+			oFile.close();
+
+			ofstream oFile1;
+			oFile1.open("testroad100.csv", ios::out | ios::trunc);
+			for (int i = 0; i < 120; i++)
+			{
+				oFile1 << flag_road[i] << endl;
+			}
+
+			for (int i = 0; i < 120; i++)
+			{
+				flag_road[i] = 0;
+			}
+
+			oFile1.close();
+		}
+
+		/*写出100~200辆车的统计情况*/
+		if (flagnum == 200)
+		{
+			ofstream oFile2;
+			oFile2.open("testcross200.csv", ios::out | ios::trunc);
+			for (int i = 0; i < 100; i++)
+			{
+				oFile2 << flag[i] << endl;
+			}
+
+			oFile2.close();
+
+
+			ofstream oFile3;
+			oFile3.open("testroad200.csv", ios::out | ios::trunc);
+			for (int i = 0; i < 120; i++)
+			{
+				oFile3 << flag_road[i] << endl;
+			}
+
+			oFile3.close();
+		}
+
 		cars[i].path = pathRoad;
 	}
 
