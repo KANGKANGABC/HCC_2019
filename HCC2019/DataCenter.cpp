@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <string>
 
-
 DataCenter::DataCenter()
 {
 }
@@ -145,7 +144,6 @@ void DataCenter::readCarData()
 		car[i - 1].starttime = carTask[i - 1][4] + (8 - car[i - 1].speed )*80 + i % 160;//这里给自己挖了一个坑
 		car[i - 1].status = SLEEPING;//车的初始状态为SLEEPING
 		car[i - 1].dirCross = NONE;//车的过路口状态为NONE
-
 	}
 	sort(speedType.begin(), speedType.end());
 	car_speed_num = speedType.size();

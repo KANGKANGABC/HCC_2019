@@ -63,9 +63,6 @@ private:
 	//判断该车能否在某路口转向并行驶
 	bool isCanDriveToNextRoad(Car car, int dir, int idCross);//dir为目标行驶方向
 
-	//某个road上的车辆行进，直到该车辆行驶变成等待状态或者终止状态
-	void driveAllCarsJustOnOneRoadToEndState(int idRoad, int idCross);
-
 	//车库中的车辆上路行驶
 	void driverCarInGarage();
 
