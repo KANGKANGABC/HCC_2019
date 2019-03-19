@@ -4,8 +4,8 @@
 using namespace std;
 
 //构造函数定义
-Graph_DG::Graph_DG(int vexnum, int edge):
-vexnum(vexnum), edge(edge){
+Graph_DG::Graph_DG(int vexnum, int edge) :
+	vexnum(vexnum), edge(edge) {
 	//初始化路长的邻接矩阵
 	arc = new int*[this->vexnum];		//指向指针的数组，实际就是一个二维的数组（矩阵）
 	for (int i = 0; i < this->vexnum; i++) {
@@ -31,6 +31,25 @@ vexnum(vexnum), edge(edge){
 		for (int k = 0; k < this->vexnum; k++) {
 			//初始化为无穷达
 			arcTime[i][k] = FLT_MAX;
+		}
+	}
+
+	//初始化jamDegree的邻接矩阵
+	jamDegree = new int*[this->vexnum];		//指向指针的数组，实际就是一个二维的数组（矩阵）
+	for (int i = 0; i < this->vexnum; i++) {
+		jamDegree[i] = new int[this->vexnum];
+		for (int k = 0; k < this->vexnum; k++) {
+			//初始化为0
+			jamDegree[i][k] = 0;
+		}
+	}
+	//初始化jamDegreeTmp的邻接矩阵
+	jamDegreeTmp = new int*[this->vexnum];		//指向指针的数组，实际就是一个二维的数组（矩阵）
+	for (int i = 0; i < this->vexnum; i++) {
+		jamDegreeTmp[i] = new int[this->vexnum];
+		for (int k = 0; k < this->vexnum; k++) {
+			//初始化为0
+			jamDegreeTmp[i][k] = 0;
 		}
 	}
 }
@@ -250,6 +269,8 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 	//首先初始化dis数组
 	disfloat = new DisFloat[this->vexnum];
 
+	static float w = 1;
+
 	//计算时间的邻接矩阵
 	for (int i = 0; i < this->vexnum; i++)
 	{
@@ -262,7 +283,7 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 
 			else
 			{
-				arcTime[i][j] = arcRoadv[i][j] > speed ? ((float)arc[i][j] / speed) : ((float)arc[i][j] / arcRoadv[i][j]);	//取道路限速和车速较小的一个用来求时间
+				arcTime[i][j] = arcRoadv[i][j] > speed ? (((float)arc[i][j] / speed) + w * jamDegree[i][j]) : (((float)arc[i][j] / arcRoadv[i][j]) + w * jamDegree[i][j]);	//取道路限速和车速较小的一个用来求时间
 			}
 		}
 	}
@@ -275,7 +296,7 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 		tmp.push_back(begin);
 		tmp.push_back(i + 1);
 		disfloat[i].path = tmp;
-		disfloat[i].value = arc[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
+		disfloat[i].value = arcTime[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
 	}
 	//设置起点到起点自己的路径为0
 	disfloat[begin - 1].value = 0;
@@ -287,7 +308,7 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 		//temp用于保存当前dis数组中最小的那个下标
 		//min记录当前的最小值
 		int temp = 0;
-		int min = INT_MAX;
+		float min = FLT_MAX;
 		//这里的for循环我的理解就是算法中优先队列的作用（找目前最短的点），选择准备进行松弛的点，给下一步的for循环进行松弛操作
 		for (i = 0; i < this->vexnum; i++) {
 			if (!disfloat[i].visit && disfloat[i].value < min) {
@@ -300,8 +321,8 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 		++count;
 		//下面这个for循环这么理解（更新的是temp指向的点的值），它是将所有的点都进行了一次松弛更新的操作，如果满足条件则更新否则不更新，在算法中写的是值操作相邻的点进行操作，因为不相邻的没有意义（这里就用无穷达来表达了这种情况！因此它直接所有点遍历，如果可以只存邻接的点那会更好！）
 		for (i = 0; i < this->vexnum; i++) {
-			if (!disfloat[i].visit && arc[temp][i] != INT_MAX && (disfloat[temp].value + arc[temp][i]) < disfloat[i].value) {
-				disfloat[i].value = disfloat[temp].value + arc[temp][i];
+			if (!disfloat[i].visit && arcTime[temp][i] != FLT_MAX && (disfloat[temp].value + arcTime[temp][i]) < disfloat[i].value) {
+				disfloat[i].value = disfloat[temp].value + arcTime[temp][i];
 				vector<int> tmp;
 				tmp = disfloat[temp].path;
 				tmp.push_back(i + 1);
@@ -310,6 +331,7 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 		}
 	}
 	vector<int> path_tmp = disfloat[end - 1].path;
+
 	delete[] disfloat;//释放动态申请的disfloat数组
 	return path_tmp;
 }
@@ -342,4 +364,24 @@ vector<int> Graph_DG::print_path(int begin, int end) {
 	cout << "长度 " << dis[end].value << endl;
 
 	return dis[end].path;
+}
+
+void Graph_DG::upDateJam()
+{
+	//将临时jamDgreeTmp中的统计值更新到jamDegree中，用来给time邻接矩阵做调整
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		for (int j = 0; j < this->vexnum; j++)
+		{
+			jamDegree[i][j] = jamDegreeTmp[i][j];
+		}
+	}
+	//将jamDegreeTmp的矩阵重置为0，准备下一次100辆车的统计信息
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		for (int j = 0; j < this->vexnum; j++)
+		{
+			jamDegreeTmp[i][j] = 0;
+		}
+	}
 }

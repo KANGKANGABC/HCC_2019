@@ -734,6 +734,8 @@ void Scheduler::getPath()
 
 void Scheduler::getPathByTime()
 {
+	static int num = 0;
+	static int flag[100] = { 0 };
 
 	Graph_DG graph(vexnum, edge);
 	graph.createArcGraph(tmp);
@@ -742,6 +744,58 @@ void Scheduler::getPathByTime()
 	for (int i = 0; i < num_Cars; ++i)
 	{
 		vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed);
+
+		//统计车辆情况，每100辆车更新一次jamDegree的矩阵
+		num++;
+		if (num == 100)
+		{
+			num = 0;
+			graph.upDateJam();
+			for (int i = 0; i < vexnum; i++)
+			{
+				flag[i] = 0;
+			}
+		}
+		for (int i = 0; i < pathCross.size(); i++)
+		{
+			flag[pathCross.at(i) - 1]++;//记录64个cross的使用情况
+		}
+		//将统计的情况放到jamDegreeTmp的矩阵中
+		for (int i = 0, j = 1; j < pathCross.size(); i++, j++)
+		{
+			graph.jamDegreeTmp[pathCross.at(i) - 1][pathCross.at(j) - 1]++;
+		}
+
+		//if (num == 100)
+		//{
+		//	ofstream oFile;
+		//	oFile.open("test.csv", ios::out | ios::trunc);
+		//	for (int i=0; i < 100; i++)
+		//	{
+		//		oFile << flag[i] << endl;
+		//	}
+		//	
+		//	for (int i = 0; i < 64; i++)
+		//	{
+		//		flag[i] = 0;
+		//	}
+		//	graph.upDateJam();
+		//	oFile.close();
+		//}
+
+		///*写出100~200辆车的统计情况*/
+		//if (num == 200)
+		//{
+		//	ofstream oFile;
+		//	oFile.open("test2.csv", ios::out | ios::trunc);
+		//	for (int i = 0; i < 100; i++)
+		//	{
+		//		oFile << flag[i] << endl;
+		//	}
+
+		//	oFile.close();
+		//}
+
 		vector<int> pathRoad(pathCross.size() - 1);
 		for (int j = 0; j < pathRoad.size(); ++j)
 		{
