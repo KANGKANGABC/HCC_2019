@@ -269,7 +269,7 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 	//首先初始化dis数组
 	disfloat = new DisFloat[this->vexnum];
 
-	static float w = 1;
+	static float w = 50;
 
 	//计算时间的邻接矩阵
 	for (int i = 0; i < this->vexnum; i++)
