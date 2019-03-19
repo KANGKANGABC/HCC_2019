@@ -254,7 +254,13 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 	//统计分析：flag[]数组负责统计cross的规划使用情况，可以得到道路的使用率（拥堵情况）；flagnum负责记录统计的次数，每100次记录一次
 	static int flag[100] = { 0 };
 	static int flagnum = 0;
+	static int w = 1;
 
+	if (flagnum == 100)
+	{
+		flagnum = 0;
+		upDateJam();
+	}
 	//计算时间的邻接矩阵
 	for (int i = 0; i < this->vexnum; i++)
 	{
@@ -267,10 +273,11 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 
 			else
 			{
-				arcTime[i][j] = arcRoadv[i][j] > speed ? ((float)arc[i][j] / speed) : ((float)arc[i][j] / arcRoadv[i][j]);	//取道路限速和车速较小的一个用来求时间
+				arcTime[i][j] = arcRoadv[i][j] > speed ? (((float)arc[i][j] / speed) + w * jamDegree[i][j]) : (((float)arc[i][j] / arcRoadv[i][j]) + w * jamDegree[i][j]);	//取道路限速和车速较小的一个用来求时间
 			}
 		}
 	}
+
 
 	int i;
 	for (i = 0; i < this->vexnum; i++) {
@@ -280,7 +287,7 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 		tmp.push_back(begin);
 		tmp.push_back(i + 1);
 		disfloat[i].path = tmp;
-		disfloat[i].value = arc[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
+		disfloat[i].value = arcTime[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
 	}
 	//设置起点到起点自己的路径为0
 	disfloat[begin - 1].value = 0;
@@ -305,8 +312,8 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 		++count;
 		//下面这个for循环这么理解（更新的是temp指向的点的值），它是将所有的点都进行了一次松弛更新的操作，如果满足条件则更新否则不更新，在算法中写的是值操作相邻的点进行操作，因为不相邻的没有意义（这里就用无穷达来表达了这种情况！因此它直接所有点遍历，如果可以只存邻接的点那会更好！）
 		for (i = 0; i < this->vexnum; i++) {
-			if (!disfloat[i].visit && arc[temp][i] != INT_MAX && (disfloat[temp].value + arc[temp][i]) < disfloat[i].value) {
-				disfloat[i].value = disfloat[temp].value + arc[temp][i];
+			if (!disfloat[i].visit && arcTime[temp][i] != INT_MAX && (disfloat[temp].value + arcTime[temp][i]) < disfloat[i].value) {
+				disfloat[i].value = disfloat[temp].value + arcTime[temp][i];
 				vector<int> tmp;
 				tmp = disfloat[temp].path;
 				tmp.push_back(i + 1);
@@ -322,49 +329,49 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 		flag[path_tmp.at(i)]++;//记录64个cross的使用情况
 	}
 	flagnum++;
-	/*写出前100辆车的统计情况*/
-	if (flagnum == 100)
-	{
-		ofstream oFile;
-		oFile.open("test.csv", ios::out | ios::trunc);
-		for (int i=0; i < 100; i++)
-		{
-			oFile << flag[i] << endl;
-		}
-		
-		for (int i = 0; i < 64; i++)
-		{
-			flag[i] = 0;
-		}
-		oFile.close();
-		//打印统计矩阵 jamDegree
-		for(int i = 0; i < 64; i++)
-		{
-			for (int j = 0; j < 64; j++)
-			{
-				cout << jamDegree[i][j] << " ";
-			}
-			cout << endl;
-		}
-		getchar();
-	}
+	///*写出前100辆车的统计情况*/
+	//if (flagnum == 100)
+	//{
+	//	ofstream oFile;
+	//	oFile.open("test.csv", ios::out | ios::trunc);
+	//	for (int i=0; i < 100; i++)
+	//	{
+	//		oFile << flag[i] << endl;
+	//	}
+	//	
+	//	for (int i = 0; i < 64; i++)
+	//	{
+	//		flag[i] = 0;
+	//	}
+	//	oFile.close();
+	//	//打印统计矩阵 jamDegree
+	//	for(int i = 0; i < 64; i++)
+	//	{
+	//		for (int j = 0; j < 64; j++)
+	//		{
+	//			cout << jamDegree[i][j] << " ";
+	//		}
+	//		cout << endl;
+	//	}
+	//	getchar();
+	//}
 
-	/*写出100~200辆车的统计情况*/
-	if (flagnum == 200)
-	{
-		ofstream oFile;
-		oFile.open("test2.csv", ios::out | ios::trunc);
-		for (int i = 0; i < 100; i++)
-		{
-			oFile << flag[i] << endl;
-		}
+	///*写出100~200辆车的统计情况*/
+	//if (flagnum == 200)
+	//{
+	//	ofstream oFile;
+	//	oFile.open("test2.csv", ios::out | ios::trunc);
+	//	for (int i = 0; i < 100; i++)
+	//	{
+	//		oFile << flag[i] << endl;
+	//	}
 
-		oFile.close();
-	}
+	//	oFile.close();
+	//}
 
 	for (int i = 0, j = 1; j < path_tmp.size(); i++, j++)
 	{
-		jamDegree[path_tmp.at(i)][path_tmp.at(j)]++;
+		jamDegreeTmp[path_tmp.at(i)][path_tmp.at(j)]++;
 	}
 
 /********************************统计道路车辆通过率测试**********************************/
@@ -401,4 +408,24 @@ vector<int> Graph_DG::print_path(int begin, int end) {
 	cout << "长度 " << dis[end].value << endl;
 
 	return dis[end].path;
+}
+
+void Graph_DG::upDateJam()
+{
+	//将临时jamDgreeTmp中的统计值更新到jamDegree中，用来给time邻接矩阵做调整
+	for (int i = 0; i < this->vexnum; i++) 
+	{
+		for (int j = 0; j < this->vexnum; j++)
+		{
+			jamDegree[i][j] = jamDegreeTmp[i][j];
+		}
+	}
+	//将jamDegreeTmp的矩阵重置为0，准备下一次100辆车的统计信息
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		for (int j = 0; j < this->vexnum; j++)
+		{
+			jamDegree[i][j] = jamDegreeTmp[i][j];
+		}
+	}
 }

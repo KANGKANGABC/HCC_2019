@@ -6,7 +6,8 @@
 #include "define.h"
 using namespace std;
 
-static int jamDegree[64][64] = { 0 };//定义全局变量数组，存放堵塞程度的统计值
+static int jamDegree[100][100] = { 0 };//定义全局变量数组，存放堵塞程度的统计值
+static int jamDegreeTmp[100][100] = { 0 };//定义全局变量数组，存放堵塞程度的统计值
 
 struct Dis {
 	vector<int> path;//路径的经过
@@ -64,4 +65,6 @@ public:
 	void print_path(int begin);
 	//打印begin到end之间的最短距离
 	vector<int> print_path(int begin, int end);
+	//跟新jamDegree的邻接矩阵
+	void upDateJam();
 };
