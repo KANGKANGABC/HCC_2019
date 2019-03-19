@@ -6,9 +6,6 @@
 #include "define.h"
 using namespace std;
 
-static int jamDegree[100][100] = { 0 };//定义全局变量数组，存放堵塞程度的统计值
-static int jamDegreeTmp[100][100] = { 0 };//定义全局变量数组，存放堵塞程度的统计值
-
 struct Dis {
 	vector<int> path;//路径的经过
 	int value;
@@ -41,6 +38,8 @@ private:
 	DisFloat *disfloat; //记录各个顶点的时间的最短路径信息
 	
 public:
+	int **jamDegree;	//两个保存道路拥挤度的矩阵
+	int **jamDegreeTmp;
 	//构造函数（参数表：邻接矩阵，顶点数（cross数量），边数（road数量））
 	Graph_DG(int vexnum, int edge);
 	//析构函数

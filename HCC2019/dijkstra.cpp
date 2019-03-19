@@ -1,7 +1,6 @@
 #include "dijkstra.h"
 #include "iostream"
 #include "DataCenter.h"
-#include "fstream"
 using namespace std;
 
 //构造函数定义
@@ -32,6 +31,25 @@ vexnum(vexnum), edge(edge){
 		for (int k = 0; k < this->vexnum; k++) {
 			//初始化为无穷达
 			arcTime[i][k] = FLT_MAX;
+		}
+	}
+
+	//初始化jamDegree的邻接矩阵
+	jamDegree = new int*[this->vexnum];		//指向指针的数组，实际就是一个二维的数组（矩阵）
+	for (int i = 0; i < this->vexnum; i++) {
+		jamDegree[i] = new int[this->vexnum];
+		for (int k = 0; k < this->vexnum; k++) {
+			//初始化为0
+			jamDegree[i][k] = 0;
+		}
+	}
+	//初始化jamDegreeTmp的邻接矩阵
+	jamDegreeTmp = new int*[this->vexnum];		//指向指针的数组，实际就是一个二维的数组（矩阵）
+	for (int i = 0; i < this->vexnum; i++) {
+		jamDegreeTmp[i] = new int[this->vexnum];
+		for (int k = 0; k < this->vexnum; k++) {
+			//初始化为0
+			jamDegreeTmp[i][k] = 0;
 		}
 	}
 }
@@ -251,16 +269,8 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 	//首先初始化dis数组
 	disfloat = new DisFloat[this->vexnum];
 
-	//统计分析：flag[]数组负责统计cross的规划使用情况，可以得到道路的使用率（拥堵情况）；flagnum负责记录统计的次数，每100次记录一次
-	static int flag[100] = { 0 };
-	static int flagnum = 0;
-	static int w = 1;
+	static float w = 0.2;
 
-	if (flagnum == 100)
-	{
-		flagnum = 0;
-		upDateJam();
-	}
 	//计算时间的邻接矩阵
 	for (int i = 0; i < this->vexnum; i++)
 	{
@@ -277,7 +287,6 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 			}
 		}
 	}
-
 
 	int i;
 	for (i = 0; i < this->vexnum; i++) {
@@ -299,7 +308,7 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 		//temp用于保存当前dis数组中最小的那个下标
 		//min记录当前的最小值
 		int temp = 0;
-		int min = INT_MAX;
+		float min = FLT_MAX;
 		//这里的for循环我的理解就是算法中优先队列的作用（找目前最短的点），选择准备进行松弛的点，给下一步的for循环进行松弛操作
 		for (i = 0; i < this->vexnum; i++) {
 			if (!disfloat[i].visit && disfloat[i].value < min) {
@@ -312,7 +321,7 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 		++count;
 		//下面这个for循环这么理解（更新的是temp指向的点的值），它是将所有的点都进行了一次松弛更新的操作，如果满足条件则更新否则不更新，在算法中写的是值操作相邻的点进行操作，因为不相邻的没有意义（这里就用无穷达来表达了这种情况！因此它直接所有点遍历，如果可以只存邻接的点那会更好！）
 		for (i = 0; i < this->vexnum; i++) {
-			if (!disfloat[i].visit && arcTime[temp][i] != INT_MAX && (disfloat[temp].value + arcTime[temp][i]) < disfloat[i].value) {
+			if (!disfloat[i].visit && arcTime[temp][i] != FLT_MAX && (disfloat[temp].value + arcTime[temp][i]) < disfloat[i].value) {
 				disfloat[i].value = disfloat[temp].value + arcTime[temp][i];
 				vector<int> tmp;
 				tmp = disfloat[temp].path;
@@ -322,59 +331,6 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 		}
 	}
 	vector<int> path_tmp = disfloat[end - 1].path;
-
-/********************************统计道路车辆通过率测试**********************************/
-	for (int i = 0; i < path_tmp.size(); i++) {
-		//cout << path_tmp.size() <<" " << path_tmp.at(i) <<  endl;
-		flag[path_tmp.at(i)]++;//记录64个cross的使用情况
-	}
-	flagnum++;
-	///*写出前100辆车的统计情况*/
-	//if (flagnum == 100)
-	//{
-	//	ofstream oFile;
-	//	oFile.open("test.csv", ios::out | ios::trunc);
-	//	for (int i=0; i < 100; i++)
-	//	{
-	//		oFile << flag[i] << endl;
-	//	}
-	//	
-	//	for (int i = 0; i < 64; i++)
-	//	{
-	//		flag[i] = 0;
-	//	}
-	//	oFile.close();
-	//	//打印统计矩阵 jamDegree
-	//	for(int i = 0; i < 64; i++)
-	//	{
-	//		for (int j = 0; j < 64; j++)
-	//		{
-	//			cout << jamDegree[i][j] << " ";
-	//		}
-	//		cout << endl;
-	//	}
-	//	getchar();
-	//}
-
-	///*写出100~200辆车的统计情况*/
-	//if (flagnum == 200)
-	//{
-	//	ofstream oFile;
-	//	oFile.open("test2.csv", ios::out | ios::trunc);
-	//	for (int i = 0; i < 100; i++)
-	//	{
-	//		oFile << flag[i] << endl;
-	//	}
-
-	//	oFile.close();
-	//}
-
-	for (int i = 0, j = 1; j < path_tmp.size(); i++, j++)
-	{
-		jamDegreeTmp[path_tmp.at(i)][path_tmp.at(j)]++;
-	}
-
-/********************************统计道路车辆通过率测试**********************************/
 
 	delete[] disfloat;//释放动态申请的disfloat数组
 	return path_tmp;
