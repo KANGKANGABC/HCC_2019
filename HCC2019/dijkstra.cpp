@@ -425,7 +425,7 @@ void Graph_DG::upDateJam()
 	{
 		for (int j = 0; j < this->vexnum; j++)
 		{
-			jamDegree[i][j] = jamDegreeTmp[i][j];
+			jamDegreeTmp[i][j] = 0;
 		}
 	}
 }
