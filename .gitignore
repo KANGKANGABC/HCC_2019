@@ -4,6 +4,9 @@
 # User Output files (LiYing)
 road_graph.txt
 
+# User Output files (ZhaoKang)
+answer.txt
+
 # User-specific files
 *.suo
 #*.user

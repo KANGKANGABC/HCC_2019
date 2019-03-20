@@ -4,4 +4,8 @@
     <LocalDebuggerCommandArguments>train1_test\car.txt train1_test\road.txt train1_test\cross.txt train1_test\answer.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommandArguments>train1_test\car.txt train1_test\road.txt train1_test\cross.txt train1_test\answer.txt</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

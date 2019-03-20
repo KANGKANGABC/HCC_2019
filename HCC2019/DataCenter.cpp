@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <string>
 
-
 DataCenter::DataCenter()
 {
 }
@@ -141,11 +140,32 @@ void DataCenter::readCarData()
 		car[i - 1].speed = carTask[i - 1][3];
 		car[i - 1].plantime = carTask[i - 1][4];
 		//car[i - 1].starttime = carTask[i - 1][4] + i%400;//这里给自己挖了一个坑
-		car[i - 1].plantime = carTask[i - 1][4] + (8 - car[i - 1].speed) * 200 + i % 400;//这里给自己挖了一个坑
-		car[i - 1].starttime = carTask[i - 1][4] + (8 - car[i - 1].speed )*55 + i % 110;//这里给自己挖了一个坑
+		int n2, n4, n6, n8;
+		n2 = 75;
+		n4 = 75;
+		n6 = 75;
+		n8 = 75;
+		switch (car[i - 1].speed)
+		{
+		case 2:
+			car[i - 1].plantime = car[i - 1].plantime + 6 * n2 + i % (2 * n2 - 10);
+			break;
+		case 4:
+			car[i - 1].plantime = car[i - 1].plantime + 4 * n4 + i % (2 * n4 - 10);
+			break;
+		case 6:
+			car[i - 1].plantime = car[i - 1].plantime + 2 * n6 + i % (2 * n6 - 10);
+			break;
+		case 8:
+			car[i - 1].plantime = car[i - 1].plantime + 0 * n8 + i % (2 * n8 - 10);
+			break;
+		default:
+			break;
+		}
+		//car[i - 1].plantime = carTask[i - 1][4] + (8 - car[i - 1].speed) * n + i % (2*n);//这里给自己挖了一个坑
+		car[i - 1].starttime = carTask[i - 1][4] + (8 - car[i - 1].speed )*80 + i % 160;//这里给自己挖了一个坑
 		car[i - 1].status = SLEEPING;//车的初始状态为SLEEPING
 		car[i - 1].dirCross = NONE;//车的过路口状态为NONE
-
 	}
 	sort(speedType.begin(), speedType.end());
 	car_speed_num = speedType.size();

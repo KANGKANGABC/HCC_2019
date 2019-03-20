@@ -36,7 +36,7 @@ private:
 	void driveAllCarsJustOnRoadToEndState();
 	
 	/*让该车前进*/
-	void driveCar(Car car, int indexCar);//indexCar为该车在车道的位置
+	int driveCar(Car car, int indexCar);//indexCar为该车在车道的位置
 
 	/*将该车加入道路行驶*/
 	void addCar(Car car,int i);//i为该车在cars[]中的下标，便于加入车失败时延后时间片
@@ -63,9 +63,6 @@ private:
 	//判断该车能否在某路口转向并行驶
 	bool isCanDriveToNextRoad(Car car, int dir, int idCross);//dir为目标行驶方向
 
-	//某个road上的车辆行进，直到该车辆行驶变成等待状态或者终止状态
-	void driveAllCarsJustOnOneRoadToEndState(int idRoad, int idCross);
-
 	//车库中的车辆上路行驶
 	void driverCarInGarage();
 
@@ -74,6 +71,9 @@ private:
 
 	//输出所有车辆状态
 	void putAllCarStatus();
+
+	//输出所有道路状态
+	void putAllRoadStatus();
 
 	//获得该cross的对应优先级道路ID，如果道路ID为-1则返回-1
 	int getFirstRoadFromCross(int idCross,int index);
