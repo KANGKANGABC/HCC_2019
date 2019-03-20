@@ -161,19 +161,24 @@ void Scheduler::driveAllCarsJustOnRoadToEndState()
 			{
 				for (int m = 0; m < roads[i].lane[j].laneCar.size(); ++m)
 				{
-					if(roads[i].lane[j].laneCar[m].dirCross == NONE)
-						driveCar(roads[i].lane[j].laneCar[m], m);//从第一辆车开始往后调度
+					if (roads[i].lane[j].laneCar[m].dirCross == NONE)
+					{
+						int result = driveCar(roads[i].lane[j].laneCar[m], m);//从第一辆车开始往后调度
+						if (result == 2)
+							m--;
+					}
 					//roads[i].lane[j] = lane;//这里一定要将lane写回，否则车辆调度无效
 					//这里不要写回，写回容易误操作，只需要保证更新car的状态是通过road->lane->car的方式索引即可
 					//此处有问题，如果一个车道有两辆车，但是第一辆车被开到下一车道，如果车道信息没有及时更新
 					//会出现误操作，索引到并不存在的第二辆车
+					//0320如果前车到达终点，被删除，索引的时候会遗漏一辆车
 				}
 			}
 		}
 	}
 }
 
-bool Scheduler::driveCar(Car car, int indexCar)
+int Scheduler::driveCar(Car car, int indexCar)
 {
 	//这里假设AA：如果某辆车从路口驶入下一道路，不可能在一个时间片内驶完下一道路全程
 	//也就是说只有处于NONE状态WAITTING的车才有可能即将到达终点
@@ -206,6 +211,7 @@ bool Scheduler::driveCar(Car car, int indexCar)
 					num_CarsScheduling -= 1;//正在调度的车辆数减一
 					std::vector<Car>::iterator it = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.begin();
 					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.erase(it);//删除该道路第一辆车
+					return 2;//代表前面一辆车到达终点
 				}
 				else
 				{
@@ -287,7 +293,7 @@ bool Scheduler::driveCar(Car car, int indexCar)
 				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = roads[car.idCurRoad - 5000].length;
 				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//该车调度完成，等待下一时间片再行驶
 				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = NONE;
-				return true;
+				return 1;
 			}
 			else
 			{
@@ -298,7 +304,7 @@ bool Scheduler::driveCar(Car car, int indexCar)
 					if (disNextRoad < carNext.location)//不形成阻挡
 					{
 						driverToNextRoad(car, idNextRoad, idNextLane, disNextRoad);//行驶到下个路口
-						return true;
+						return 1;
 					}
 					else//形成阻挡
 					{
@@ -306,7 +312,7 @@ bool Scheduler::driveCar(Car car, int indexCar)
 						{
 							driverToNextRoad(car, idNextRoad, idNextLane, carNext.location - 1);//行驶到下个路口，前车之后
 							assert(carNext.location >= 1);
-							return true;
+							return 1;
 						}
 						//如果前车处于等待状态，那么此车也不行驶，继续等待
 					}
@@ -314,7 +320,7 @@ bool Scheduler::driveCar(Car car, int indexCar)
 				else//如果该车道没有阻挡
 				{
 					driverToNextRoad(car, idNextRoad, idNextLane, disNextRoad);//行驶到下个路口
-					return true;
+					return 1;
 				}
 			}
 		}
@@ -524,13 +530,13 @@ bool Scheduler::isCanDriveToNextRoad(Car car, int dir, int idCross)
 		int idNextLane = isCanEnter(crosses[idCross - 1].roadID[dir], idCross);
 		if (idNextLane != -1)
 		{
-			bool result = driveCar(car, -1);//该车可以转向，但是不代表该车转向后不会因为有车阻挡然后WAITTING
+			int result = driveCar(car, -1);//该车可以转向，但是不代表该车转向后不会因为有车阻挡然后WAITTING
 			//实际上driverCar后可能有如下三种情况
 			//1.成功行驶到下个路口
 			//2.因为下个路口有车waitting,此车无法行驶
 			//3.因为行驶里程不够，只能继续等在路口
 			//if (car_original.idCurRoad != car.idCurRoad || car_original.location != car.location)//road发生变化或者location发生变化，视为转向成功
-			if(result)
+			if(result == 1)
 				return true;
 			//第三种情况视为成功或者不成功，对结果应该影响不大
 		}
