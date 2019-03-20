@@ -51,6 +51,8 @@ int main(int argc, char *argv[])
 	//int time = sd.getSysTime();
 	//sd.getPathByScheduler();
 	int time = sd.getSysTime();
+	sd.getPathByTime_dynamic();//获得车辆的路径信息
+   // int time = sd.getSysTime();
 	dc.writeResult(answer_file);
 
 	// TODO:read input filebuf
