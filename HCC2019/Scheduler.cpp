@@ -822,7 +822,7 @@ void Scheduler ::getPathByTime_dynamic()
 
 		num++;
 		//定时更新交通拥堵邻接矩阵jamDegreeLongBefore
-		if (num == 200)
+		if (num == 100)
 		{
 			num = 0;
 			graph.upDateJamStatic();
