@@ -1,6 +1,7 @@
 #include "dijkstra.h"
 #include "iostream"
 #include "DataCenter.h"
+#include<algorithm>
 using namespace std;
 
 //构造函数定义
@@ -52,6 +53,55 @@ Graph_DG::Graph_DG(int vexnum, int edge) :
 			jamDegreeTmp[i][k] = 0;
 		}
 	}
+
+	//初始化jamDegreeLongBefore的邻接矩阵
+	jamDegreeLongBefore = new int*[this->vexnum];		//指向指针的数组，实际就是一个二维的数组（矩阵）
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		jamDegreeLongBefore[i] = new int[this->vexnum];
+		for (int k = 0; k < this->vexnum; k++)
+		{
+			//初始化为0
+			jamDegreeLongBefore[i][k] = 0;
+		}
+	}
+
+	//初始化jamDegreeBefore的邻接矩阵
+	jamDegreeBefore = new int*[this->vexnum];		//指向指针的数组，实际就是一个二维的数组（矩阵）
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		jamDegreeBefore[i] = new int[this->vexnum];
+		for (int k = 0; k < this->vexnum; k++)
+		{
+			//初始化为0
+			jamDegreeBefore[i][k] = 0;
+		}
+	}
+
+	//初始化jamDegreeNowInt的邻接矩阵
+	jamDegreeNowInt = new int*[this->vexnum];		//指向指针的数组，实际就是一个二维的数组（矩阵）
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		jamDegreeNowInt[i] = new int[this->vexnum];
+		for (int k = 0; k < this->vexnum; k++)
+		{
+			//初始化为0
+			jamDegreeNowInt[i][k] = 0;
+		}
+	}
+
+	//初始化jamDegreeNowFloat的邻接矩阵
+	jamDegreeNowFloat = new float*[this->vexnum];		//指向指针的数组，实际就是一个二维的数组（矩阵）
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		jamDegreeNowFloat[i] = new float[this->vexnum];
+		for (int k = 0; k < this->vexnum; k++)
+		{
+			//初始化为0
+			jamDegreeNowFloat[i][k] = 0;
+		}
+	}
+
 }
 
 //析构函数
@@ -264,6 +314,98 @@ vector<int> Graph_DG::Dijkstra(int begin, int end) {
 	return path_tmp;
 }
 
+//用归一化后的邻接矩阵实施dijkstra算法
+vector<int> Graph_DG::DijkstraNor(int begin, int end, int speed)
+{
+	//首先初始化dis数组
+	disfloat = new DisFloat[this->vexnum];
+
+	static float w = 50;
+
+	//计算时间的未归一化邻接矩阵
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		for (int j = 0; j < this->vexnum; j++)
+		{
+			if (arc[i][j] == INT_MAX || arcRoadv[i][j] == 0 || speed == 0)
+			{
+				arcTime[i][j] = FLT_MAX;
+			}
+			else
+			{
+				arcTime[i][j] = (float)arc[i][j] / min(speed, arcRoadv[i][j]);	      //取道路限速和车速较小的一个用来求时间
+			}
+		}
+	}
+
+	//得到归一化后的时间矩阵
+	normalizedFloat(arcTime);
+
+	//得到考虑了时间和交通拥堵的归一化矩阵
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		for (int j = 0; j < this->vexnum; j++)
+		{
+			if (arc[i][j] == INT_MAX || arcRoadv[i][j] == 0 || speed == 0)
+			{
+				arcTime[i][j] = FLT_MAX;
+			}
+
+			else
+			{
+				arcTime[i][j] = arcTime[i][j] + jamDegreeNowFloat[i][j];
+			}
+		}
+	}
+
+	int i;
+	for (i = 0; i < this->vexnum; i++) {
+		//设置当前的路径
+		vector<int> tmp;
+		tmp = disfloat[i].path;
+		tmp.push_back(begin);
+		tmp.push_back(i + 1);
+		disfloat[i].path = tmp;
+		disfloat[i].value = arcTime[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
+	}
+	//设置起点到起点自己的路径为0
+	disfloat[begin - 1].value = 0;
+	disfloat[begin - 1].visit = true;
+
+	int count = 1;
+	//计算到其他各顶点的最短路径
+	while (count != this->vexnum) {
+		//temp用于保存当前dis数组中最小的那个下标
+		//min记录当前的最小值
+		int temp = 0;
+		float min = FLT_MAX;
+		//这里的for循环我的理解就是算法中优先队列的作用（找目前最短的点），选择准备进行松弛的点，给下一步的for循环进行松弛操作
+		for (i = 0; i < this->vexnum; i++) {
+			if (!disfloat[i].visit && disfloat[i].value < min) {
+				min = disfloat[i].value;
+				temp = i;
+			}
+		}
+
+		disfloat[temp].visit = true;		//把上一步找到的准备进行松弛操作的点加入已找到的最短路径集合（实际上就是下次不再入优先队列，每个点至进行一次入队）
+		++count;
+		//下面这个for循环这么理解（更新的是temp指向的点的值），它是将所有的点都进行了一次松弛更新的操作，如果满足条件则更新否则不更新，在算法中写的是值操作相邻的点进行操作，因为不相邻的没有意义（这里就用无穷达来表达了这种情况！因此它直接所有点遍历，如果可以只存邻接的点那会更好！）
+		for (i = 0; i < this->vexnum; i++) {
+			if (!disfloat[i].visit && arcTime[temp][i] != FLT_MAX && (disfloat[temp].value + arcTime[temp][i]) < disfloat[i].value) {
+				disfloat[i].value = disfloat[temp].value + arcTime[temp][i];
+				vector<int> tmp;
+				tmp = disfloat[temp].path;
+				tmp.push_back(i + 1);
+				disfloat[i].path = tmp;
+			}
+		}
+	}
+	vector<int> path_tmp = disfloat[end - 1].path;
+
+	delete[] disfloat;//释放动态申请的disfloat数组
+	return path_tmp;
+}
+
 //重载dijkstra算法，返回从start到end的时间最短的路径
 vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 	//首先初始化dis数组
@@ -283,7 +425,9 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 
 			else
 			{
+
 				arcTime[i][j] = arcRoadv[i][j] > speed ? (((float)arc[i][j] / speed) + w * jamDegree[i][j]) : (((float)arc[i][j] / arcRoadv[i][j]) + w * jamDegree[i][j]);	//取道路限速和车速较小的一个用来求时间
+
 			}
 		}
 	}
@@ -382,6 +526,102 @@ void Graph_DG::upDateJam()
 		for (int j = 0; j < this->vexnum; j++)
 		{
 			jamDegreeTmp[i][j] = 0;
+		}
+	}
+}
+
+void Graph_DG::upDateJamStatic() 
+{
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		for (int j = 0; j < this->vexnum; j++)
+		{
+			jamDegreeLongBefore[i][j] = jamDegreeBefore[i][j];
+		}
+	}
+}
+
+void Graph_DG :: cleanUpJamDegreeBefore()
+{
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		for (int j = 0; j < this->vexnum; j++)
+		{
+			jamDegreeBefore[i][j] = 0;
+		}
+	}
+
+}
+
+void  Graph_DG::upDateJamDynamic()
+{
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		for (int j = 0; j < this->vexnum; j++)
+		{
+			jamDegreeNowInt[i][j] = jamDegreeLongBefore[i][j] + jamDegreeBefore[i][j];
+		}
+	}
+
+//归一化
+	normalizedInt(jamDegreeNowInt, jamDegreeNowFloat);
+}
+
+void  Graph_DG::normalizedInt( int**temp ,  float **tempNormalized)
+{
+	vector<int> tempValue;
+	int tempMax = 0;
+	int tempMin = 0;
+	int tempDifference=0;
+
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		for (int j = 0; j < this->vexnum; j++)
+		{
+			tempValue.push_back(temp[i][j]);
+		}
+	}
+
+	tempMax = *max_element(tempValue.begin(),tempValue.end());
+	tempDifference = tempMax - tempMin;
+
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		for (int j = 0; j < this->vexnum; j++)
+		{
+			tempNormalized[i][j] = tempDifference == 0 ? 0 : (temp[i][j] - tempMin) / tempDifference;
+		}
+	}
+
+}
+
+void  Graph_DG::normalizedFloat( float**temp )   //归一化后存回原矩阵
+{
+	vector<float> tempValue;
+	float tempMax = 0;
+	float tempMin = 0;
+	float tempDifference = 0;
+
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		for (int j = 0; j < this->vexnum; j++)
+		{
+			if (temp[i][j] != FLT_MAX)
+			{
+				tempValue.push_back(temp[i][j]);
+			}	
+		}
+	}
+
+	tempMax = *max_element(tempValue.begin(), tempValue.end());
+	tempMin = *min_element(tempValue.begin(), tempValue.end());
+	tempDifference = tempMax - tempMin;
+
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		for (int j = 0; j < this->vexnum; j++)
+		{
+			temp[i][j] = (temp[i][j] - tempMin) / tempDifference;
 		}
 	}
 }

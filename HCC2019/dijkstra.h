@@ -40,6 +40,13 @@ private:
 public:
 	int **jamDegree;	//两个保存道路拥挤度的矩阵
 	int **jamDegreeTmp;
+
+	//用于根据前车运行情况更新邻接矩阵的getPathByTime_dynamic()的三个矩阵;
+	int ** jamDegreeLongBefore;  //存储0-200辆车规划后的道路情况
+	int ** jamDegreeBefore;          //存储200-i辆车规划后的道路情况
+	int ** jamDegreeNowInt;         //存储前200+i辆车规划后的道路情况
+	float ** jamDegreeNowFloat;   //存储归一化后的交通拥堵矩阵
+
 	//构造函数（参数表：邻接矩阵，顶点数（cross数量），边数（road数量））
 	Graph_DG(int vexnum, int edge);
 	//析构函数
@@ -50,7 +57,7 @@ public:
 	void createArcRoadvGraph(vector<std::vector<int> > graphMaxSpeed);
 	//打印路长邻接矩阵
 	void print();
-	//打印道路限速邻接矩阵
+	//打印道路限速邻接矩阵  
 	void printRoadv();
 	//打印时间邻接矩阵
 	void printTimeArc();
@@ -60,10 +67,23 @@ public:
 	vector<int> Dijkstra(int begin, int end);
 	//重载dijkstra算法，返回从start到end的时间最短的路径
 	vector<int> Dijkstra(int begin, int end, int speed);
+	//用归一化后的矩阵实施D算法
+	vector<int> DijkstraNor(int begin, int end, int speed);
 	//打印begin到所有顶点的最短路径
 	void print_path(int begin);
 	//打印begin到end之间的最短距离
 	vector<int> print_path(int begin, int end);
 	//跟新jamDegree的邻接矩阵
 	void upDateJam();
+	//更新jamDegreeLongBefore的邻接矩阵
+	void upDateJamStatic();
+	//将JamDegreeBefore矩阵清0
+	void cleanUpJamDegreeBefore();
+	//根据jamDegreeLongBefore和JamDegreeBefore的值求得jamDegreeNowInt的值，归一化得jamDegreeNowFloat
+	void upDateJamDynamic();
+	//归一化
+	void normalizedInt( int ** temp , float **tempNormalized);
+	void normalizedFloat(float **temp);
+	//更新
+	//清空
 };
