@@ -757,7 +757,7 @@ void Scheduler::getPathByTime()
 			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
 			//assert(pathRoad[j] != 0);
 		}
-
+		/*
 		//统计road的情况
 		for (int i = 0; i < pathRoad.size(); i++)
 		{
@@ -795,8 +795,9 @@ void Scheduler::getPathByTime()
 				flag_road[i] = 0;
 			}
 		}
-
+		*/
 		/*写出100~200辆车的统计情况*/
+		/*
 		if (flagnum == 400)
 		{
 			ofstream oFile2;
@@ -818,7 +819,8 @@ void Scheduler::getPathByTime()
 
 			oFile3.close();
 		}
-
+		*/
 		cars[i].path = pathRoad;
+
 	}
 }
