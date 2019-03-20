@@ -35,7 +35,7 @@ public:
 	std::vector<std::vector<int> > getRoadvArc();
 
 	//将结果写出到result.txt
-	void writeResult(char *filename);
+	void writeResult(const char *filename);
 
 	//获得规划的路径
 	void getPath();

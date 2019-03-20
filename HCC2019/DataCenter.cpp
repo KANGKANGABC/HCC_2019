@@ -225,7 +225,7 @@ std::vector<std::vector<int> > DataCenter::getRoadvArc()
 	return graphMaxSpeed;
 }
 
-void DataCenter::writeResult(char *filename)
+void DataCenter::writeResult(const char *filename)
 {
 	result += "#(carId,StartTime,RoadId...)\n";
 	for (int i = 0; i < m_car_num; ++i)

@@ -30,8 +30,7 @@ int main(int argc, char *argv[])
 	std::cout << "crossPath is " << crossPath << std::endl;
 	std::cout << "answerPath is " << answerPath << std::endl;
 
-	char *answer_file = argv[4];
-	char *answer_file2 = argv[5];
+	const char *answer_file = answerPath.c_str();
 
 	char *data_road[MAX_ROAD_NUM];
 	char *data_car[MAX_CAR_NUM];
@@ -50,7 +49,7 @@ int main(int argc, char *argv[])
 	//dc.writeResult(answer_file);
 	//sd.getPathByTime();//获得车辆的路径信息
 	//int time = sd.getSysTime();
-	sd.getPathByScheduler();
+	//sd.getPathByScheduler();
 	int time = sd.getSysTime();
 	dc.writeResult(answer_file);
 
