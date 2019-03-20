@@ -60,6 +60,8 @@ public:
 	vector<int> Dijkstra(int begin, int end);
 	//重载dijkstra算法，返回从start到end的时间最短的路径
 	vector<int> Dijkstra(int begin, int end, int speed);
+	//重载dijkstra算法，返回从start到end的时间最短的路径，jamDegree为道路拥堵情况矩阵，w为加权系数
+	vector<int> Dijkstra(int begin, int end, int speed, vector<std::vector<float> > jamDegree, float w);
 	//打印begin到所有顶点的最短路径
 	void print_path(int begin);
 	//打印begin到end之间的最短距离

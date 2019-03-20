@@ -47,6 +47,11 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 		graphC2R[i].resize(m_cross_num);
 	}
 
+	//将graphRoadStatusByDS大小设置为路口的数量
+	graphRoadStatusByDS.resize(m_cross_num);
+	for (int i = 0; i < m_cross_num; ++i) {
+		graphRoadStatusByDS[i].resize(m_cross_num);
+	}
 
 	//Car调度任务向量大小设置
 	//Car任务数量为所有需要调度的Car数
@@ -141,10 +146,10 @@ void DataCenter::readCarData()
 		car[i - 1].plantime = carTask[i - 1][4];
 		//car[i - 1].starttime = carTask[i - 1][4] + i%400;//这里给自己挖了一个坑
 		int n2, n4, n6, n8;
-		n2 = 45;
-		n4 = 45;
-		n6 = 45;
-		n8 = 45;
+		n2 = 65;
+		n4 = 65;
+		n6 = 65;
+		n8 = 65;
 		switch (car[i - 1].speed)
 		{
 		case 2:

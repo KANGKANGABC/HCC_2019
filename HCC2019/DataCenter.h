@@ -69,6 +69,9 @@ public:
 	//根据速度存储车辆
 	std::vector<std::vector<Car> > carsBySpeed;
 
+	//动态调度器计算出来的道路情况矩阵
+	std::vector<std::vector<float> > graphRoadStatusByDS;
+
 private:
 
 	char **inputRoadData;//输入道路数据

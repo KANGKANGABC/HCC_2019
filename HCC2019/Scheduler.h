@@ -12,6 +12,8 @@ public:
 	Scheduler(DataCenter &dc);
 	~Scheduler();
 	int getSysTime();
+	//基于动态调度器规划路径
+	void getPathByScheduler();
 	//获得路径,为每辆车规划路径
 	void getPath();
 	//获得路径,为每辆车规划路径，基于时间
@@ -20,6 +22,7 @@ public:
 	std::vector<std::vector<int> > tmp;
 	std::vector<std::vector<int> > tmp1;
 private:
+	int timecount;
 	int num_CarsScheduling;//正在调度的car数量
 	int num_CarsPut;//已经发车的car数量
 	int num_Roads;//道路数量
@@ -32,6 +35,9 @@ private:
 	//CrossToRoad转换表
 	std::vector<std::vector<int> > graphC2R;
 
+	//动态调度器计算出来的道路情况矩阵
+	std::vector<std::vector<float> > graphRoadStatusByDS;
+
 	/*所有road上的车辆行进，直到该车辆行驶变成等待状态或者终止状态*/
 	void driveAllCarsJustOnRoadToEndState();
 	
@@ -40,6 +46,9 @@ private:
 
 	/*将该车加入道路行驶*/
 	void addCar(Car car,int i);//i为该车在cars[]中的下标，便于加入车失败时延后时间片
+
+	/*将该车加入道路行驶,动态规划路径*/
+	void addCar(Car car, int i, Graph_DG &graph);
 
 	//判断某cross的某road是否可以行驶进入//输入ID为修正前的ID
 	int isCanEnter(int idRoad, int idCross);//如果返回值-1，代表不可加入，否则返回可驶入的lane ID
@@ -65,6 +74,9 @@ private:
 
 	//车库中的车辆上路行驶
 	void driverCarInGarage();
+
+	//车库中的车辆上路行驶,动态更新其路径
+	void driverCarInGarageDynamic(Graph_DG &graph);
 
 	//打印车辆状态
 	void putCarStatus(Car car);
