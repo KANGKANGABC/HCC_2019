@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
 	Scheduler sd(dc);
 	sd.getPathByTime_dynamic();//获得车辆的路径信息
-    int time = sd.getSysTime();
+   // int time = sd.getSysTime();
 	dc.writeResult(answer_file);
 
 	// TODO:read input filebuf
