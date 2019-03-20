@@ -6,7 +6,6 @@
 #include "define.h"
 using namespace std;
 
-
 struct Dis {
 	vector<int> path;//路径的经过
 	int value;
@@ -39,6 +38,8 @@ private:
 	DisFloat *disfloat; //记录各个顶点的时间的最短路径信息
 	
 public:
+	int **jamDegree;	//两个保存道路拥挤度的矩阵
+	int **jamDegreeTmp;
 	//构造函数（参数表：邻接矩阵，顶点数（cross数量），边数（road数量））
 	Graph_DG(int vexnum, int edge);
 	//析构函数
@@ -63,4 +64,6 @@ public:
 	void print_path(int begin);
 	//打印begin到end之间的最短距离
 	vector<int> print_path(int begin, int end);
+	//跟新jamDegree的邻接矩阵
+	void upDateJam();
 };
