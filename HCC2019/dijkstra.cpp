@@ -1,4 +1,4 @@
-#include "dijkstra.h"
+﻿#include "dijkstra.h"
 #include "iostream"
 #include "DataCenter.h"
 #include<algorithm>
@@ -191,7 +191,7 @@ void Graph_DG::printRoadv() {
 				cout << arcRoadv[count_row][count_col] << " ";
 			++count_col;
 		}
-		cout << endl;
+		std::cout << endl;
 		++count_row;
 	}
 }
