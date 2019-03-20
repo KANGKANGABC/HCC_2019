@@ -167,8 +167,9 @@ void DataCenter::readCarData()
 		default:
 			break;
 		}
+		car[i - 1].starttime = car[i - 1].plantime;
 		//car[i - 1].plantime = carTask[i - 1][4] + (8 - car[i - 1].speed) * n + i % (2*n);//这里给自己挖了一个坑
-		car[i - 1].starttime = carTask[i - 1][4] + (8 - car[i - 1].speed )*80 + i % 160;//这里给自己挖了一个坑
+		//car[i - 1].starttime = carTask[i - 1][4] + (8 - car[i - 1].speed )*80 + i % 160;//这里给自己挖了一个坑
 		//car[i - 1].starttime = carTask[i - 1][4];
 
 		car[i - 1].status = SLEEPING;//车的初始状态为SLEEPING

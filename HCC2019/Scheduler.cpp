@@ -490,7 +490,7 @@ void Scheduler::addCar(Car car, int i)
 		int indexCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size();//该车为末尾
 		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.push_back(car);//将该车加入对应道路,对应车道,加入队尾
 		driveCar(car, indexCar);//car行驶 indexCar为-1，表示该车在lane中还没有位置
-		cars[car.id - 10000].starttime = time_Scheduler;
+		//cars[car.id - 10000].starttime = time_Scheduler;
 		num_CarsPut += 1;
 		//roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1].starttime = time_Scheduler;
 		//记录实际出发时间
@@ -519,7 +519,7 @@ void Scheduler::addCar(Car car, int i, Graph_DG & graph)
 		int indexCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size();//该车为末尾
 		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.push_back(car);//将该车加入对应道路,对应车道,加入队尾
 		driveCar(car, indexCar);//car行驶 indexCar为-1，表示该车在lane中还没有位置
-		cars[car.id - 10000].starttime = time_Scheduler;
+		//cars[car.id - 10000].starttime = time_Scheduler;
 		num_CarsPut += 1;
 		//roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1].starttime = time_Scheduler;
 		//记录实际出发时间
