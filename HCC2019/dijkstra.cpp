@@ -330,15 +330,15 @@ vector<int> Graph_DG::DijkstraNor(int begin, int end, int speed)
 			if (arc[i][j] == INT_MAX || arcRoadv[i][j] == 0 || speed == 0)
 			{
 				arcTime[i][j] = FLT_MAX;
-				cout << 0 << ' ';
+				//cout << 0 << ' ';
 			}
 			else
 			{
 				arcTime[i][j] = (float)arc[i][j] / min(speed, arcRoadv[i][j]);	      //取道路限速和车速较小的一个用来求时间
-				cout << arcTime[i][j] << ' ';
+				//cout << arcTime[i][j] << ' ';
 			}
 		}
-		cout << '\n' << endl;
+		//cout << '\n' << endl;
 	}
 
 	//得到归一化后的时间矩阵
@@ -352,17 +352,17 @@ vector<int> Graph_DG::DijkstraNor(int begin, int end, int speed)
 			if (arc[i][j] == INT_MAX || arcRoadv[i][j] == 0 || speed == 0)
 			{
 				arcTime[i][j] = FLT_MAX;
-				cout << 0 << ' ';
+				//cout << 0 << ' ';
 
 			}
 
 			else
 			{
 				arcTime[i][j] = arcTime[i][j] + jamDegreeNowFloat[i][j];
-				cout << arcTime[i][j] << ' ';
+				//cout << arcTime[i][j] << ' ';
 			}
 		}
-		cout << '\n' << endl;
+		//cout << '\n' << endl;
 	}
 
 	int i;
@@ -597,9 +597,9 @@ void  Graph_DG::normalizedInt( int**temp ,  float **tempNormalized)
 		for (int j = 0; j < this->vexnum; j++)
 		{
 			tempNormalized[i][j] = tempDifference == 0 ? 0 : float((temp[i][j] - tempMin) )/ tempDifference;
-			cout << tempNormalized[i][j] << ' ' ;
+			//cout << tempNormalized[i][j] << ' ' ;
 		}
-		cout << '\n' << endl;
+		//cout << '\n' << endl;
 	}
 
 }
@@ -633,12 +633,12 @@ void  Graph_DG::normalizedFloat( float**temp )   //归一化后存回原矩阵
 			if (temp[i][j] != FLT_MAX)
 			{
 				temp[i][j] = (temp[i][j] - tempMin) / tempDifference;
-				cout << temp[i][j] << ' ';
+				//cout << temp[i][j] << ' ';
 			}
-			else 
-				cout << 0 << ' ';
+			//else 
+				//cout << 0 << ' ';
 		}
-		cout << '\n' << endl;
+		//cout << '\n' << endl;
 	}
 
 }
