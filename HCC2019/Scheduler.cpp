@@ -1083,7 +1083,7 @@ void Scheduler::getPath()
 
 void Scheduler::getPathByTime() 
 {
-	static int num = 0;
+	int num = 0;
 	static int flagnum = 0;
 	static int flag[100] = { 0 };
 	static int flag_road[120] = { 0 };
