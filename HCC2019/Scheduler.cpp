@@ -199,10 +199,15 @@ void Scheduler::getPathByScheduler()
 				while (1)//循环调度路口四个方向的车，直到全部车辆完成调度，或者阻塞
 				{
 					bool isWorkingRoad = false;
-					for (int j = 0; j < 4; )//这里按要求是根据道路id进行升序调度
+					bool isConflict = false;
+					for (int j = 0; j < 4; ++j)//这里按要求是根据道路id进行升序调度
 					{
 					CONFLICT:
-						++j;
+						if (isConflict)
+						{
+							isConflict = false;
+							j++;
+						}
 						if (j >= 4)
 							break;
 						int idRoad = getFirstRoadFromCross(idCross, j);
@@ -223,6 +228,8 @@ void Scheduler::getPathByScheduler()
 									if (roads[idRoad - 5000].lane[m].laneCar.size() != 0)
 									{
 										Car car = roads[idRoad - 5000].lane[m].laneCar[0];
+										if (car.id == 14899)
+											PRINT("get");
 										if (car.status == WAITTING)//只处理在路口且为等待状态的车
 										{
 											assert(car.status == WAITTING);//车辆在路口调度时一定要是WAITTING状态
@@ -261,6 +268,7 @@ void Scheduler::getPathByScheduler()
 												}
 												else
 												{
+													isConflict = true;
 													goto CONFLICT;
 												}
 												//判断转入的road是否可以行驶
@@ -283,6 +291,7 @@ void Scheduler::getPathByScheduler()
 													}
 													else
 													{
+														isConflict = true;
 														goto CONFLICT;
 													}
 												}
@@ -309,6 +318,7 @@ void Scheduler::getPathByScheduler()
 														}
 														else
 														{
+															isConflict = true;
 															goto CONFLICT;
 														}
 													}
@@ -716,20 +726,16 @@ bool Scheduler::isBeDD(int idRoad, int idCross)//注意这里的ID不需要减1
 			return false;
 	}
 	//原本以为需要判断所有车道，现在只判断优先级最高的车道
-	for (int i = idStartLane; i < idStartLane + roads[idRoad - 5000].channel; ++i)
+	if (roads[idRoad - 5000].lane[idStartLane].laneCar.size() != 0)
 	{
-		if (roads[idRoad - 5000].lane[idStartLane].laneCar.size() != 0)
+		if (roads[idRoad - 5000].lane[idStartLane].laneCar[0].dirCross == DD)
 		{
-			if (roads[idRoad - 5000].lane[idStartLane].laneCar[0].dirCross == DD)
-			{
-				//只有等待状态的车会形成冲突
-				if (roads[idRoad - 5000].lane[idStartLane].laneCar[0].status == WAITTING)
-					return true;//存在左转车辆
-			}
-
+			//只有等待状态的车会形成冲突
+			if (roads[idRoad - 5000].lane[idStartLane].laneCar[0].status == WAITTING)
+				return true;//存在左转车辆
 		}
-	}
 
+	}
 	return false;
 }
 
@@ -745,16 +751,13 @@ bool Scheduler::isBeLEFT(int idRoad, int idCross)//注意这里的ID不需要减
 			return false;
 	}
 	//原本以为需要判断所有车道，现在只判断优先级最高的车道
-	for (int i = idStartLane; i < idStartLane + roads[idRoad - 5000].channel; ++i)
+	if (roads[idRoad - 5000].lane[idStartLane].laneCar.size() != 0)
 	{
-		if (roads[idRoad - 5000].lane[idStartLane].laneCar.size() != 0)
+		if (roads[idRoad - 5000].lane[idStartLane].laneCar[0].dirCross == LEFT)
 		{
-			if (roads[idRoad - 5000].lane[idStartLane].laneCar[0].dirCross == LEFT)
-			{
-				//只有等待状态的车会形成冲突
-				if (roads[idRoad - 5000].lane[idStartLane].laneCar[0].status == WAITTING)
-					return true;//存在左转车辆
-			}
+			//只有等待状态的车会形成冲突
+			if (roads[idRoad - 5000].lane[idStartLane].laneCar[0].status == WAITTING)
+				return true;//存在左转车辆
 		}
 	}
 	return false;
