@@ -49,8 +49,11 @@ int main(int argc, char *argv[])
 	//sd.getPathByTime();//获得车辆的路径信息
 	//dc.writeResult(answer_file);
 	//sd.getPathByTime();//获得车辆的路径信息
-	//int time = sd.getSysTime();
+	//dc.writeResult(answer_file);
 	sd.getPathByScheduler();
+	//dc.writeResult(answer_file);
+	//int time = sd.getSysTime();
+	//sd.getPathByScheduler();
 	//int time = sd.getSysTime();
 	//sd.getPathByTime_dynamic();//获得车辆的路径信息
 	//int time = sd.getSysTime();

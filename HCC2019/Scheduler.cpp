@@ -77,11 +77,26 @@ int Scheduler::getSysTime()
 											assert(car.status == WAITTING);//车辆在路口调度时一定要是WAITTING状态
 											int dirConflict = 0;
 											int dirTarget = 0;
+											int idNextCross = 0;
+											std::vector<Car>::iterator itCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.begin();
 											switch (roads[idRoad - 5000].lane[m].laneCar[0].dirCross)
 											{
 											case NONE:
-												PRINT("get\n");
-												//该车准备通过路口
+												if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//逆向
+													idNextCross = roads[car.idCurRoad - 5000].idFrom;//此车即将驶入的路口
+												else
+													idNextCross = roads[car.idCurRoad - 5000].idTo;//此车即将驶入的路口
+												//根据假设AA，此时可能有车辆驶入终点
+												if (idNextCross == car.idCrossTo)//如果此车将要驶出出口
+												{
+													num_CarsScheduling -= 1;//正在调度的车辆数减一
+													roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.erase(itCar);//删除该道路第一辆车
+													isWorkingCross = true;
+													isWorkingRoad = true;
+													isWorkingLane = true;
+													driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
+													//该车准备通过路口
+												}
 												break;
 											case DD://直行>左转>右转
 												dirTarget = getDirByRoadCrossDir(idCross, idRoad) + 2;//目标方向
@@ -155,8 +170,8 @@ int Scheduler::getSysTime()
 				break;
 		}
 		driverCarInGarage();//车库中的上路行驶
-		//putAllCarStatus();//输出所有车的状态
-		//putAllRoadStatus();
+		putAllCarStatus();//输出所有车的状态
+		putAllRoadStatus();
 		time_Scheduler++;//更新调度器时间
 	}
 	return time_Scheduler;
@@ -306,10 +321,7 @@ void Scheduler::getPathByScheduler()
 		//putAllCarStatus();//输出所有车的状态
 		//putAllRoadStatus();
 		time_Scheduler++;//更新调度器时间
-		if (time_Scheduler % 2 == 0)//每50个时间片更新一次路径
-		{
-			putAllRoadStatus();
-		}
+		putAllRoadStatus();
 	}
 }
 
