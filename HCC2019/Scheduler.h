@@ -46,6 +46,8 @@ private:
 	/*让该车前进*/
 	int driveCar(Car car, int indexCar);//indexCar为该车在车道的位置
 
+	int driveCarNew(Car car);
+
 	/*将该车加入道路行驶*/
 	void addCar(Car car,int i);//i为该车在cars[]中的下标，便于加入车失败时延后时间片
 
