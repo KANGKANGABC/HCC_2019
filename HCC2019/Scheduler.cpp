@@ -199,8 +199,12 @@ void Scheduler::getPathByScheduler()
 				while (1)//循环调度路口四个方向的车，直到全部车辆完成调度，或者阻塞
 				{
 					bool isWorkingRoad = false;
-					for (int j = 0; j < 4; ++j)//这里按要求是根据道路id进行升序调度
+					for (int j = 0; j < 4; )//这里按要求是根据道路id进行升序调度
 					{
+					CONFLICT:
+						++j;
+						if (j >= 4)
+							break;
 						int idRoad = getFirstRoadFromCross(idCross, j);
 						if (idRoad != -1)
 						{
@@ -221,8 +225,6 @@ void Scheduler::getPathByScheduler()
 										Car car = roads[idRoad - 5000].lane[m].laneCar[0];
 										if (car.status == WAITTING)//只处理在路口且为等待状态的车
 										{
-											if (car.id == 15940 && car.idCurRoad == 5074)
-												PRINT("");
 											assert(car.status == WAITTING);//车辆在路口调度时一定要是WAITTING状态
 											int dirConflict = 0;
 											int dirTarget = 0;
@@ -257,6 +259,10 @@ void Scheduler::getPathByScheduler()
 													isWorkingLane = true;
 													driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
 												}
+												else
+												{
+													goto CONFLICT;
+												}
 												//判断转入的road是否可以行驶
 
 												break;
@@ -274,6 +280,10 @@ void Scheduler::getPathByScheduler()
 														isWorkingRoad = true;
 														isWorkingLane = true;
 														driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
+													}
+													else
+													{
+														goto CONFLICT;
 													}
 												}
 												break;
@@ -296,6 +306,10 @@ void Scheduler::getPathByScheduler()
 															isWorkingRoad = true;
 															isWorkingLane = true;
 															driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
+														}
+														else
+														{
+															goto CONFLICT;
 														}
 													}
 												}
@@ -572,13 +586,14 @@ void Scheduler::addCar(Car car, int i, Graph_DG & graph)
 		car.status = FINESHED;//切换car的状态
 		car.idCurRoad = idRoadTarget;
 		car.idCurLane = idLaneTarget;
-		car.location = 0;
+		car.location = 1;
 		car.dirCross = NONE;
 		std::vector<int>::iterator itPath = car.path.begin();
 		car.path.erase(itPath);//已经驶向下一个路口，所以删除path中第一项
 		int indexCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size();//该车为末尾
 		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.push_back(car);//将该车加入对应道路,对应车道,加入队尾
 		driveCar(car, indexCar);//car行驶 indexCar为-1，表示该车在lane中还没有位置
+		assert(roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location != 0);
 		//cars[car.id - 10000].starttime = time_Scheduler;
 		num_CarsPut += 1;
 		//roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1].starttime = time_Scheduler;
@@ -768,6 +783,7 @@ int Scheduler::getCrossDistance(Car car, int idCurRoad, int idNextRoad)
 
 void Scheduler::driverToNextRoad(Car car, int idNextRoad, int idNextLane, int location)
 {
+	assert(location > 0);
 	std::vector<Car>::iterator it = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.begin();
 	roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.erase(it);	//将该车从当前lane删除,该车肯定是当前lane的第一辆车
 	car.idCurRoad = idNextRoad;
