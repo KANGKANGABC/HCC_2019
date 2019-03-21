@@ -228,8 +228,6 @@ void Scheduler::getPathByScheduler()
 									if (roads[idRoad - 5000].lane[m].laneCar.size() != 0)
 									{
 										Car car = roads[idRoad - 5000].lane[m].laneCar[0];
-										if (car.id == 14899)
-											PRINT("get");
 										if (car.status == WAITTING)//只处理在路口且为等待状态的车
 										{
 											assert(car.status == WAITTING);//车辆在路口调度时一定要是WAITTING状态
@@ -704,11 +702,17 @@ int Scheduler::isCanEnter(int idRoad, int idCross)
 		}
 		else
 		{
+
 			Car carNext = roads[idRoad - 5000].lane[j].laneCar[roads[idRoad - 5000].lane[j].laneCar.size() - 1];
-			if (carNext.status == FINESHED)
+			if (j == idStartLane + roads[idRoad - 5000].channel - 1)
 			{
-				return -2;
+				if (carNext.status == FINESHED)
+				{
+					return -2;
+				}
 			}
+			else
+				continue;//修复此处重大bug，原本是return -1;
 		}
 	}
 	return -1;//不存在空位
@@ -882,7 +886,7 @@ void Scheduler::driverCarInGarageDynamic(Graph_DG &graph)
 	{
 		if (cars[i].plantime == time_Scheduler && cars[i].status == SLEEPING)
 		{
-			vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed, graphRoadStatusByDS, 10);
+			vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed, graphRoadStatusByDS, 12);
 			//cross矩阵转road矩阵
 			vector<int> pathRoad(pathCross.size() - 1);
 			for (int j = 0; j < pathRoad.size(); ++j)
@@ -1091,32 +1095,6 @@ void Scheduler::driveAllCarsJustOnOneChannelToEndState(int idRoad, int idCross, 
 					}
 
 				}
-				/*
-				else
-				{
-					//此车也将行驶出路口，需要判断此车在路口的方向
-					//判断车的方向
-					int idNextCross = 0;
-					if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//逆向
-						idNextCross = roads[car.idCurRoad - 5000].idFrom;//此车即将驶入的路口
-					else
-						idNextCross = roads[car.idCurRoad - 5000].idTo;//此车即将驶入的路口
-					//根据假设AA，此时可能有车辆驶入终点
-					if (idNextCross == car.idCrossTo)//如果此车将要驶出出口
-					{
-						num_CarsScheduling -= 1;//正在调度的车辆数减一
-						std::vector<Car>::iterator it = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.begin();
-						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.erase(it);//删除该道路第一辆车
-					}
-					else
-					{
-						int idNextRoad = car.path[0];//此车即将驶入的道路
-						int idCurRoad = car.idCurRoad;//此车当前道路
-						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[i].dirCross = getCrossDir(idCurRoad, idNextRoad, idNextCross);//设置路口方向
-						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[i].status = WAITTING;//此车变为等待状态
-					}
-				}
-				*/
 			}
 		}
 	}
