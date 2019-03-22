@@ -33,7 +33,7 @@ Scheduler::~Scheduler()
 {
 }
 
-bool Scheduler::getParaByScheduler()
+int Scheduler::getParaByScheduler()
 {
 	int para = 70;
 	for (int i = 0; i < 10; ++i)//迭代10次
@@ -46,12 +46,12 @@ bool Scheduler::getParaByScheduler()
 		}
 		else
 		{
-			para += 4;//稳妥一点
+			para += 2;
 			break;
 		}
 
 	}
-	return false;
+	return para;
 }
 
 bool Scheduler::getSysTime()
@@ -852,7 +852,7 @@ void Scheduler::driverCarInGarage()
 	}
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		if (cars[i].plantime == time_Scheduler && cars[i].status == SLEEPING)
+		if (cars[i].starttime == time_Scheduler && cars[i].status == SLEEPING)
 		{
 			addCar(cars[i], i);
 		}
@@ -879,7 +879,7 @@ void Scheduler::driverCarInGarageDynamic(Graph_DG &graph)
 	}
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		if (cars[i].plantime == time_Scheduler && cars[i].status == SLEEPING)
+		if (cars[i].starttime == time_Scheduler && cars[i].status == SLEEPING)
 		{
 			vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed, graphRoadStatusByDS, 12);
 			//cross矩阵转road矩阵
@@ -1110,21 +1110,20 @@ void Scheduler::getPlantimeByPeriod(int period)
 		switch (cars[i].speed)
 		{
 		case 2:
-			cars[i].plantime = 10 + 6 * n2 + i % (2 * n2 - 10);
+			cars[i].starttime = cars[i].plantime + 6 * n2 + i % (2 * n2 - 10);
 			break;
 		case 4:
-			cars[i].plantime = 10 + 4 * n4 + i % (2 * n4 - 10);
+			cars[i].starttime = cars[i].plantime + 4 * n4 + i % (2 * n4 - 10);
 			break;
 		case 6:
-			cars[i].plantime = 10 + 2 * n6 + i % (2 * n6 - 10);
+			cars[i].starttime = cars[i].plantime + 2 * n6 + i % (2 * n6 - 10);
 			break;
 		case 8:
-			cars[i].plantime = 10 + 0 * n8 + i % (2 * n8 - 10);
+			cars[i].starttime = cars[i].plantime + 0 * n8 + i % (2 * n8 - 10);
 			break;
 		default:
 			break;
 		}
-		cars[i].starttime = cars[i].plantime;
 		cars[i].status = SLEEPING;
 		cars[i].dirCross = NONE;
 		cars[i].location = 0;

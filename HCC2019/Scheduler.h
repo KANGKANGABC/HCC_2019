@@ -11,7 +11,7 @@ class Scheduler
 public:
 	Scheduler(DataCenter &dc);
 	~Scheduler();
-	bool getParaByScheduler();//请将初始参数设置为70以上
+	int getParaByScheduler();//请将初始参数设置为70以上
 	bool getSysTime();
 	//基于动态调度器规划路径
 	void getPathByScheduler();

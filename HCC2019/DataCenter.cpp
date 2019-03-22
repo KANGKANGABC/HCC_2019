@@ -154,21 +154,20 @@ void DataCenter::readCarData()
 		switch (car[i - 1].speed)
 		{
 		case 2:
-			car[i - 1].plantime = car[i - 1].plantime + 6 * n2 + i % (2 * n2 - 10);
+			car[i - 1].starttime = car[i - 1].plantime + 6 * n2 + i % (2 * n2 - 10);
 			break;
 		case 4:
-			car[i - 1].plantime = car[i - 1].plantime + 4 * n4 + i % (2 * n4 - 10);
+			car[i - 1].starttime = car[i - 1].plantime + 4 * n4 + i % (2 * n4 - 10);
 			break;
 		case 6:
-			car[i - 1].plantime = car[i - 1].plantime + 2 * n6 + i % (2 * n6 - 10);
+			car[i - 1].starttime = car[i - 1].plantime + 2 * n6 + i % (2 * n6 - 10);
 			break;
 		case 8:
-			car[i - 1].plantime = car[i - 1].plantime + 0 * n8 + i % (2 * n8 - 10);
+			car[i - 1].starttime = car[i - 1].plantime + 0 * n8 + i % (2 * n8 - 10);
 			break;
 		default:
 			break;
 		}
-		car[i - 1].starttime = car[i - 1].plantime;
 		//car[i - 1].plantime = carTask[i - 1][4] + (8 - car[i - 1].speed) * n + i % (2*n);//这里给自己挖了一个坑
 		//car[i - 1].starttime = carTask[i - 1][4] + (8 - car[i - 1].speed )*80 + i % 160;//这里给自己挖了一个坑
 		//car[i - 1].starttime = carTask[i - 1][4];

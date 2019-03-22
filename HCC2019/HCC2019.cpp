@@ -45,8 +45,9 @@ int main(int argc, char *argv[])
 	dc.readCrossData();
 
 	Scheduler sd(dc);
-	sd.getParaByScheduler();
-	//dc.getPath();
+	dc.getPath();
+	dc.writeResult(answer_file);
+	int para = sd.getParaByScheduler();
 	//sd.getPathByTime();//获得车辆的路径信息
 	//dc.writeResult(answer_file);
 	//sd.getPathByTime();//获得车辆的路径信息
@@ -59,6 +60,7 @@ int main(int argc, char *argv[])
 	//sd.getPathByTime_dynamic();//获得车辆的路径信息
 	//int time = sd.getSysTime();
 	dc.writeResult(answer_file);
+	PRINT("para:%d\n",para);
 
 	// TODO:read input filebuf
 	// TODO:process
