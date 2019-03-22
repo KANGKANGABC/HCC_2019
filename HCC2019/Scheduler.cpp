@@ -33,8 +33,31 @@ Scheduler::~Scheduler()
 {
 }
 
-int Scheduler::getSysTime()
+bool Scheduler::getParaByScheduler()
 {
+	int para = 70;
+	for (int i = 0; i < 10; ++i)//迭代10次
+	{
+		getPlantimeByPeriod(para);
+		getPath();//获得初始参数
+		if (getSysTime())
+		{
+			para -= 2;
+		}
+		else
+		{
+			para += 4;//稳妥一点
+			break;
+		}
+
+	}
+	return false;
+}
+
+bool Scheduler::getSysTime()
+{
+	time_Scheduler = 0;
+	num_CarsScheduling = num_Cars;
 	while (num_CarsScheduling > 0)
 	{
 		PRINT("***********time_Scheduler:%d************\n", time_Scheduler);//打印系统时间
@@ -195,12 +218,13 @@ int Scheduler::getSysTime()
 		}
 
 		driverCarInGarage();
-		putAllCarStatus();//输出所有车的状态
+		if (!putAllCarStatus())//输出所有车的状态
+			return false;//发生死锁
 		//putAllRoadStatus();
 		time_Scheduler++;//更新调度器时间
 		putAllRoadStatus();
 	}
-	return time_Scheduler;
+	return true;
 }
 
 void Scheduler::getPathByScheduler()
@@ -881,7 +905,7 @@ void Scheduler::putCarStatus(Car car)
 			car.id, car.idCrossFrom, car.idCrossTo, car.idCurRoad, car.idCurLane, car.location, car.status, car.dirCross);//鎵撳嵃绯荤粺鏃堕棿
 }
 
-void Scheduler::putAllCarStatus()
+bool Scheduler::putAllCarStatus()
 {
 	for (int i = 0; i < num_Roads; ++i)//按道路ID升序进行调度
 	{
@@ -893,12 +917,16 @@ void Scheduler::putAllCarStatus()
 			{
 				for (int m = 0; m < lane.laneCar.size(); ++m)
 				{
-					if(lane.laneCar[m].status == WAITTING)
+					if (lane.laneCar[m].status == WAITTING)
+					{
 						putCarStatus(lane.laneCar[m]);
+						return false;
+					}
 				}
 			}
 		}
 	}
+	return true;
 }
 
 void Scheduler::putAllRoadStatus()
@@ -1067,6 +1095,41 @@ void Scheduler::driveAllCarsJustOnOneChannelToEndState(int idRoad, int idCross, 
 				}
 			}
 		}
+	}
+}
+
+void Scheduler::getPlantimeByPeriod(int period)
+{
+	for (int i = 0; i < num_Cars; ++i)//忽略第0行数据
+	{
+		int n2, n4, n6, n8;
+		n2 = period;
+		n4 = period;
+		n6 = period;
+		n8 = period;
+		switch (cars[i].speed)
+		{
+		case 2:
+			cars[i].plantime = 10 + 6 * n2 + i % (2 * n2 - 10);
+			break;
+		case 4:
+			cars[i].plantime = 10 + 4 * n4 + i % (2 * n4 - 10);
+			break;
+		case 6:
+			cars[i].plantime = 10 + 2 * n6 + i % (2 * n6 - 10);
+			break;
+		case 8:
+			cars[i].plantime = 10 + 0 * n8 + i % (2 * n8 - 10);
+			break;
+		default:
+			break;
+		}
+		cars[i].starttime = cars[i].plantime;
+		cars[i].status = SLEEPING;
+		cars[i].dirCross = NONE;
+		cars[i].location = 0;
+		cars[i].idCurRoad = 0;
+		cars[i].idCurLane = 0;
 	}
 }
 

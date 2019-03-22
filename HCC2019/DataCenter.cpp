@@ -147,10 +147,10 @@ void DataCenter::readCarData()
 		car[i - 1].plantime = carTask[i - 1][4];
 		//car[i - 1].starttime = carTask[i - 1][4] + i%400;//这里给自己挖了一个坑
 		int n2, n4, n6, n8;
-		n2 = 50;
-		n4 = 50;
-		n6 = 50;
-		n8 = 50;
+		n2 = 70;
+		n4 = 70;
+		n6 = 70;
+		n8 = 70;
 		switch (car[i - 1].speed)
 		{
 		case 2:

@@ -11,7 +11,8 @@ class Scheduler
 public:
 	Scheduler(DataCenter &dc);
 	~Scheduler();
-	int getSysTime();
+	bool getParaByScheduler();//请将初始参数设置为70以上
+	bool getSysTime();
 	//基于动态调度器规划路径
 	void getPathByScheduler();
 	//获得路径,为每辆车规划路径
@@ -85,7 +86,7 @@ private:
 	void putCarStatus(Car car);
 
 	//输出所有车辆状态
-	void putAllCarStatus();
+	bool putAllCarStatus();
 
 	//输出所有道路状态
 	void putAllRoadStatus();
@@ -99,5 +100,7 @@ private:
 	//某个road上的某个channel车辆行进，仅处理该车道上行驶且能到达终止状态的车
 	void driveAllCarsJustOnOneChannelToEndState(int idRoad, int idCross, int idChannel);
 
+	//根据时间周期安排出发时间
+	void getPlantimeByPeriod(int period);
 };
 
