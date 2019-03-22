@@ -36,7 +36,7 @@ Scheduler::~Scheduler()
 int Scheduler::getParaByScheduler()
 {
 	int para = 70;
-	for (int i = 0; i < 10; ++i)//迭代10次
+	for (int i = 0; i < 20; ++i)//迭代20次
 	{
 		getPlantimeByPeriod(para);
 		getPath();//获得初始参数
@@ -46,11 +46,11 @@ int Scheduler::getParaByScheduler()
 		}
 		else
 		{
-			para += 2;
 			break;
 		}
 
 	}
+	para += 4;
 	getPlantimeByPeriod(para);
 	getPath();//获得初始参数
 	return para;
