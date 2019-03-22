@@ -43,8 +43,9 @@ int Scheduler::getParaByScheduler()
 	int timeMax = INT_MAX;
 	for (int i = 0; i < 20; ++i)//迭代20次
 	{
-		getPlantimeByPeriod(para);
-		getPath();//获得初始参数
+		//getPlantimeByPeriod(para);
+		//getPath();//获得初始参数
+		ReOrderStartByTime(para);
 		//int time = getSysTime();
 		int time = getPathByScheduler();
 		if (time > 0)
@@ -62,7 +63,7 @@ int Scheduler::getParaByScheduler()
 
 	}
 	para += 4;
-	getPlantimeByPeriod(para);
+	ReOrderStartByTime(para);
 	getPath();//获得初始参数
 	getPathByScheduler();//重跑一次路径
 	return para;
