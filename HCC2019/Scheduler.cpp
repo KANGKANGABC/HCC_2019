@@ -51,6 +51,8 @@ int Scheduler::getParaByScheduler()
 		}
 
 	}
+	getPlantimeByPeriod(para);
+	getPath();//获得初始参数
 	return para;
 }
 
