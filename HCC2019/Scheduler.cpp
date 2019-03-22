@@ -1230,7 +1230,7 @@ void Scheduler::getPathByTime_reorderCars()
 			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
 			//assert(pathRoad[j] != 0);
 		}
-		/*
+		
 		//统计road的情况
 		for (int i = 0; i < pathRoad.size(); i++)
 		{
@@ -1268,9 +1268,8 @@ void Scheduler::getPathByTime_reorderCars()
 				flag_road[i] = 0;
 			}
 		}
-		*/
-		/*写出100~200辆车的统计情况*/
-		/*
+		
+		//写出100~200辆车的统计情况
 		if (flagnum == 400)
 		{
 			ofstream oFile2;
@@ -1292,7 +1291,6 @@ void Scheduler::getPathByTime_reorderCars()
 
 			oFile3.close();
 		}
-		*/
 		qcars[i].path = pathRoad;
 		cars[qcars[i].id - 10000].path = qcars[i].path;	//将qcars得到的路径赋值到cars的path变量中
 	}

@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 	std::string crossPath(argv[3]);
 	std::string answerPath(argv[4]);
 
-	std::string s = "config_10\\answer2.txt";//调试dijkstra用
+	//std::string s = "config_10\\answer2.txt";//调试dijkstra用
 
 
 	std::cout << "carPath is " << carPath << std::endl;
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 	std::cout << "answerPath is " << answerPath << std::endl;
 
 	const char *answer_file = answerPath.c_str();
-	char *answer_file2 = &s[0]; //调试dijkstra用
+	//char *answer_file2 = &s[0]; //调试dijkstra用
 
 	char *data_road[MAX_ROAD_NUM];
 	char *data_car[MAX_CAR_NUM];
@@ -49,22 +49,22 @@ int main(int argc, char *argv[])
 	dc.reorderCars();//按照时间重排序车辆
 
 	Scheduler sd(dc);
-	dc.getPath();
+	//dc.getPath();
 	sd.getPathByTime_reorderCars();//获得车辆的路径信息
 	//dc.writeResult(answer_file);
 	//sd.getPathByTime();//获得车辆的路径信息
 	//dc.writeResult(answer_file);
 	//sd.getPathByScheduler();
-	//dc.writeResult(answer_file);
+	dc.writeResult(answer_file);
 	//int time = sd.getSysTime();
 	//sd.getPathByScheduler();
 	//int time = sd.getSysTime();
 	//sd.getPathByTime_dynamic();//获得车辆的路径信息
 	//int time = sd.getSysTime();
-	dc.writeResult(answer_file);
+	//dc.writeResult(answer_file);
 
-	sd.getPathByTime_reorderCars();//获得车辆的路径信息 //调试dijkstra用
-	dc.writeResult(answer_file2);//调试dijkstra用
+	//sd.getPathByTime_reorderCars();//获得车辆的路径信息 //调试dijkstra用
+	//dc.writeResult(answer_file2);//调试dijkstra用
 
 	// TODO:read input filebuf
 	// TODO:process
