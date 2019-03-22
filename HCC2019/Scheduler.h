@@ -12,7 +12,7 @@ public:
 	Scheduler(DataCenter &dc);
 	~Scheduler();
 	int getParaByScheduler();//请将初始参数设置为70以上
-	bool getSysTime();
+	int getSysTime();
 	//基于动态调度器规划路径
 	void getPathByScheduler();
 	//获得路径,为每辆车规划路径

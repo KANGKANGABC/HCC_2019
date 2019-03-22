@@ -36,12 +36,18 @@ Scheduler::~Scheduler()
 int Scheduler::getParaByScheduler()
 {
 	int para = 70;
+	int timeMax = INT_MAX;
 	for (int i = 0; i < 20; ++i)//迭代20次
 	{
 		getPlantimeByPeriod(para);
 		getPath();//获得初始参数
-		if (getSysTime())
+		int time = getSysTime();
+		if (time > 0)
 		{
+			if (time <= timeMax)
+				timeMax = time;
+			else
+				break;
 			para -= 2;
 		}
 		else
@@ -56,7 +62,7 @@ int Scheduler::getParaByScheduler()
 	return para;
 }
 
-bool Scheduler::getSysTime()
+int Scheduler::getSysTime()
 {
 	time_Scheduler = 0;
 	num_CarsScheduling = num_Cars;
@@ -226,7 +232,7 @@ bool Scheduler::getSysTime()
 		time_Scheduler++;//更新调度器时间
 		putAllRoadStatus();
 	}
-	return true;
+	return time_Scheduler;
 }
 
 void Scheduler::getPathByScheduler()
