@@ -57,6 +57,9 @@ public:
 	//所有Car的指针
 	Car * car;
 
+	//经过排序的car的指针
+	vector<Car*> carOrderTime;
+
 	int m_road_num;//ROAD数量
 	int m_car_num;//CAR数量
 	int m_cross_num;//CROSS数量

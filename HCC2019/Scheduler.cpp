@@ -52,8 +52,17 @@ int Scheduler::getSysTime()
 				while (1)//循环调度路口四个方向的车，直到全部车辆完成调度，或者阻塞
 				{
 					bool isWorkingRoad = false;
+					bool isConflict = false;
 					for (int j = 0; j < 4; ++j)//这里按要求是根据道路id进行升序调度
 					{
+					CONFLICT:
+						if (isConflict)
+						{
+							isConflict = false;
+							j++;
+						}
+						if (j >= 4)
+							break;
 						int idRoad = getFirstRoadFromCross(idCross, j);
 						if (idRoad != -1)
 						{
@@ -108,6 +117,11 @@ int Scheduler::getSysTime()
 													isWorkingLane = true;
 													driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
 												}
+												else
+												{
+													isConflict = true;
+													goto CONFLICT;
+												}
 												//判断转入的road是否可以行驶
 
 												break;
@@ -125,6 +139,11 @@ int Scheduler::getSysTime()
 														isWorkingRoad = true;
 														isWorkingLane = true;
 														driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
+													}
+													else
+													{
+														isConflict = true;
+														goto CONFLICT;
 													}
 												}
 												break;
@@ -148,6 +167,11 @@ int Scheduler::getSysTime()
 															isWorkingLane = true;
 															driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
 														}
+														else
+														{
+															isConflict = true;
+															goto CONFLICT;
+														}
 													}
 												}
 												break;
@@ -169,10 +193,12 @@ int Scheduler::getSysTime()
 			if (!isWorkingCross)//如果一个循环后没有任何一辆车被调度，则退出调度循环
 				break;
 		}
-		driverCarInGarage();//车库中的上路行驶
+
+		driverCarInGarage();
 		putAllCarStatus();//输出所有车的状态
-		putAllRoadStatus();
+		//putAllRoadStatus();
 		time_Scheduler++;//更新调度器时间
+		putAllRoadStatus();
 	}
 	return time_Scheduler;
 }
@@ -793,10 +819,19 @@ bool Scheduler::isCanDriveToNextRoad(Car car, int dir, int idCross)
 
 void Scheduler::driverCarInGarage()
 {
+	int numCarsWait = carsWaitInGarage.size();
+	for (int j = 0; j < numCarsWait; ++j)
+	{
+		Car car = carsWaitInGarage.front();
+		carsWaitInGarage.pop_front();
+		addCar(car, car.id - 10000);
+	}
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		if (cars[i].plantime == time_Scheduler&&cars[i].status==SLEEPING)
-			addCar(cars[i],i);
+		if (cars[i].plantime == time_Scheduler && cars[i].status == SLEEPING)
+		{
+			addCar(cars[i], i);
+		}
 	}
 }
 

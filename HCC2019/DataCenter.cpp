@@ -71,6 +71,7 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 	road = new Road[m_road_num];//创建所有道路的对象
 	cross = new Cross[m_cross_num];//创建所有路口的对象
 	car = new Car[m_car_num];//创建所有汽车的对象
+	carOrderTime.resize(m_car_num);
 }
 
 DataCenter::~DataCenter()
@@ -175,6 +176,23 @@ void DataCenter::readCarData()
 		car[i - 1].status = SLEEPING;//车的初始状态为SLEEPING
 		car[i - 1].dirCross = NONE;//车的过路口状态为NONE
 	}
+	/*
+	for (int i = 0; i <= 2000; ++i)//忽略第0行数据//最大出发时间为200
+	{
+		for (int j = 0; j < m_car_num; ++j)
+		{
+			if (car[j].plantime == i)
+			{
+				carOrderTime.push_back(&car[j]);
+			}
+		}
+		//将car进行排序，排完序的放进carOrderTime
+	}
+	for (int i = 0; i <= 2000; ++i)
+	{
+		PRINT("%d:  %d\n", carOrderTime[i]->id, carOrderTime[i]->plantime);
+	}
+	*/
 	sort(speedType.begin(), speedType.end());
 	car_speed_num = speedType.size();
 	printf("readCarData done!\n");
