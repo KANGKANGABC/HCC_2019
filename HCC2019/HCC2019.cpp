@@ -46,10 +46,11 @@ int main(int argc, char *argv[])
 	dc.readRoadData();
 	dc.readCarData();
 	dc.readCrossData();
+	dc.reorderCars();//按照时间重排序车辆
 
 	Scheduler sd(dc);
 	dc.getPath();
-	sd.getPathByTime();//获得车辆的路径信息
+	sd.getPathByTime_reorderCars();//获得车辆的路径信息
 	//dc.writeResult(answer_file);
 	//sd.getPathByTime();//获得车辆的路径信息
 	//dc.writeResult(answer_file);
@@ -62,7 +63,7 @@ int main(int argc, char *argv[])
 	//int time = sd.getSysTime();
 	dc.writeResult(answer_file);
 
-	sd.getPathByTime();//获得车辆的路径信息 //调试dijkstra用
+	sd.getPathByTime_reorderCars();//获得车辆的路径信息 //调试dijkstra用
 	dc.writeResult(answer_file2);//调试dijkstra用
 
 	// TODO:read input filebuf

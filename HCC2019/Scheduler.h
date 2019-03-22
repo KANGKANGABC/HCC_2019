@@ -18,6 +18,7 @@ public:
 	void getPath();
 	//获得路径,为每辆车规划路径，基于时间
 	void getPathByTime();
+	void getPathByTime_reorderCars();//车辆按出发时间重排序后进行静态规划
 	void getPathByTime_dynamic(); //根据1-100 和101-199车的轨迹，更新第200辆车的邻接矩阵
 
 	int vexnum, edge;
@@ -34,6 +35,7 @@ private:
 	Road *roads;//所有的道路（道路对象数组的指针）
 	Cross *crosses;//所有的路口（路口对象数组的指针）
 	Car *cars;//所有的车
+	vector<Car> qcars;//按时间重排序
 	//CrossToRoad转换表
 	std::vector<std::vector<int> > graphC2R;
 

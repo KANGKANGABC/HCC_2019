@@ -10,6 +10,7 @@ Scheduler::Scheduler(DataCenter &dc)
 	roads = dc.road;
 	crosses = dc.cross;
 	cars = dc.car;
+	qcars = dc.qCar;	//按时间重排序
 	time_Scheduler = 0;//调度器初始时间设置为0
 	vexnum = dc.getCrossNum();
 	edge = dc.getRoadNum();
@@ -1188,6 +1189,115 @@ void Scheduler::getPathByTime()
 
 	}
 }
+
+void Scheduler::getPathByTime_reorderCars()
+{
+	int num = 0;
+	static int flagnum = 0;
+	static int flag[100] = { 0 };
+	static int flag_road[120] = { 0 };
+
+	Graph_DG graph(vexnum, edge);
+	graph.createArcGraph(tmp);
+	graph.createArcRoadvGraph(tmp1);
+
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		vector<int> pathCross = graph.Dijkstra(qcars[i].idCrossFrom, qcars[i].idCrossTo, qcars[i].speed);
+
+		//统计车辆情况，每100辆车更新一次jamDegree的矩阵
+		num++;
+		flagnum++;
+		if (num == 200)
+		{
+			num = 0;
+			graph.upDateJam();
+		}
+		for (int i = 0; i < pathCross.size(); i++)
+		{
+			flag[pathCross.at(i) - 1]++;//记录64个cross的使用情况
+		}
+		//将统计的情况放到jamDegreeTmp的矩阵中
+		for (int i = 0, j = 1; j < pathCross.size(); i++, j++)
+		{
+			graph.jamDegreeTmp[pathCross.at(i) - 1][pathCross.at(j) - 1]++;
+		}
+
+		//cross矩阵转road矩阵
+		vector<int> pathRoad(pathCross.size() - 1);
+		for (int j = 0; j < pathRoad.size(); ++j)
+		{
+			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+			//assert(pathRoad[j] != 0);
+		}
+		/*
+		//统计road的情况
+		for (int i = 0; i < pathRoad.size(); i++)
+		{
+			flag_road[pathRoad.at(i) - 5000]++;//记录road的使用情况
+		}
+
+
+		//统计cross的情况
+		if (flagnum == 200)
+		{
+			ofstream oFile;
+			oFile.open("testcross100.csv", ios::out | ios::trunc);
+			for (int i=0; i < 100; i++)
+			{
+				oFile << flag[i] << endl;
+			}
+
+			oFile.close();
+
+			for (int i = 0; i < 100; i++)
+			{
+				flag[i] = 0;
+			}
+
+			ofstream oFile1;
+			oFile1.open("testroad100.csv", ios::out | ios::trunc);
+			for (int i = 0; i < 120; i++)
+			{
+				oFile1 << flag_road[i] << endl;
+			}
+			oFile1.close();
+
+			for (int i = 0; i < 120; i++)
+			{
+				flag_road[i] = 0;
+			}
+		}
+		*/
+		/*写出100~200辆车的统计情况*/
+		/*
+		if (flagnum == 400)
+		{
+			ofstream oFile2;
+			oFile2.open("testcross200.csv", ios::out | ios::trunc);
+			for (int i = 0; i < 100; i++)
+			{
+				oFile2 << flag[i] << endl;
+			}
+
+			oFile2.close();
+
+
+			ofstream oFile3;
+			oFile3.open("testroad200.csv", ios::out | ios::trunc);
+			for (int i = 0; i < 120; i++)
+			{
+				oFile3 << flag_road[i] << endl;
+			}
+
+			oFile3.close();
+		}
+		*/
+		qcars[i].path = pathRoad;
+		cars[qcars[i].id - 10000].path = qcars[i].path;	//将qcars得到的路径赋值到cars的path变量中
+	}
+}
+
 
 void Scheduler ::getPathByTime_dynamic()
 {
