@@ -20,7 +20,7 @@ public:
 	//获得路径,为每辆车规划路径，基于时间
 	void getPathByTime();
 	void getPathByTime_dynamic(); //根据1-100 和101-199车的轨迹，更新第200辆车的邻接矩阵
-
+	void ReOrderStartByTime(int para);//根据行驶时间重新安排出发时间
 	int vexnum, edge;
 	std::vector<std::vector<int> > tmp;
 	std::vector<std::vector<int> > tmp1;

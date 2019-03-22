@@ -147,10 +147,10 @@ void DataCenter::readCarData()
 		car[i - 1].plantime = carTask[i - 1][4];
 		//car[i - 1].starttime = carTask[i - 1][4] + i%400;//这里给自己挖了一个坑
 		int n2, n4, n6, n8;
-		n2 = 70;
-		n4 = 70;
-		n6 = 70;
-		n8 = 70;
+		n2 = PARA_PERIOD;
+		n4 = PARA_PERIOD;
+		n6 = PARA_PERIOD;
+		n8 = PARA_PERIOD;
 		switch (car[i - 1].speed)
 		{
 		case 2:
@@ -258,6 +258,30 @@ void DataCenter::writeResult(const char *filename)
 			line += ", ";
 			line += std::to_string(car[i].path[j]);
 		}
+		line += ")\n";
+		result += line;
+	}
+	const char *result_file = result.c_str();
+	write_result(result_file, filename);
+}
+
+void DataCenter::writeResultWithTime(const char *filename)
+{
+	result += "#(carId,StartTime,RoadId...)\n";
+	for (int i = 0; i < m_car_num; ++i)
+	{
+		std::string line = "(" + std::to_string(car[i].id);
+		line += ", ";
+		line += std::to_string(car[i].starttime);
+		for (int j = 0; j < car[i].path.size(); ++j)
+		{
+			line += ", ";
+			line += std::to_string(car[i].path[j]);
+		}
+		line += ", ";
+		line += std::to_string(car[i].time);
+		line += ", ";
+		line += std::to_string(car[i].starttime);
 		line += ")\n";
 		result += line;
 	}

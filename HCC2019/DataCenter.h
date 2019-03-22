@@ -37,6 +37,8 @@ public:
 	//将结果写出到result.txt
 	void writeResult(const char *filename);
 
+	void writeResultWithTime(const char *filename);
+
 	//获得规划的路径
 	void getPath();
 

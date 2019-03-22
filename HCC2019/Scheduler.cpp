@@ -33,6 +33,10 @@ Scheduler::~Scheduler()
 {
 }
 
+bool less_time(const Car & m1, const Car & m2) {
+	return m1.time < m2.time;
+}
+
 int Scheduler::getParaByScheduler()
 {
 	int para = 70;
@@ -411,6 +415,82 @@ int Scheduler::getPathByScheduler()
 		putAllRoadStatus();
 	}
 	return time_Scheduler;
+}
+
+void Scheduler::ReOrderStartByTime(int para)
+{
+
+	for (int j = 0; j < num_Cars; ++j)
+	{
+		if (cars[j].speed == 8 && cars[j].status == SLEEPING)
+			carsInGarage.push_back(cars[j]);
+	}
+	std::sort(carsInGarage.begin(), carsInGarage.end(), less_time);
+	int size = carsInGarage.size();
+	for (int i = 0; i < size; i++)
+	{
+		int index = i / (size /(2 * para));
+		Car car = carsInGarage.front();//先调度时间长的
+		carsInGarage.pop_front();
+		if (index >= cars[car.id - 10000].plantime)
+			cars[car.id - 10000].starttime = index;
+		else
+			cars[car.id - 10000].starttime = cars[car.id - 10000].plantime;
+	}
+
+	for (int j = 0; j < num_Cars; ++j)
+	{
+		if (cars[j].speed == 6 && cars[j].status == SLEEPING)
+			carsInGarage.push_back(cars[j]);
+	}
+	std::sort(carsInGarage.begin(), carsInGarage.end(), less_time);
+	size = carsInGarage.size();
+	for (int i = 0; i < size; i++)
+	{
+		int index = i / (size / (2 * para));
+		Car car = carsInGarage.front();//先调度时间长的
+		carsInGarage.pop_front();
+		if (index >= cars[car.id - 10000].plantime)
+			cars[car.id - 10000].starttime = 2 * para + index;
+		else
+			cars[car.id - 10000].starttime = 2 * para + cars[car.id - 10000].plantime;
+	}
+
+	for (int j = 0; j < num_Cars; ++j)
+	{
+		if (cars[j].speed == 4 && cars[j].status == SLEEPING)
+			carsInGarage.push_back(cars[j]);
+	}
+	std::sort(carsInGarage.begin(), carsInGarage.end(), less_time);
+	size = carsInGarage.size();
+	for (int i = 0; i < size; i++)
+	{
+		int index = i / (size / (2 * para));
+		Car car = carsInGarage.front();//先调度时间长的
+		carsInGarage.pop_front();
+		if (index >= cars[car.id - 10000].plantime)
+			cars[car.id - 10000].starttime = 4 * para + index;
+		else
+			cars[car.id - 10000].starttime = 4 * para + cars[car.id - 10000].plantime;
+	}
+
+	for (int j = 0; j < num_Cars; ++j)
+	{
+		if (cars[j].speed == 2 && cars[j].status == SLEEPING)
+			carsInGarage.push_back(cars[j]);
+	}
+	std::sort(carsInGarage.begin(), carsInGarage.end(), less_time);
+	size = carsInGarage.size();
+	for (int i = 0; i < size; i++)
+	{
+		int index = i / (size / (2 * para));
+		Car car = carsInGarage.front();//先调度时间长的
+		carsInGarage.pop_front();
+		if (index >= cars[car.id - 10000].plantime)
+			cars[car.id - 10000].starttime = 6 * para + index;
+		else
+			cars[car.id - 10000].starttime = 6 * para + cars[car.id - 10000].plantime;
+	}
 }
 
 void Scheduler::driveAllCarsJustOnRoadToEndState()
@@ -855,9 +935,7 @@ bool Scheduler::isCanDriveToNextRoad(Car car, int dir, int idCross)
 	return false;
 }
 
-bool less_time(const Car & m1, const Car & m2) {
-	return m1.time < m2.time;
-}
+
 void Scheduler::driverCarInGarage()
 {
 	int numCarsWait = carsWaitInGarage.size();
@@ -884,7 +962,8 @@ void Scheduler::driverCarInGarageDynamic(Graph_DG &graph)
 		int timeCar = 0;
 		Car car = carsWaitInGarage.front();
 		carsWaitInGarage.pop_front();
-		vector<int> pathCross = graph.Dijkstra(car.idCrossFrom, car.idCrossTo, car.speed, graphRoadStatusByDS, 12, timeCar);
+		vector<int> pathCross = graph.Dijkstra(car.idCrossFrom, car.idCrossTo, car.speed, graphRoadStatusByDS, 5, timeCar);
+		car.time = timeCar;
 		//cross矩阵转road矩阵
 		vector<int> pathRoad(pathCross.size() - 1);
 		for (int j = 0; j < pathRoad.size(); ++j)
@@ -900,7 +979,7 @@ void Scheduler::driverCarInGarageDynamic(Graph_DG &graph)
 		if (cars[i].starttime == time_Scheduler && cars[i].status == SLEEPING)
 		{
 			int timeCar = 0;
-			vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed, graphRoadStatusByDS, 12, timeCar);
+			vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed, graphRoadStatusByDS, 5, timeCar);
 			cars[i].time = timeCar;
 			//cross矩阵转road矩阵
 			vector<int> pathRoad(pathCross.size() - 1);
@@ -910,15 +989,9 @@ void Scheduler::driverCarInGarageDynamic(Graph_DG &graph)
 				//assert(pathRoad[j] != 0);
 			}
 			cars[i].path = pathRoad;
-			carsInGarage.push_back(cars[i]);
+			addCar(cars[i], cars[i].id - 10000);
+			//carsInGarage.push_back(cars[i]);
 		}
-	}
-	std::sort(carsInGarage.begin(), carsInGarage.end(), less_time);
-	for (int i = 0; i < carsInGarage.size(); i++)
-	{
-		Car car = carsInGarage.back();//先调度时间长的
-		carsInGarage.pop_back();
-		addCar(car, car.id - 10000);
 	}
 }
 
@@ -1163,10 +1236,11 @@ void Scheduler::getPath()
 {
 	Graph_DG graph(vexnum, edge);
 	graph.createArcGraph(tmp);
-
+	
+	int timeCar = 0;
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo);
+		vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed, timeCar);
 		vector<int> pathRoad(pathCross.size() - 1);
 		for (int j = 0; j < pathRoad.size(); ++j)
 		{
@@ -1174,6 +1248,7 @@ void Scheduler::getPath()
 			//assert(pathRoad[j] != 0);
 		}
 		cars[i].path = pathRoad;
+		cars[i].time = timeCar;
 	}
 }
 

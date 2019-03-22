@@ -412,9 +412,78 @@ vector<int> Graph_DG::DijkstraNor(int begin, int end, int speed)
 	delete[] disfloat;//释放动态申请的disfloat数组
 	return path_tmp;
 }
-
 //重载dijkstra算法，返回从start到end的时间最短的路径
 vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
+	//首先初始化dis数组
+	disfloat = new DisFloat[this->vexnum];
+
+	static float w = 0.1;
+
+	//计算时间的邻接矩阵
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		for (int j = 0; j < this->vexnum; j++)
+		{
+			if (arc[i][j] == INT_MAX || arcRoadv[i][j] == 0 || speed == 0)
+			{
+				arcTime[i][j] = FLT_MAX;
+			}
+
+			else
+			{
+				arcTime[i][j] = arcRoadv[i][j] > speed ? (((float)arc[i][j] / speed) + w * jamDegree[i][j]) : (((float)arc[i][j] / arcRoadv[i][j]) + w * jamDegree[i][j]);	//取道路限速和车速较小的一个用来求时间
+			}
+		}
+	}
+
+	int i;
+	for (i = 0; i < this->vexnum; i++) {
+		//设置当前的路径
+		vector<int> tmp;
+		tmp = disfloat[i].path;
+		tmp.push_back(begin);
+		tmp.push_back(i + 1);
+		disfloat[i].path = tmp;
+		disfloat[i].value = arcTime[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
+	}
+	//设置起点到起点自己的路径为0
+	disfloat[begin - 1].value = 0;
+	disfloat[begin - 1].visit = true;
+
+	int count = 1;
+	//计算到其他各顶点的最短路径
+	while (count != this->vexnum) {
+		//temp用于保存当前dis数组中最小的那个下标
+		//min记录当前的最小值
+		int temp = 0;
+		float min = FLT_MAX;
+		//这里的for循环我的理解就是算法中优先队列的作用（找目前最短的点），选择准备进行松弛的点，给下一步的for循环进行松弛操作
+		for (i = 0; i < this->vexnum; i++) {
+			if (!disfloat[i].visit && disfloat[i].value < min) {
+				min = disfloat[i].value;
+				temp = i;
+			}
+		}
+
+		disfloat[temp].visit = true;		//把上一步找到的准备进行松弛操作的点加入已找到的最短路径集合（实际上就是下次不再入优先队列，每个点至进行一次入队）
+		++count;
+		//下面这个for循环这么理解（更新的是temp指向的点的值），它是将所有的点都进行了一次松弛更新的操作，如果满足条件则更新否则不更新，在算法中写的是值操作相邻的点进行操作，因为不相邻的没有意义（这里就用无穷达来表达了这种情况！因此它直接所有点遍历，如果可以只存邻接的点那会更好！）
+		for (i = 0; i < this->vexnum; i++) {
+			if (!disfloat[i].visit && arcTime[temp][i] != FLT_MAX && (disfloat[temp].value + arcTime[temp][i]) < disfloat[i].value) {
+				disfloat[i].value = disfloat[temp].value + arcTime[temp][i];
+				vector<int> tmp;
+				tmp = disfloat[temp].path;
+				tmp.push_back(i + 1);
+				disfloat[i].path = tmp;
+			}
+		}
+	}
+	vector<int> path_tmp = disfloat[end - 1].path;
+	delete[] disfloat;//释放动态申请的disfloat数组
+	return path_tmp;
+}
+//重载dijkstra算法，返回从start到end的时间最短的路径
+vector<int> Graph_DG::Dijkstra(int begin, int end, int speed, int &time) {
 	//首先初始化dis数组
 	disfloat = new DisFloat[this->vexnum];
 
@@ -480,6 +549,7 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 		}
 	}
 	vector<int> path_tmp = disfloat[end - 1].path;
+	time = (int)disfloat[end - 1].value;
 	delete[] disfloat;//释放动态申请的disfloat数组
 	return path_tmp;
 }
