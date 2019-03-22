@@ -36,6 +36,7 @@ private:
 	Car *cars;//所有的车
 
 	std::deque<Car> carsWaitInGarage;//上一时间片未驶出，等待驶出的车
+	std::deque<Car> carsInGarage;//此时间片待出发的车
 
 	//CrossToRoad转换表
 	std::vector<std::vector<int> > graphC2R;

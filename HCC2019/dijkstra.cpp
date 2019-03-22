@@ -484,7 +484,7 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 	return path_tmp;
 }
 
-vector<int> Graph_DG::Dijkstra(int begin, int end, int speed, vector<std::vector<float>> jamDegree, float w)
+vector<int> Graph_DG::Dijkstra(int begin, int end, int speed, vector<std::vector<float>> jamDegree, float w, int &timeCar)
 {
 	//首先初始化dis数组
 	disfloat = new DisFloat[this->vexnum];
@@ -549,6 +549,7 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed, vector<std::vector
 		}
 	}
 	vector<int> path_tmp = disfloat[end - 1].path;
+	timeCar = disfloat[end - 1].value;
 
 	delete[] disfloat;//释放动态申请的disfloat数组
 	return path_tmp;

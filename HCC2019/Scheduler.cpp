@@ -855,6 +855,9 @@ bool Scheduler::isCanDriveToNextRoad(Car car, int dir, int idCross)
 	return false;
 }
 
+bool less_time(const Car & m1, const Car & m2) {
+	return m1.time < m2.time;
+}
 void Scheduler::driverCarInGarage()
 {
 	int numCarsWait = carsWaitInGarage.size();
@@ -878,9 +881,10 @@ void Scheduler::driverCarInGarageDynamic(Graph_DG &graph)
 	int numCarsWait = carsWaitInGarage.size();
 	for(int j = 0; j < numCarsWait;++j)
 	{
+		int timeCar = 0;
 		Car car = carsWaitInGarage.front();
 		carsWaitInGarage.pop_front();
-		vector<int> pathCross = graph.Dijkstra(car.idCrossFrom, car.idCrossTo, car.speed, graphRoadStatusByDS, 12);
+		vector<int> pathCross = graph.Dijkstra(car.idCrossFrom, car.idCrossTo, car.speed, graphRoadStatusByDS, 12, timeCar);
 		//cross矩阵转road矩阵
 		vector<int> pathRoad(pathCross.size() - 1);
 		for (int j = 0; j < pathRoad.size(); ++j)
@@ -895,7 +899,9 @@ void Scheduler::driverCarInGarageDynamic(Graph_DG &graph)
 	{
 		if (cars[i].starttime == time_Scheduler && cars[i].status == SLEEPING)
 		{
-			vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed, graphRoadStatusByDS, 12);
+			int timeCar = 0;
+			vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed, graphRoadStatusByDS, 12, timeCar);
+			cars[i].time = timeCar;
 			//cross矩阵转road矩阵
 			vector<int> pathRoad(pathCross.size() - 1);
 			for (int j = 0; j < pathRoad.size(); ++j)
@@ -904,8 +910,15 @@ void Scheduler::driverCarInGarageDynamic(Graph_DG &graph)
 				//assert(pathRoad[j] != 0);
 			}
 			cars[i].path = pathRoad;
-			addCar(cars[i], i);
+			carsInGarage.push_back(cars[i]);
 		}
+	}
+	std::sort(carsInGarage.begin(), carsInGarage.end(), less_time);
+	for (int i = 0; i < carsInGarage.size(); i++)
+	{
+		Car car = carsInGarage.back();//先调度时间长的
+		carsInGarage.pop_back();
+		addCar(car, car.id - 10000);
 	}
 }
 

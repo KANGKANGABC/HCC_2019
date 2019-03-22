@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
 	Scheduler sd(dc);
 	dc.getPath();
-	dc.writeResult(answer_file);
+	//dc.writeResult(answer_file);
 	int para = sd.getParaByScheduler();
 	//sd.getPathByTime();//获得车辆的路径信息
 	//dc.writeResult(answer_file);
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	//dc.writeResult(answer_file);
 	//sd.getPathByScheduler();
 	//dc.writeResult(answer_file);
-	//bool time = sd.getSysTime();
+	//int time = sd.getSysTime();
 	//sd.getPathByScheduler();
 	//int time = sd.getSysTime();
 	//sd.getPathByTime_dynamic();//获得车辆的路径信息

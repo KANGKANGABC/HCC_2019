@@ -69,7 +69,7 @@ public:
 	vector<int> Dijkstra(int begin, int end, int speed);
 
 	//重载dijkstra算法，返回从start到end的时间最短的路径，jamDegree为道路拥堵情况矩阵，w为加权系数
-	vector<int> Dijkstra(int begin, int end, int speed, vector<std::vector<float> > jamDegree, float w);
+	vector<int> Dijkstra(int begin, int end, int speed, vector<std::vector<float> > jamDegree, float w, int &timeCar);
 	//用归一化后的矩阵实施D算法
 	vector<int> DijkstraNor(int begin, int end, int speed);
 	//打印begin到所有顶点的最短路径

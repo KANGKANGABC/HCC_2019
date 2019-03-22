@@ -15,6 +15,7 @@ public:
 	int dirCross;//标志在路口的状态 
 	int idCrossFrom;//车的出发路口
 	int idCrossTo;//车的终止路口
+	int time;
 	std::vector<int> path;
 }; 
 
