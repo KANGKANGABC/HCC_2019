@@ -14,7 +14,7 @@ public:
 	int getParaByScheduler();//请将初始参数设置为70以上
 	int getSysTime();
 	//基于动态调度器规划路径
-	void getPathByScheduler();
+	int getPathByScheduler();
 	//获得路径,为每辆车规划路径
 	void getPath();
 	//获得路径,为每辆车规划路径，基于时间

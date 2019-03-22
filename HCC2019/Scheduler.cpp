@@ -41,7 +41,8 @@ int Scheduler::getParaByScheduler()
 	{
 		getPlantimeByPeriod(para);
 		getPath();//获得初始参数
-		int time = getSysTime();
+		//int time = getSysTime();
+		int time = getPathByScheduler();
 		if (time > 0)
 		{
 			if (time <= timeMax)
@@ -59,6 +60,7 @@ int Scheduler::getParaByScheduler()
 	para += 4;
 	getPlantimeByPeriod(para);
 	getPath();//获得初始参数
+	getPathByScheduler();//重跑一次路径
 	return para;
 }
 
@@ -235,11 +237,13 @@ int Scheduler::getSysTime()
 	return time_Scheduler;
 }
 
-void Scheduler::getPathByScheduler()
+int Scheduler::getPathByScheduler()
 {
 	Graph_DG graph(vexnum, edge);
 	graph.createArcGraph(tmp);
 	graph.createArcRoadvGraph(tmp1);
+	time_Scheduler = 0;
+	num_CarsScheduling = num_Cars;
 	while (num_CarsScheduling > 0)
 	{
 		PRINT("***********time_Scheduler:%d************\n", time_Scheduler);//打印系统时间
@@ -401,10 +405,12 @@ void Scheduler::getPathByScheduler()
 
 		driverCarInGarageDynamic(graph);
 		putAllCarStatus();//输出所有车的状态
-		//putAllRoadStatus();
+		if (!putAllCarStatus())//输出所有车的状态
+			return false;//发生死锁
 		time_Scheduler++;//更新调度器时间
 		putAllRoadStatus();
 	}
+	return time_Scheduler;
 }
 
 void Scheduler::driveAllCarsJustOnRoadToEndState()
