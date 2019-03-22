@@ -24,7 +24,6 @@ public:
 	std::vector<std::vector<int> > tmp;
 	std::vector<std::vector<int> > tmp1;
 private:
-	int timecount;
 	int num_CarsScheduling;//正在调度的car数量
 	int num_CarsPut;//已经发车的car数量
 	int num_Roads;//道路数量
@@ -34,6 +33,9 @@ private:
 	Road *roads;//所有的道路（道路对象数组的指针）
 	Cross *crosses;//所有的路口（路口对象数组的指针）
 	Car *cars;//所有的车
+
+	std::deque<Car> carsWaitInGarage;//上一时间片未驶出，等待驶出的车
+
 	//CrossToRoad转换表
 	std::vector<std::vector<int> > graphC2R;
 
@@ -50,9 +52,6 @@ private:
 
 	/*将该车加入道路行驶*/
 	void addCar(Car car,int i);//i为该车在cars[]中的下标，便于加入车失败时延后时间片
-
-	/*将该车加入道路行驶,动态规划路径*/
-	void addCar(Car car, int i, Graph_DG &graph);
 
 	//判断某cross的某road是否可以行驶进入//输入ID为修正前的ID
 	int isCanEnter(int idRoad, int idCross);//如果返回值-1，代表不可加入，否则返回可驶入的lane ID

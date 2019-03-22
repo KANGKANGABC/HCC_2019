@@ -8,6 +8,7 @@
 #include <cmath>
 #include <vector>
 #include <assert.h>
+#include <deque>
 
 #include "lib_io.h"
 
