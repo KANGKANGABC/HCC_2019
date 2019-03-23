@@ -129,6 +129,11 @@ int Scheduler::getSysTime()
 											switch (roads[idRoad - 5000].lane[m].laneCar[0].dirCross)
 											{
 											case NONE:
+
+												break;
+											case DD://直行>左转>右转
+												//根据官方说明，即将到达终点的车以直行方式进入路口
+												/***************************************************************/
 												if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//逆向
 													idNextCross = roads[car.idCurRoad - 5000].idFrom;//此车即将驶入的路口
 												else
@@ -142,10 +147,10 @@ int Scheduler::getSysTime()
 													isWorkingRoad = true;
 													isWorkingLane = true;
 													driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
+													break;
 													//该车准备通过路口
 												}
-												break;
-											case DD://直行>左转>右转
+												/***************************************************************/
 												dirTarget = getDirByRoadCrossDir(idCross, idRoad) + 2;//目标方向
 												if (dirTarget > 3) dirTarget -= 4;//修正方向
 												if (isCanDriveToNextRoad(car, dirTarget, idCross))
@@ -546,7 +551,7 @@ int Scheduler::driveCar(Car car, int indexCar)
 				if (idNextCross == car.idCrossTo)//如果此车将要驶出出口
 				{
 					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = WAITTING;
-					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = NONE;
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = DD;//从NONE改为DD，直行到达终点
 					/*
 					num_CarsScheduling -= 1;//正在调度的车辆数减一
 					std::vector<Car>::iterator it = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.begin();
@@ -1177,7 +1182,7 @@ void Scheduler::driveAllCarsJustOnOneChannelToEndState(int idRoad, int idCross, 
 						if (idNextCross == car.idCrossTo)//如果此车将要驶出出口
 						{
 							roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = WAITTING;
-							roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = NONE;
+							roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = DD;
 							/*
 							num_CarsScheduling -= 1;//正在调度的车辆数减一
 							std::vector<Car>::iterator it = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.begin();

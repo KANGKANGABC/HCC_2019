@@ -49,21 +49,21 @@ int main(int argc, char *argv[])
 	//dc.writeResultWithTime(answer_file);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//dc.writeResult(answer_file);
-	int para = sd.getParaByScheduler();
+	//int para = sd.getParaByScheduler();
 	//sd.getPathByTime();//获得车辆的路径信息
 	//dc.writeResult(answer_file);
 	//sd.getPathByTime();//获得车辆的路径信息
 	//dc.writeResult(answer_file);
 	//sd.getPathByScheduler();
 	//dc.writeResult(answer_file);
-	//int time = sd.getSysTime();
+	int time = sd.getSysTime();
 	//sd.getPathByScheduler();
 	//int time = sd.getSysTime();
 	//sd.getPathByTime_dynamic();//获得车辆的路径信息
 	//int time = sd.getSysTime();
 	//dc.writeResultWithTime(answer_file);
 	dc.writeResult(answer_file);
-	PRINT("para:%d\n",para);
+	//PRINT("para:%d\n",para);
 
 	// TODO:read input filebuf
 	// TODO:process
