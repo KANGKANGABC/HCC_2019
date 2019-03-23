@@ -45,7 +45,8 @@ int main(int argc, char *argv[])
 	dc.readCrossData();
 
 	Scheduler sd(dc);
-	sd.getPath();
+	sd.getPathByTime();
+	sd.getStartTime(700);
 	//dc.writeResultWithTime(answer_file);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//dc.writeResult(answer_file);

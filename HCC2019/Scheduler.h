@@ -17,6 +17,8 @@ public:
 	int getPathByScheduler();
 	//获得路径,为每辆车规划路径
 	void getPath();
+	//获得路径后，规划出发时间,para为参数
+	void getStartTime(int para);
 	//获得路径,为每辆车规划路径，基于时间
 	void getPathByTime();
 	void getPathByTime_dynamic(); //根据1-100 和101-199车的轨迹，更新第200辆车的邻接矩阵
@@ -34,6 +36,9 @@ private:
 	Road *roads;//所有的道路（道路对象数组的指针）
 	Cross *crosses;//所有的路口（路口对象数组的指针）
 	Car *cars;//所有的车
+
+	//存储车辆的速度种类的向量
+	std::vector<int> speedType;
 
 	std::deque<Car> carsWaitInGarage;//上一时间片未驶出，等待驶出的车
 	std::deque<Car> carsInGarage;//此时间片待出发的车

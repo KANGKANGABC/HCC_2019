@@ -94,13 +94,6 @@ private:
 	//CrossToRoad转换表
 	std::vector<std::vector<int> > graphC2R;
 
-	//路口信息表
-	//(id,roadId,roadId,roadId,roadId)
-	std::vector<std::vector<int> > crossList;
-
-	//Car调度任务表
-	std::vector<std::vector<int> > carTask;
-
 	//路径列表
 	std::vector<std::vector<int> > carPathList;
 

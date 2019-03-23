@@ -19,6 +19,7 @@ Scheduler::Scheduler(DataCenter &dc)
 	graphC2R = dc.graphC2R;
 	num_CarsPut = 0;//已经发车的数量预置为0
 	graphRoadStatusByDS = dc.graphRoadStatusByDS;
+	speedType = dc.speedType;
 	for (int i = 0; i < graphRoadStatusByDS.size(); i++)
 	{
 		for (int j = 0; j < graphRoadStatusByDS[0].size(); j++)
@@ -1238,7 +1239,7 @@ void Scheduler::getPlantimeByPeriod(int period)
 	}
 }
 
-void Scheduler::getPath()
+void Scheduler::getPath()//获得最短路径和该路径下的运行时间
 {
 	Graph_DG graph(vexnum, edge);
 	graph.createArcGraph(tmp);
@@ -1258,6 +1259,64 @@ void Scheduler::getPath()
 	}
 }
 
+void Scheduler::getStartTime(int para)
+{
+	//car_speed_num 为车辆速度类型数量 speedType存放速度类型的vector
+	//para参数为每个时间片可发运行时间总和
+	//car[0].time为每辆车运行时间
+
+	std::deque<Car> carsDeque;//此时间片待出发的车 //deque是分配在堆中的，所以此处临时deque不会造成栈溢出
+	int timeStart = 1;//出发时间，从1开始安排
+	for (auto speed : speedType)
+	{
+		assert(carsDeque.size()==0);//使用前确保deque为空
+		for (int i = 0; i < num_Cars; ++i)
+		{
+			if (cars[i].speed == speed)
+			{
+				carsDeque.push_back(cars[i]);
+			}
+		}
+		std::sort(carsDeque.begin(), carsDeque.end(), less_time);//将deque中的车按照运行时间升序排列
+		//当然如果不排序也是有一定道理的
+		int loadCur;//记录当前负载
+		while (carsDeque.size() > 0)
+		{
+			loadCur = 0;
+			while (loadCur < para)
+			{
+				if (carsDeque.size() == 1)
+				{
+					Car car = carsDeque.front();
+					carsDeque.pop_front();
+					cars[car.id - 10000].starttime = timeStart;
+					break;
+				}
+				else if (carsDeque.size() == 0)
+				{
+					break;
+				}
+				Car carShortTime = carsDeque.front();
+				Car carLongTime = carsDeque.back();
+				carsDeque.pop_front();
+				carsDeque.pop_back();
+				loadCur += carLongTime.time + carShortTime.time;
+				cars[carLongTime.id - 10000].starttime = timeStart;
+				cars[carShortTime.id - 10000].starttime = timeStart;
+			}
+			timeStart++;
+		}
+	}
+	//防止starttime早于计划时间
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].starttime < cars[i].plantime)
+		{
+			cars[i].starttime = cars[i].plantime;
+		}
+	}
+}
+
 void Scheduler::getPathByTime() 
 {
 	static int num = 0;
@@ -1269,9 +1328,13 @@ void Scheduler::getPathByTime()
 	graph.createArcGraph(tmp);
 	graph.createArcRoadvGraph(tmp1);
 
+	int timeCar = 0;
+
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed);
+		vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed, timeCar);
+
+		cars[i].time = timeCar;
 
 		//统计车辆情况，每100辆车更新一次jamDegree的矩阵
 		num++;
