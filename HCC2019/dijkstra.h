@@ -65,6 +65,7 @@ public:
 	void Dijkstra(int begin);
 	//dijkstra算法，返回从start到end的路径
 	vector<int> Dijkstra(int begin, int end);
+	vector<int> DijkstraWeightOne(int begin, int end, int &timeCar);
 	//重载dijkstra算法，返回从start到end的时间最短的路径
 	vector<int> Dijkstra(int begin, int end, int speed);
 	//重载dijkstra算法，返回从start到end的时间最短的路径

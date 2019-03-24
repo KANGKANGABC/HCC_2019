@@ -1465,6 +1465,25 @@ void Scheduler::getPath()//获得最短路径和该路径下的运行时间
 		cars[i].time = timeCar;
 	}
 }
+void Scheduler::getPathWeightOne()
+{
+	Graph_DG graph(vexnum, edge);
+	graph.createArcGraph(tmp);
+
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		int timeCar = 0;
+		vector<int> pathCross = graph.DijkstraWeightOne(cars[i].idCrossFrom, cars[i].idCrossTo, timeCar);
+		vector<int> pathRoad(pathCross.size() - 1);
+		for (int j = 0; j < pathRoad.size(); ++j)
+		{
+			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+			//assert(pathRoad[j] != 0);
+		}
+		cars[i].path = pathRoad;
+		cars[i].time = timeCar;
+	}
+}
 bool Comp(const int &a, const int &b)
 {
 	return a > b;
@@ -1773,7 +1792,15 @@ void Scheduler::getTimeByDir(int para)
 		y1 = (cars[i].idCrossFrom - 1) / 8;
 		x2 = (cars[i].idCrossTo - 1) % 8;
 		y2 = (cars[i].idCrossTo - 1) / 8;
-		if ((x2 - x1)*(y2 - y1) <= 0)//符号相反
+		if ((x2 - x1) <= 0 && (y2 - y1) <= 0)
+		{
+			cars[i].dirMap = 4;
+		}
+		else if ((x2 - x1) >= 0 && (y2 - y1) >= 0)
+		{
+			cars[i].dirMap = 3;
+		}
+		else if ((x2 - x1) >= 0 && (y2 - y1) <= 0)
 		{
 			cars[i].dirMap = 2;
 		}
@@ -1797,22 +1824,6 @@ void Scheduler::getTimeByDir(int para)
 		//std::sort(carsDeque.begin(), carsDeque.end(), less_time);//将deque中的车按照运行时间升序排列
 		std::sort(carsDeque.begin(), carsDeque.end(), CompDirMap);//将deque中的车按照方向分为两类
 		//当然如果不排序也是有一定道理的
-		if (speed == 8)
-		{
-			para = 400;
-		}
-		else if(speed == 6)
-		{
-			para = 430;
-		}
-		else if (speed == 4)
-		{
-			para = 460;
-		}
-		else
-		{
-			para = 500;
-		}
 		int loadCur;//记录当前负载
 		while (carsDeque.size() > 0)
 		{

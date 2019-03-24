@@ -17,6 +17,8 @@ public:
 	int getPathByScheduler();
 	//获得路径,为每辆车规划路径
 	void getPath();
+	//获得路径,所有权重为1
+	void getPathWeightOne();
 	//获得路径后，规划出发时间,para为参数
 	void getStartTime(int para);
 	//获得路径,为每辆车规划路径，基于时间
