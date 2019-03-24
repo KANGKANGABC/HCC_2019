@@ -51,9 +51,9 @@ int main(int argc, char *argv[])
 	Scheduler sd(dc);
   
 	sd.getPath();
-	//sd.ReOrderStartByTime(PARA_PERIOD);
+	sd.ReOrderStartByTime(PARA_PERIOD);
 	//sd.getPathByTime_reorderCars();//获得车辆的路径信息
-	sd.getStartTime(400);
+	//sd.getStartTime(470);
 	//dc.writeResultWithTime(answer_file);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//dc.writeResult(answer_file);

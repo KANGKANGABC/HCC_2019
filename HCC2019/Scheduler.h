@@ -24,6 +24,7 @@ public:
 	void getPathByTime_reorderCars();//车辆按出发时间重排序后进行静态规划
 	void getPathByTime_dynamic(); //根据1-100 和101-199车的轨迹，更新第200辆车的邻接矩阵
 	void ReOrderStartByTime(int para);//根据行驶时间重新安排出发时间
+	bool addCarandChangeSTime(Car car);//往道路中添加车辆，并且通过改变出发时间留出空位
 	int vexnum, edge;
 	std::vector<std::vector<int> > tmp;
 	std::vector<std::vector<int> > tmp1;
@@ -64,7 +65,7 @@ private:
 	void driveCarStep1(Car car, int indexCar);
 
 	/*将该车加入道路行驶*/
-	void addCar(Car car,int i);//i为该车在cars[]中的下标，便于加入车失败时延后时间片
+	bool addCar(Car car,int i);//i为该车在cars[]中的下标，便于加入车失败时延后时间片
 
 	//判断某cross的某road是否可以行驶进入//输入ID为修正前的ID
 	int isCanEnter(int idRoad, int idCross);//如果返回值-1，代表不可加入，否则返回可驶入的lane ID
