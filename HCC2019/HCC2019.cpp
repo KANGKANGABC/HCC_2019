@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 	sd.getPath();
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//sd.getPathByTime_reorderCars();//获得车辆的路径信息
-	sd.getStartTime(420);
+	sd.getStartTime(400);
 	//dc.writeResultWithTime(answer_file);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//dc.writeResult(answer_file);
@@ -68,8 +68,8 @@ int main(int argc, char *argv[])
 	int time = sd.getSysTime();
 	//sd.getPathByTime_dynamic();//获得车辆的路径信息
 	//int time = sd.getSysTime();
-	dc.writeResultWithTime(answer_file);
-	//dc.writeResult(answer_file);
+	//dc.writeResultWithTime(answer_file);
+	dc.writeResult(answer_file);
 	//PRINT("para:%d\n",para);
 
 	// TODO:read input filebuf
