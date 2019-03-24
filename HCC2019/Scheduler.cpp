@@ -1573,69 +1573,6 @@ void Scheduler::getPathByTime()
 			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
 			//assert(pathRoad[j] != 0);
 		}
-		/*
-		//统计road的情况
-		for (int i = 0; i < pathRoad.size(); i++)
-		{
-			flag_road[pathRoad.at(i) - 5000]++;//记录road的使用情况
-		}
-
-
-		//统计cross的情况
-		if (flagnum == 200)
-		{
-			ofstream oFile;
-			oFile.open("testcross100.csv", ios::out | ios::trunc);
-			for (int i=0; i < 100; i++)
-			{
-				oFile << flag[i] << endl;
-			}
-
-			oFile.close();
-
-			for (int i = 0; i < 100; i++)
-			{
-				flag[i] = 0;
-			}
-
-			ofstream oFile1;
-			oFile1.open("testroad100.csv", ios::out | ios::trunc);
-			for (int i = 0; i < 120; i++)
-			{
-				oFile1 << flag_road[i] << endl;
-			}
-			oFile1.close();
-
-			for (int i = 0; i < 120; i++)
-			{
-				flag_road[i] = 0;
-			}
-		}
-		*/
-		/*写出100~200辆车的统计情况*/
-		/*
-		if (flagnum == 400)
-		{
-			ofstream oFile2;
-			oFile2.open("testcross200.csv", ios::out | ios::trunc);
-			for (int i = 0; i < 100; i++)
-			{
-				oFile2 << flag[i] << endl;
-			}
-
-			oFile2.close();
-
-
-			ofstream oFile3;
-			oFile3.open("testroad200.csv", ios::out | ios::trunc);
-			for (int i = 0; i < 120; i++)
-			{
-				oFile3 << flag_road[i] << endl;
-			}
-
-			oFile3.close();
-		}
-		*/
 		cars[i].path = pathRoad;
 
 	}
@@ -1816,5 +1753,90 @@ void Scheduler ::getPathByTime_dynamic()
 			//assert(pathRoad[j] != 0);
 		}
 		cars[i].path = pathRoad;
+	}
+}
+
+bool CompDirMap(const Car &a, const Car &b)
+{
+	return a.dirMap > b.dirMap;
+}
+
+void Scheduler::getTimeByDir(int para)
+{
+	std::deque<Car> carsDeque;//此时间片待出发的车 //deque是分配在堆中的，所以此处临时deque不会造成栈溢出
+	int timeStart = 1;//出发时间，从1开始安排
+
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		int x1, y1, x2, y2;
+		x1 = (cars[i].idCrossFrom - 1) % 8;
+		y1 = (cars[i].idCrossFrom - 1) / 8;
+		x2 = (cars[i].idCrossTo - 1) % 8;
+		y2 = (cars[i].idCrossTo - 1) / 8;
+		if ((x2 - x1)*(y2 - y1) <= 0)//符号相反
+		{
+			cars[i].dirMap = 2;
+		}
+		else
+		{
+			cars[i].dirMap = 1;
+		}
+
+	}
+	sort(speedType.begin(), speedType.end(), Comp);
+	for (auto speed : speedType)
+	{
+		assert(carsDeque.size() == 0);//使用前确保deque为空
+		for (int i = 0; i < num_Cars; ++i)
+		{
+			if (cars[i].speed == speed)
+			{
+				carsDeque.push_back(cars[i]);
+			}
+		}
+		//std::sort(carsDeque.begin(), carsDeque.end(), less_time);//将deque中的车按照运行时间升序排列
+		std::sort(carsDeque.begin(), carsDeque.end(), CompDirMap);//将deque中的车按照方向分为两类
+		//当然如果不排序也是有一定道理的
+		if (speed == 8)
+		{
+			para = 400;
+		}
+		else if(speed == 6)
+		{
+			para = 430;
+		}
+		else if (speed == 4)
+		{
+			para = 460;
+		}
+		else
+		{
+			para = 500;
+		}
+		int loadCur;//记录当前负载
+		while (carsDeque.size() > 0)
+		{
+			loadCur = 0;
+			while (loadCur < para)
+			{
+				if (carsDeque.size() == 0)
+				{
+					break;
+				}
+				Car carTime = carsDeque.front();
+				carsDeque.pop_front();
+				loadCur += carTime.time;
+				cars[carTime.id - 10000].starttime = timeStart;
+			}
+			timeStart++;
+		}
+	}
+	//防止starttime早于计划时间
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].starttime < cars[i].plantime)
+		{
+			cars[i].starttime = cars[i].plantime;
+		}
 	}
 }

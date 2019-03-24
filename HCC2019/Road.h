@@ -16,6 +16,7 @@ public:
 	int idCrossFrom;//车的出发路口
 	int idCrossTo;//车的终止路口
 	int time;
+	int dirMap;//车在地图上的方向，分为（++）（--）（+-）（-+）四种
 	std::vector<int> path;
 }; 
 

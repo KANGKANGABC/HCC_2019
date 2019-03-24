@@ -203,7 +203,7 @@ void DataCenter::writeResult(const char *filename)
 
 void DataCenter::writeResultWithTime(const char *filename)
 {
-	result += "#(carId,StartTime,RoadId,Time,StartTime...)\n";
+	result += "#(carId,StartTime,RoadId,Time,StartTime,DirMap...)\n";
 	for (int i = 0; i < m_car_num; ++i)
 	{
 		std::string line = "(" + std::to_string(car[i].id);
@@ -218,6 +218,8 @@ void DataCenter::writeResultWithTime(const char *filename)
 		line += std::to_string(car[i].time);
 		line += ", ";
 		line += std::to_string(car[i].starttime);
+		line += ", ";
+		line += std::to_string(car[i].dirMap);
 		line += ")\n";
 		result += line;
 	}
