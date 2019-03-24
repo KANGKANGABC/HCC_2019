@@ -21,7 +21,7 @@
 #define INT_MAX 0x7fffffff
 #define FLT_MAX 3.402823466e+38F
 
-#define PARA_PERIOD 70
+#define PARA_PERIOD 100
 
 #ifdef _DEBUG
 #define PRINT   printf

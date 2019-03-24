@@ -60,6 +60,9 @@ private:
 
 	int driveCarNew(Car car);
 
+	//第一阶段车行驶
+	void driveCarStep1(Car car, int indexCar);
+
 	/*将该车加入道路行驶*/
 	void addCar(Car car,int i);//i为该车在cars[]中的下标，便于加入车失败时延后时间片
 
@@ -111,4 +114,5 @@ private:
 
 	//根据时间周期安排出发时间
 	void getPlantimeByPeriod(int period);
+
 };
