@@ -188,7 +188,7 @@ void DataCenter::writeResult(const char *filename)
 	{
 		std::string line = "(" + std::to_string(car[i].id);
 		line += ", ";
-		line += std::to_string(car[i].starttime);
+		line += std::to_string(car[i].starttimeAnswer);
 		for (int j = 0; j < car[i].path.size(); ++j)
 		{
 			line += ", ";

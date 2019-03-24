@@ -66,6 +66,8 @@ private:
 
 	int driveCarNew(Car car);
 
+	Car getCarFromRoad(int idRoad,int dir);
+
 	//第一阶段车行驶
 	void driveCarStep1(Car car, int indexCar);
 

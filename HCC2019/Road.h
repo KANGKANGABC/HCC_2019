@@ -10,6 +10,7 @@ public:
 	int speed;
 	int plantime;//计划驶出时间
 	int starttime;//真实驶出时间
+	int starttimeAnswer;//写出answer的starttime
 	int idCurRoad;//当前车所在的道路ID
 	int idCurLane;//当前车所在的车道ID
 	int dirCross;//标志在路口的状态 
