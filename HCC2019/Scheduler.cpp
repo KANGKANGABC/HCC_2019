@@ -516,7 +516,7 @@ bool Scheduler::addCarandChangeSTime(Car car)
 	{
 		if (roads[idRoadTarget - 5000].lane[i].laneCar.size() != 0)
 		{
-			if (roads[idRoadTarget - 5000].lane[i].laneCar[roads[idRoadTarget - 5000].lane[i].laneCar.size() - 1].location > 2)//这里保留一个空位
+			if (roads[idRoadTarget - 5000].lane[i].laneCar[roads[idRoadTarget - 5000].lane[i].laneCar.size() - 1].location > 2)//留下一个空位
 			{
 				idLaneTarget = i;
 				break;
@@ -1150,7 +1150,6 @@ bool Scheduler::isCanDriveToNextRoad(Car car, int dir, int idCross)
 	return false;
 }
 
-
 void Scheduler::driverCarInGarage()
 {
 	int numCarsWait = carsWaitInGarage.size();
@@ -1159,12 +1158,14 @@ void Scheduler::driverCarInGarage()
 		Car car = carsWaitInGarage.front();
 		carsWaitInGarage.pop_front();
 		//addCar(car, car.id - 10000);
+		
 		bool isAdded = addCarandChangeSTime(car);
 		if (isAdded)
 		{
 			cars[car.id - 10000].status = FINESHED;//切换car的状态
 			cars[car.id - 10000].starttime = time_Scheduler;
 		}
+		
 	}
 	for (int i = 0; i < num_Cars; ++i)
 	{

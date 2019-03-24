@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//dc.writeResult(answer_file);
 	//int para = sd.getParaByScheduler();
-	//sd.getPathByTime();//获得车辆的路径信息
+	sd.getPathByTime();//获得车辆的路径信息
 
 	//dc.writeResult(answer_file);
 	//sd.getPathByTime();//获得车辆的路径信息
