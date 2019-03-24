@@ -117,7 +117,7 @@ void DataCenter::readCarData()
 	{
 		std::string carInfo = inputCarData[i];
 		std::vector<std::string> sp = Tools::split(carInfo, ", ");
-
+    
 		car[i - 1].id = std::stoi(sp[0].substr(1));//去除左括号
 		car[i - 1].idCrossFrom = std::stoi(sp[1]);
 		car[i - 1].idCrossTo = std::stoi(sp[2]);
@@ -241,4 +241,50 @@ void DataCenter::getPath()
 		}
 		car[i].path = pathRoad;
 	}
+}
+
+void DataCenter::swap(int i, int j)
+{
+	Car tmp;
+	tmp = qCar[i];
+	qCar[i] = qCar[j];
+	qCar[j] = tmp;
+}
+
+void DataCenter::quicksort(int begin, int end)
+{
+	int i, j;
+	i = begin + 1;
+	j = end;
+	if(begin < end)
+	{
+		while (i < j)
+		{
+			if (qCar[i].plantime > qCar[begin].plantime)
+			{
+				swap(i, j);
+				j--;
+			}
+			else
+				i++;
+		}
+		if (qCar[i].plantime > qCar[begin].plantime)
+			i--;
+		swap(i, begin);
+		quicksort(begin, i - 1);
+		quicksort(i + 1, end);
+	}
+}
+
+void DataCenter::reorderCars()
+{
+	for (int i = 0; i < m_car_num; i++)
+	{
+		qCar.push_back(car[i]);//将id顺序的车辆放到qcar的vector中
+	}
+
+	int begin = 0;
+	int end = qCar.size() - 1;
+	quicksort(begin, end);
+
 }

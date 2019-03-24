@@ -5,6 +5,7 @@
 #include "define.h"
 #include "Road.h"
 #include "dijkstra.h"
+#include "vector"
 
 
 class DataCenter
@@ -42,6 +43,10 @@ public:
 	//获得规划的路径
 	void getPath();
 
+	//快速排序用
+	void swap(int i, int j);
+	void quicksort(int begin, int end);
+
 	enum
 	{// 车辆运行状态 //请参考论坛中关于任务调度的解释
 		SLEEPING,	// 等待出发（车库中）
@@ -77,8 +82,12 @@ public:
 	//动态调度器计算出来的道路情况矩阵
 	std::vector<std::vector<float> > graphRoadStatusByDS;
 
-private:
+	//将车辆按时间进行重排序
+	void reorderCars();
 
+	vector<Car> qCar;	//按照出发时间将车辆重排序
+
+private:
 	char **inputRoadData;//输入道路数据
 	char **inputCarData;//输入道路数据
 	char **inputCrossData;//输入道路数据

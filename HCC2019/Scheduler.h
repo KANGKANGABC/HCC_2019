@@ -11,102 +11,105 @@ class Scheduler
 public:
 	Scheduler(DataCenter &dc);
 	~Scheduler();
-	int getParaByScheduler();//Çë½«³õÊ¼²ÎÊıÉèÖÃÎª70ÒÔÉÏ
+	int getParaByScheduler();//è¯·å°†åˆå§‹å‚æ•°è®¾ç½®ä¸º70ä»¥ä¸Š
 	int getSysTime();
-	//»ùÓÚ¶¯Ì¬µ÷¶ÈÆ÷¹æ»®Â·¾¶
+	//åŸºäºåŠ¨æ€è°ƒåº¦å™¨è§„åˆ’è·¯å¾„
 	int getPathByScheduler();
-	//»ñµÃÂ·¾¶,ÎªÃ¿Á¾³µ¹æ»®Â·¾¶
+	//è·å¾—è·¯å¾„,ä¸ºæ¯è¾†è½¦è§„åˆ’è·¯å¾„
 	void getPath();
-	//»ñµÃÂ·¾¶ºó£¬¹æ»®³ö·¢Ê±¼ä,paraÎª²ÎÊı
+	//è·å¾—è·¯å¾„åï¼Œè§„åˆ’å‡ºå‘æ—¶é—´,paraä¸ºå‚æ•°
 	void getStartTime(int para);
-	//»ñµÃÂ·¾¶,ÎªÃ¿Á¾³µ¹æ»®Â·¾¶£¬»ùÓÚÊ±¼ä
+	//è·å¾—è·¯å¾„,ä¸ºæ¯è¾†è½¦è§„åˆ’è·¯å¾„ï¼ŒåŸºäºæ—¶é—´
 	void getPathByTime();
-	void getPathByTime_dynamic(); //¸ù¾İ1-100 ºÍ101-199³µµÄ¹ì¼££¬¸üĞÂµÚ200Á¾³µµÄÁÚ½Ó¾ØÕó
-	void ReOrderStartByTime(int para);//¸ù¾İĞĞÊ»Ê±¼äÖØĞÂ°²ÅÅ³ö·¢Ê±¼ä
+	void getPathByTime_reorderCars();//è½¦è¾†æŒ‰å‡ºå‘æ—¶é—´é‡æ’åºåè¿›è¡Œé™æ€è§„åˆ’
+	void getPathByTime_dynamic(); //æ ¹æ®1-100 å’Œ101-199è½¦çš„è½¨è¿¹ï¼Œæ›´æ–°ç¬¬200è¾†è½¦çš„é‚»æ¥çŸ©é˜µ
+	void ReOrderStartByTime(int para);//æ ¹æ®è¡Œé©¶æ—¶é—´é‡æ–°å®‰æ’å‡ºå‘æ—¶é—´
 	int vexnum, edge;
 	std::vector<std::vector<int> > tmp;
 	std::vector<std::vector<int> > tmp1;
 private:
-	int num_CarsScheduling;//ÕıÔÚµ÷¶ÈµÄcarÊıÁ¿
-	int num_CarsPut;//ÒÑ¾­·¢³µµÄcarÊıÁ¿
-	int num_Roads;//µÀÂ·ÊıÁ¿
-	int num_Crosses;//Â·¿ÚÊıÁ¿
-	int num_Cars;//³µÊıÁ¿
-	int time_Scheduler;//µ÷¶ÈÆ÷ÔËĞĞÊ±¼ä
-	Road *roads;//ËùÓĞµÄµÀÂ·£¨µÀÂ·¶ÔÏóÊı×éµÄÖ¸Õë£©
-	Cross *crosses;//ËùÓĞµÄÂ·¿Ú£¨Â·¿Ú¶ÔÏóÊı×éµÄÖ¸Õë£©
-	Car *cars;//ËùÓĞµÄ³µ
+	int num_CarsScheduling;//æ­£åœ¨è°ƒåº¦çš„caræ•°é‡
+	int num_CarsPut;//å·²ç»å‘è½¦çš„caræ•°é‡
+	int num_Roads;//é“è·¯æ•°é‡
+	int num_Crosses;//è·¯å£æ•°é‡
+	int num_Cars;//è½¦æ•°é‡
+	int time_Scheduler;//è°ƒåº¦å™¨è¿è¡Œæ—¶é—´
+	Road *roads;//æ‰€æœ‰çš„é“è·¯ï¼ˆé“è·¯å¯¹è±¡æ•°ç»„çš„æŒ‡é’ˆï¼‰
+	Cross *crosses;//æ‰€æœ‰çš„è·¯å£ï¼ˆè·¯å£å¯¹è±¡æ•°ç»„çš„æŒ‡é’ˆï¼‰
+	Car *cars;//æ‰€æœ‰çš„è½¦
+  
+	vector<Car> qcars;//æŒ‰æ—¶é—´é‡æ’åº
 
-	//´æ´¢³µÁ¾µÄËÙ¶ÈÖÖÀàµÄÏòÁ¿
+	//å­˜å‚¨è½¦è¾†çš„é€Ÿåº¦ç§ç±»çš„å‘é‡
 	std::vector<int> speedType;
 
-	std::deque<Car> carsWaitInGarage;//ÉÏÒ»Ê±¼äÆ¬Î´Ê»³ö£¬µÈ´ıÊ»³öµÄ³µ
-	std::deque<Car> carsInGarage;//´ËÊ±¼äÆ¬´ı³ö·¢µÄ³µ
+	std::deque<Car> carsWaitInGarage;//ä¸Šä¸€æ—¶é—´ç‰‡æœªé©¶å‡ºï¼Œç­‰å¾…é©¶å‡ºçš„è½¦
+	std::deque<Car> carsInGarage;//æ­¤æ—¶é—´ç‰‡å¾…å‡ºå‘çš„è½¦
 
-	//CrossToRoad×ª»»±í
+	//CrossToRoadè½¬æ¢è¡¨
 	std::vector<std::vector<int> > graphC2R;
 
-	//¶¯Ì¬µ÷¶ÈÆ÷¼ÆËã³öÀ´µÄµÀÂ·Çé¿ö¾ØÕó
+	//åŠ¨æ€è°ƒåº¦å™¨è®¡ç®—å‡ºæ¥çš„é“è·¯æƒ…å†µçŸ©é˜µ
 	std::vector<std::vector<float> > graphRoadStatusByDS;
 
-	/*ËùÓĞroadÉÏµÄ³µÁ¾ĞĞ½ø£¬Ö±µ½¸Ã³µÁ¾ĞĞÊ»±ä³ÉµÈ´ı×´Ì¬»òÕßÖÕÖ¹×´Ì¬*/
+	/*æ‰€æœ‰roadä¸Šçš„è½¦è¾†è¡Œè¿›ï¼Œç›´åˆ°è¯¥è½¦è¾†è¡Œé©¶å˜æˆç­‰å¾…çŠ¶æ€æˆ–è€…ç»ˆæ­¢çŠ¶æ€*/
 	void driveAllCarsJustOnRoadToEndState();
 	
-	/*ÈÃ¸Ã³µÇ°½ø*/
-	int driveCar(Car car, int indexCar);//indexCarÎª¸Ã³µÔÚ³µµÀµÄÎ»ÖÃ
+	/*è®©è¯¥è½¦å‰è¿›*/
+	int driveCar(Car car, int indexCar);//indexCarä¸ºè¯¥è½¦åœ¨è½¦é“çš„ä½ç½®
 
 	int driveCarNew(Car car);
 
-	/*½«¸Ã³µ¼ÓÈëµÀÂ·ĞĞÊ»*/
-	void addCar(Car car,int i);//iÎª¸Ã³µÔÚcars[]ÖĞµÄÏÂ±ê£¬±ãÓÚ¼ÓÈë³µÊ§°ÜÊ±ÑÓºóÊ±¼äÆ¬
+	/*å°†è¯¥è½¦åŠ å…¥é“è·¯è¡Œé©¶*/
+	void addCar(Car car,int i);//iä¸ºè¯¥è½¦åœ¨cars[]ä¸­çš„ä¸‹æ ‡ï¼Œä¾¿äºåŠ å…¥è½¦å¤±è´¥æ—¶å»¶åæ—¶é—´ç‰‡
 
-	//ÅĞ¶ÏÄ³crossµÄÄ³roadÊÇ·ñ¿ÉÒÔĞĞÊ»½øÈë//ÊäÈëIDÎªĞŞÕıÇ°µÄID
-	int isCanEnter(int idRoad, int idCross);//Èç¹û·µ»ØÖµ-1£¬´ú±í²»¿É¼ÓÈë£¬·ñÔò·µ»Ø¿ÉÊ»ÈëµÄlane ID
+	//åˆ¤æ–­æŸcrossçš„æŸroadæ˜¯å¦å¯ä»¥è¡Œé©¶è¿›å…¥//è¾“å…¥IDä¸ºä¿®æ­£å‰çš„ID
+	int isCanEnter(int idRoad, int idCross);//å¦‚æœè¿”å›å€¼-1ï¼Œä»£è¡¨ä¸å¯åŠ å…¥ï¼Œå¦åˆ™è¿”å›å¯é©¶å…¥çš„lane ID
 		
-	//ÅĞ¶ÏÄ³crossµÄÄ³roadÊÇ·ñ´æÔÚĞèÒªÖ±ĞĞµÄ³µ
+	//åˆ¤æ–­æŸcrossçš„æŸroadæ˜¯å¦å­˜åœ¨éœ€è¦ç›´è¡Œçš„è½¦
 	bool isBeDD(int idRoad, int idCross);
 
-	//ÅĞ¶ÏÄ³crossµÄÄ³roadÊÇ·ñ´æÔÚĞèÒª×ó×ªµÄ³µ
+	//åˆ¤æ–­æŸcrossçš„æŸroadæ˜¯å¦å­˜åœ¨éœ€è¦å·¦è½¬çš„è½¦
 	bool isBeLEFT(int idRoad, int idCross);
 
-	//ÊäÈëµ±Ç°µÀÂ·ºÍÏÂÒ»µÀÂ·£¬ÒÔ¼°Â·¿ÚID£¬¼ÆËã³ö³µÁ¾´Óµ±Ç°µÀÂ·Ê»ÈëÏÂÒ»µÀÂ·µÄ·½Ïò
+	//è¾“å…¥å½“å‰é“è·¯å’Œä¸‹ä¸€é“è·¯ï¼Œä»¥åŠè·¯å£IDï¼Œè®¡ç®—å‡ºè½¦è¾†ä»å½“å‰é“è·¯é©¶å…¥ä¸‹ä¸€é“è·¯çš„æ–¹å‘
 	int getCrossDir(int idCurRoad, int idNextRoad, int idNextCross);
 
-	//Èç¹û³µÁ¾´Óµ±Ç°µÀÂ·Ê»ÏòÏÂÒ»Â·¿Ú£¬ÒòÎªµÀÂ·ÏŞËÙ¿ÉÄÜÓëÇø±ğ£¬ÕâÀï¸ù¾İ¹Ù·½µÄ¹æÔò¼ÆËã³µÁ¾ÄÜĞĞÊ»µÄ×î´ó¾àÀë
-	//Èç¹ûÄÜĞĞÊ»µÄ×î´ó¾àÀëÎª0£¬ÄÇÃ´Ö»ÄÜÍ£ÔÚÂ·¿Ú£¬µÈ´ıÏÂÒ»´Îµ÷¶È
+	//å¦‚æœè½¦è¾†ä»å½“å‰é“è·¯é©¶å‘ä¸‹ä¸€è·¯å£ï¼Œå› ä¸ºé“è·¯é™é€Ÿå¯èƒ½ä¸åŒºåˆ«ï¼Œè¿™é‡Œæ ¹æ®å®˜æ–¹çš„è§„åˆ™è®¡ç®—è½¦è¾†èƒ½è¡Œé©¶çš„æœ€å¤§è·ç¦»
+	//å¦‚æœèƒ½è¡Œé©¶çš„æœ€å¤§è·ç¦»ä¸º0ï¼Œé‚£ä¹ˆåªèƒ½åœåœ¨è·¯å£ï¼Œç­‰å¾…ä¸‹ä¸€æ¬¡è°ƒåº¦
 	int getCrossDistance(Car car, int idCurRoad, int idNextRoad);
 
-	//½«¸Ã³µĞĞÊ»µ½ÏÂ¸öroad ¸ù¾İ¼ÙÉèAA:´ËÊ±²»´æÔÚÓĞ³µµ½´ïÖÕµã
+	//å°†è¯¥è½¦è¡Œé©¶åˆ°ä¸‹ä¸ªroad æ ¹æ®å‡è®¾AA:æ­¤æ—¶ä¸å­˜åœ¨æœ‰è½¦åˆ°è¾¾ç»ˆç‚¹
 	void driverToNextRoad(Car car, int idNextRoad, int idNextLane, int location);
 
-	//ÅĞ¶Ï¸Ã³µÄÜ·ñÔÚÄ³Â·¿Ú×ªÏò²¢ĞĞÊ»
-	bool isCanDriveToNextRoad(Car car, int dir, int idCross);//dirÎªÄ¿±êĞĞÊ»·½Ïò
+	//åˆ¤æ–­è¯¥è½¦èƒ½å¦åœ¨æŸè·¯å£è½¬å‘å¹¶è¡Œé©¶
+	bool isCanDriveToNextRoad(Car car, int dir, int idCross);//dirä¸ºç›®æ ‡è¡Œé©¶æ–¹å‘
 
-	//³µ¿âÖĞµÄ³µÁ¾ÉÏÂ·ĞĞÊ»
+	//è½¦åº“ä¸­çš„è½¦è¾†ä¸Šè·¯è¡Œé©¶
 	void driverCarInGarage();
 
-	//³µ¿âÖĞµÄ³µÁ¾ÉÏÂ·ĞĞÊ»,¶¯Ì¬¸üĞÂÆäÂ·¾¶
+	//è½¦åº“ä¸­çš„è½¦è¾†ä¸Šè·¯è¡Œé©¶,åŠ¨æ€æ›´æ–°å…¶è·¯å¾„
 	void driverCarInGarageDynamic(Graph_DG &graph);
 
-	//´òÓ¡³µÁ¾×´Ì¬
+	//æ‰“å°è½¦è¾†çŠ¶æ€
 	void putCarStatus(Car car);
 
-	//Êä³öËùÓĞ³µÁ¾×´Ì¬
+	//è¾“å‡ºæ‰€æœ‰è½¦è¾†çŠ¶æ€
 	bool putAllCarStatus();
 
-	//Êä³öËùÓĞµÀÂ·×´Ì¬
+	//è¾“å‡ºæ‰€æœ‰é“è·¯çŠ¶æ€
 	void putAllRoadStatus();
 
-	//»ñµÃ¸ÃcrossµÄ¶ÔÓ¦ÓÅÏÈ¼¶µÀÂ·ID£¬Èç¹ûµÀÂ·IDÎª-1Ôò·µ»Ø-1
+	//è·å¾—è¯¥crossçš„å¯¹åº”ä¼˜å…ˆçº§é“è·¯IDï¼Œå¦‚æœé“è·¯IDä¸º-1åˆ™è¿”å›-1
 	int getFirstRoadFromCross(int idCross,int index);
 
-	//»ñµÃÄ³roadÔÚÄ³crossµÄÄ³·½Ïò
+	//è·å¾—æŸroadåœ¨æŸcrossçš„æŸæ–¹å‘
 	int getDirByRoadCrossDir(int idCross,int idRoad);
 
-	//Ä³¸öroadÉÏµÄÄ³¸öchannel³µÁ¾ĞĞ½ø£¬½ö´¦Àí¸Ã³µµÀÉÏĞĞÊ»ÇÒÄÜµ½´ïÖÕÖ¹×´Ì¬µÄ³µ
+	//æŸä¸ªroadä¸Šçš„æŸä¸ªchannelè½¦è¾†è¡Œè¿›ï¼Œä»…å¤„ç†è¯¥è½¦é“ä¸Šè¡Œé©¶ä¸”èƒ½åˆ°è¾¾ç»ˆæ­¢çŠ¶æ€çš„è½¦
 	void driveAllCarsJustOnOneChannelToEndState(int idRoad, int idCross, int idChannel);
 
-	//¸ù¾İÊ±¼äÖÜÆÚ°²ÅÅ³ö·¢Ê±¼ä
+	//æ ¹æ®æ—¶é—´å‘¨æœŸå®‰æ’å‡ºå‘æ—¶é—´
 	void getPlantimeByPeriod(int period);
 };
 
