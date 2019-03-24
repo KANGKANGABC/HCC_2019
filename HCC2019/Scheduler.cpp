@@ -659,8 +659,19 @@ void Scheduler::driveCarStep1(Car car, int indexCar)
 			{
 				int idNextRoad = car.path[0];//此车即将驶入的道路
 				int idCurRoad = car.idCurRoad;//此车当前道路
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = getCrossDir(idCurRoad, idNextRoad, idNextCross);//设置路口方向
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;//此车变为等待状态
+
+				int disNextRoad = getCrossDistance(car, car.idCurRoad, idNextRoad);
+				if (disNextRoad == 0)//可行驶距离为0，则停在当前路口
+				{
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = roads[car.idCurRoad - 5000].length;
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//车标记为终止状态
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = NONE;
+				}
+				else
+				{
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = getCrossDir(idCurRoad, idNextRoad, idNextCross);//设置路口方向
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;//此车变为等待状态
+				}
 			}
 		}
 		else//不是第一辆车
@@ -1000,16 +1011,19 @@ void Scheduler::driverCarInGarage()
 	{
 		Car car = carsWaitInGarage.front();
 		carsWaitInGarage.pop_front();
-		//addCar(car, car.id - 10000);
+		addCar(car, car.id - 10000);
 		
+	
 		bool isAdded = addCarandChangeSTime(car);
 		if (isAdded)
 		{
 			cars[car.id - 10000].status = FINESHED;//切换car的状态
 			//cars[car.id - 10000].starttime = time_Scheduler;
 		}
+		
 	}
 	*/
+	
 	for (int i = 0; i < num_Cars; ++i)
 	{
 		if (cars[i].starttime == time_Scheduler && cars[i].status == SLEEPING)
@@ -1247,6 +1261,22 @@ void Scheduler::driveAllCarsJustOnOneChannelToEndState(int idRoad, int idCross, 
 							roads[idRoad - 5000].lane[idChannel].laneCar[i].location = carNext.location - 1;//车正常行驶
 							roads[idRoad - 5000].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
 							roads[idRoad - 5000].lane[idChannel].laneCar[i].dirCross = NONE;
+						}
+					}
+					else
+					{
+						if (car.path.size() > 0)
+						{
+							int idNextRoad = car.path[0];//此车即将驶入的道路
+							int idCurRoad = car.idCurRoad;//此车当前道路
+
+							int disNextRoad = getCrossDistance(car, car.idCurRoad, idNextRoad);
+							if (disNextRoad == 0)//可行驶距离为0，则停在当前路口
+							{
+								roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = roads[car.idCurRoad - 5000].length;
+								roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//车标记为终止状态
+								roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = NONE;
+							}
 						}
 					}
 				}
