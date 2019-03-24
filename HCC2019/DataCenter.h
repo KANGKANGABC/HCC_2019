@@ -40,8 +40,6 @@ public:
 
 	void writeResultWithTime(const char *filename);
 
-	//获得规划的路径
-	void getPath();
 
 	//快速排序用
 	void swap(int i, int j);

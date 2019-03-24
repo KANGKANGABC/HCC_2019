@@ -225,23 +225,6 @@ void DataCenter::writeResultWithTime(const char *filename)
 	write_result(result_file, filename);
 }
 
-void DataCenter::getPath()
-{
-	Graph_DG graph(vexnum, edge);
-	graph.createArcGraph(graphRoad);
-
-	for (int i = 0; i < m_car_num; ++i)
-	{
-		vector<int> pathCross = graph.Dijkstra(car[i].idCrossFrom, car[i].idCrossTo);
-		vector<int> pathRoad(pathCross.size() - 1);
-		for (int j = 0; j < pathRoad.size(); ++j)
-		{
-			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
-			//assert(pathRoad[j] != 0);
-		}
-		car[i].path = pathRoad;
-	}
-}
 
 void DataCenter::swap(int i, int j)
 {

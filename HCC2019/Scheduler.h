@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "define.h"
 #include "Road.h"
 #include "DataCenter.h"
@@ -112,4 +112,3 @@ private:
 	//根据时间周期安排出发时间
 	void getPlantimeByPeriod(int period);
 };
-

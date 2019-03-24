@@ -1259,7 +1259,10 @@ void Scheduler::getPath()//获得最短路径和该路径下的运行时间
 		cars[i].time = timeCar;
 	}
 }
-
+bool Comp(const int &a, const int &b)
+{
+	return a > b;
+}
 void Scheduler::getStartTime(int para)
 {
 	//car_speed_num 为车辆速度类型数量 speedType存放速度类型的vector
@@ -1268,6 +1271,8 @@ void Scheduler::getStartTime(int para)
 
 	std::deque<Car> carsDeque;//此时间片待出发的车 //deque是分配在堆中的，所以此处临时deque不会造成栈溢出
 	int timeStart = 1;//出发时间，从1开始安排
+
+	sort(speedType.begin(), speedType.end(), Comp);
 	for (auto speed : speedType)
 	{
 		assert(carsDeque.size()==0);//使用前确保deque为空
