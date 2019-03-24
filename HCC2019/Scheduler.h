@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "define.h"
 #include "Road.h"
 #include "DataCenter.h"
@@ -19,6 +19,7 @@ public:
 	void getPath();
 	//获得路径后，规划出发时间,para为参数
 	void getStartTime(int para);
+	void getStartTime_loadbalance(int carnum);
 	//获得路径,为每辆车规划路径，基于时间
 	void getPathByTime();
 	void getPathByTime_reorderCars();//车辆按出发时间重排序后进行静态规划

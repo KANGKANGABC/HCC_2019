@@ -1318,6 +1318,70 @@ void Scheduler::getStartTime(int para)
 	}
 }
 
+void Scheduler::getStartTime_loadbalance(int carnum)
+{
+	//car_speed_num 为车辆速度类型数量 speedType存放速度类型的vector
+	//para参数为每个时间片可发运行时间总和
+	//car[0].time为每辆车运行时间
+
+	//carnum为同一时刻道路上的行驶的车辆总数
+	//balance是一个二维vector用来记录当前道路上的车辆情况，当值为ture的时候表明有车，false没有
+	// |	|	|	|
+	// |	|	|	|
+	// |	|	|	|
+	static vector<vector<bool> > balance(carnum, vector<bool>(1, false));
+
+	std::deque<Car> carsDeque;//此时间片待出发的车 //deque是分配在堆中的，所以此处临时deque不会造成栈溢出
+	int timeStart = 1;//出发时间，从1开始安排
+	for (auto speed : speedType)
+	{
+		assert(carsDeque.size() == 0);//使用前确保deque为空
+		for (int i = 0; i < num_Cars; ++i)
+		{
+			if (cars[i].speed == speed)
+			{
+				carsDeque.push_back(cars[i]);
+			}
+		}
+		std::sort(carsDeque.begin(), carsDeque.end(), less_time);//将deque中的车按照运行时间升序排列
+		//当然如果不排序也是有一定道理的
+		while (carsDeque.size() > 0)
+		{
+			Car tmp;
+			//遍历当前道路上的车辆情况
+			for (int i = 0; i < carnum; i++)
+			{
+				if (balance[i][timeStart - 1] == false)//当前没有车辆，将车辆的行驶时间添加进去
+				{
+
+					if (carsDeque.size() == 0)
+						goto L1;
+					tmp = carsDeque.front();
+					//cout << endl;
+					balance[i].insert(balance[i].begin(), tmp.time, true);
+					cars[tmp.id - 10000].starttime = timeStart;//对处理过的car的starttime赋值
+					//int n = tmp.id - 10000;
+					//int m = cars[n].starttime;
+					carsDeque.pop_front();
+				}
+				else
+					continue;//如果
+			}
+
+			timeStart++;
+		}
+	L1:cout << endl;
+	}
+	//防止starttime早于计划时间
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].starttime < cars[i].plantime)
+		{
+			cars[i].starttime = cars[i].plantime;
+		}
+	}
+}
+
 void Scheduler::getPathByTime() 
 {
 	int num = 0;
