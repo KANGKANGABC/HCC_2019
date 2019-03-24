@@ -10,7 +10,6 @@ Scheduler::Scheduler(DataCenter &dc)
 	roads = dc.road;
 	crosses = dc.cross;
 	cars = dc.car;
-	qcars = dc.qCar;	//按时间重排序
 	time_Scheduler = 0;//调度器初始时间设置为0
 	vexnum = dc.getCrossNum();
 	edge = dc.getRoadNum();
@@ -1331,55 +1330,34 @@ void Scheduler::getStartTime_loadbalance(int carnum)
 	// |	|	|	|
 	static vector<vector<bool> > balance(carnum, vector<bool>(1, false));
 
-	std::deque<Car> carsDeque;//此时间片待出发的车 //deque是分配在堆中的，所以此处临时deque不会造成栈溢出
 	int timeStart = 1;//出发时间，从1开始安排
-	for (auto speed : speedType)
+	
+	while (qCar.size() > 0)
 	{
-		assert(carsDeque.size() == 0);//使用前确保deque为空
-		for (int i = 0; i < num_Cars; ++i)
+		Car tmp;
+		//遍历当前道路上的车辆情况
+		for (int i = 0; i < carnum; i++)
 		{
-			if (cars[i].speed == speed)
-			{
-				carsDeque.push_back(cars[i]);
-			}
-		}
-		std::sort(carsDeque.begin(), carsDeque.end(), less_time);//将deque中的车按照运行时间升序排列
-		//当然如果不排序也是有一定道理的
-		while (carsDeque.size() > 0)
-		{
-			Car tmp;
-			//遍历当前道路上的车辆情况
-			for (int i = 0; i < carnum; i++)
-			{
-				if (balance[i][timeStart - 1] == false)//当前没有车辆，将车辆的行驶时间添加进去
+			if (balance[i][timeStart - 1] == false)//当前没有车辆，将车辆的行驶时间添加进去
 				{
 
-					if (carsDeque.size() == 0)
-						goto L1;
-					tmp = carsDeque.front();
-					//cout << endl;
-					balance[i].insert(balance[i].begin(), tmp.time, true);
-					cars[tmp.id - 10000].starttime = timeStart;//对处理过的car的starttime赋值
-					//int n = tmp.id - 10000;
-					//int m = cars[n].starttime;
-					carsDeque.pop_front();
+				if (qCar.size() == 0)
+					goto L1;
+				tmp = qCar.front();
+				if (tmp.plantime < timeStart)
+				{
+					goto L2;
 				}
-				else
-					continue;//如果
+				balance[i].insert(balance[i].begin(), tmp.time, true);
+				cars[tmp.id - 10000].starttime = timeStart;//对处理过的car的starttime赋值
+				qCar.erase(qCar.begin());
 			}
-
-			timeStart++;
+			else
+				continue;//如果
 		}
+		L2:timeStart++;
+	}
 	L1:cout << endl;
-	}
-	//防止starttime早于计划时间
-	for (int i = 0; i < num_Cars; ++i)
-	{
-		if (cars[i].starttime < cars[i].plantime)
-		{
-			cars[i].starttime = cars[i].plantime;
-		}
-	}
 }
 
 void Scheduler::getPathByTime() 
@@ -1507,7 +1485,7 @@ void Scheduler::getPathByTime_reorderCars()
 
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		vector<int> pathCross = graph.Dijkstra(qcars[i].idCrossFrom, qcars[i].idCrossTo, qcars[i].speed);
+		vector<int> pathCross = graph.Dijkstra(qCar[i].idCrossFrom, qCar[i].idCrossTo, qCar[i].speed);
 
 		//统计车辆情况，每100辆车更新一次jamDegree的矩阵
 		num++;
@@ -1595,8 +1573,8 @@ void Scheduler::getPathByTime_reorderCars()
 
 			oFile3.close();
 		}
-		qcars[i].path = pathRoad;
-		cars[qcars[i].id - 10000].path = qcars[i].path;	//将qcars得到的路径赋值到cars的path变量中
+		qCar[i].path = pathRoad;
+		cars[qCar[i].id - 10000].path = qCar[i].path;	//将qcars得到的路径赋值到cars的path变量中
 	}
 }
 
@@ -1670,4 +1648,51 @@ void Scheduler ::getPathByTime_dynamic()
 		}
 		cars[i].path = pathRoad;
 	}
+}
+
+
+void Scheduler::swap(int i, int j)
+{
+	Car tmp;
+	tmp = qCar[i];
+	qCar[i] = qCar[j];
+	qCar[j] = tmp;
+}
+
+void Scheduler::quicksort(int begin, int end)
+{
+	int i, j;
+	i = begin + 1;
+	j = end;
+	if (begin < end)
+	{
+		while (i < j)
+		{
+			if (qCar[i].plantime > qCar[begin].plantime)
+			{
+				swap(i, j);
+				j--;
+			}
+			else
+				i++;
+		}
+		if (qCar[i].plantime > qCar[begin].plantime)
+			i--;
+		swap(i, begin);
+		quicksort(begin, i - 1);
+		quicksort(i + 1, end);
+	}
+}
+
+void Scheduler::reorderCars()
+{
+	for (int i = 0; i < num_Cars; i++)
+	{
+		qCar.push_back(cars[i]);//将id顺序的车辆放到qcar的vector中
+	}
+
+	int begin = 0;
+	int end = qCar.size() - 1;
+	quicksort(begin, end);
+
 }

@@ -24,6 +24,9 @@ public:
 	void getPathByTime();
 	void getPathByTime_reorderCars();//车辆按出发时间重排序后进行静态规划
 	void getPathByTime_dynamic(); //根据1-100 和101-199车的轨迹，更新第200辆车的邻接矩阵
+	void swap(int i, int j);
+	void quicksort(int begin, int end);
+	void reorderCars();
 	void ReOrderStartByTime(int para);//根据行驶时间重新安排出发时间
 	int vexnum, edge;
 	std::vector<std::vector<int> > tmp;
@@ -39,7 +42,7 @@ private:
 	Cross *crosses;//所有的路口（路口对象数组的指针）
 	Car *cars;//所有的车
   
-	vector<Car> qcars;//按时间重排序
+	vector<Car> qCar;	//按照出发时间将车辆重排序
 
 	//存储车辆的速度种类的向量
 	std::vector<int> speedType;
