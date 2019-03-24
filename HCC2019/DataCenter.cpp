@@ -53,24 +53,11 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 		graphRoadStatusByDS[i].resize(m_cross_num);
 	}
 
-	//Car调度任务向量大小设置
-	//Car任务数量为所有需要调度的Car数
-	carTask.resize(m_car_num);
-	// |   0     1    2     3       4        5           6         7   |
-	// | 车辆ID 起点 终点 车辆速度 出发时间 当前道路ID 当前道路位置 当前状态|
-	for (int i = 0; i < m_car_num; ++i) {
-		carTask[i].resize(8);
-	}
-
-	//路口信息表大小设置
-	crossList.resize(m_cross_num);
-	for (int i = 0; i < m_cross_num; ++i) {
-		crossList[i].resize(5);
-	}
 
 	road = new Road[m_road_num];//创建所有道路的对象
 	cross = new Cross[m_cross_num];//创建所有路口的对象
 	car = new Car[m_car_num];//创建所有汽车的对象
+	carOrderTime.resize(m_car_num);
 }
 
 DataCenter::~DataCenter()
@@ -130,51 +117,23 @@ void DataCenter::readCarData()
 	{
 		std::string carInfo = inputCarData[i];
 		std::vector<std::string> sp = Tools::split(carInfo, ", ");
-		carTask[i - 1][0] = std::stoi(sp[0].substr(1));//去除左括号
-		carTask[i - 1][1] = std::stoi(sp[1]);
-		carTask[i - 1][2] = std::stoi(sp[2]);
-		carTask[i - 1][3] = std::stoi(sp[3]);
-		carTask[i - 1][4] = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
-		carTask[i - 1][5] = 0;
-		carTask[i - 1][6] = 0;
-		carTask[i - 1][7] = SLEEPING;
-
-		car[i - 1].id = carTask[i - 1][0];
-		car[i - 1].idCrossFrom = carTask[i - 1][1];
-		car[i - 1].idCrossTo = carTask[i - 1][2];
-		car[i - 1].speed = carTask[i - 1][3];
-		car[i - 1].plantime = carTask[i - 1][4];
-		//car[i - 1].starttime = carTask[i - 1][4] + i%400;//这里给自己挖了一个坑
-		int n2, n4, n6, n8;
-		n2 = 55;
-		n4 = 55;
-		n6 = 55;
-		n8 = 55;
-		switch (car[i - 1].speed)
-		{
-		case 2:
-			car[i - 1].plantime = car[i - 1].plantime + 6 * n2 + i % (2 * n2 - 10);
-			break;
-		case 4:
-			car[i - 1].plantime = car[i - 1].plantime + 4 * n4 + i % (2 * n4 - 10);
-			break;
-		case 6:
-			car[i - 1].plantime = car[i - 1].plantime + 2 * n6 + i % (2 * n6 - 10);
-			break;
-		case 8:
-			car[i - 1].plantime = car[i - 1].plantime + 0 * n8 + i % (2 * n8 - 10);
-			break;
-		default:
-			break;
-		}
-		car[i - 1].starttime = car[i - 1].plantime;
-		//car[i - 1].plantime = carTask[i - 1][4] + (8 - car[i - 1].speed) * n + i % (2*n);//这里给自己挖了一个坑
-		//car[i - 1].starttime = carTask[i - 1][4] + (8 - car[i - 1].speed )*80 + i % 160;//这里给自己挖了一个坑
-		//car[i - 1].starttime = carTask[i - 1][4];
-
+    
+		car[i - 1].id = std::stoi(sp[0].substr(1));//去除左括号
+		car[i - 1].idCrossFrom = std::stoi(sp[1]);
+		car[i - 1].idCrossTo = std::stoi(sp[2]);
+		car[i - 1].speed = std::stoi(sp[3]);
+		car[i - 1].plantime = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
 		car[i - 1].status = SLEEPING;//车的初始状态为SLEEPING
 		car[i - 1].dirCross = NONE;//车的过路口状态为NONE
+
+		vector<int>::iterator it;
+		it = find(speedType.begin(), speedType.end(), car[i - 1].speed);
+		if (it == speedType.end())
+		{
+			speedType.push_back(car[i - 1].speed);
+		}
 	}
+
 	sort(speedType.begin(), speedType.end());
 	car_speed_num = speedType.size();
 	printf("readCarData done!\n");
@@ -187,13 +146,7 @@ void DataCenter::readCrossData()
 	{
 		std::string crossInfo = inputCrossData[i];
 		std::vector<std::string> sp = Tools::split(crossInfo, ", ");
-		crossList[i - 1][0] = std::stoi(sp[0].substr(1));//去除左括号
-		crossList[i - 1][1] = std::stoi(sp[1]);
-		crossList[i - 1][2] = std::stoi(sp[2]);
-		crossList[i - 1][3] = std::stoi(sp[3]);
-		crossList[i - 1][4] = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
 
-		
 		cross[i - 1].id = std::stoi(sp[0].substr(1));//去除左括号
 		cross[i - 1].roadID_T = std::stoi(sp[1]);
 		cross[i - 1].roadID_R = std::stoi(sp[2]);
@@ -241,6 +194,30 @@ void DataCenter::writeResult(const char *filename)
 			line += ", ";
 			line += std::to_string(car[i].path[j]);
 		}
+		line += ")\n";
+		result += line;
+	}
+	const char *result_file = result.c_str();
+	write_result(result_file, filename);
+}
+
+void DataCenter::writeResultWithTime(const char *filename)
+{
+	result += "#(carId,StartTime,RoadId...)\n";
+	for (int i = 0; i < m_car_num; ++i)
+	{
+		std::string line = "(" + std::to_string(car[i].id);
+		line += ", ";
+		line += std::to_string(car[i].starttime);
+		for (int j = 0; j < car[i].path.size(); ++j)
+		{
+			line += ", ";
+			line += std::to_string(car[i].path[j]);
+		}
+		line += ", ";
+		line += std::to_string(car[i].time);
+		line += ", ";
+		line += std::to_string(car[i].starttime);
 		line += ")\n";
 		result += line;
 	}

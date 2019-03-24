@@ -38,6 +38,8 @@ public:
 	//将结果写出到result.txt
 	void writeResult(const char *filename);
 
+	void writeResultWithTime(const char *filename);
+
 	//获得规划的路径
 	void getPath();
 
@@ -61,6 +63,9 @@ public:
 
 	//所有Car的指针
 	Car * car;
+
+	//经过排序的car的指针
+	vector<Car*> carOrderTime;
 
 	int m_road_num;//ROAD数量
 	int m_car_num;//CAR数量
@@ -97,13 +102,6 @@ private:
 
 	//CrossToRoad转换表
 	std::vector<std::vector<int> > graphC2R;
-
-	//路口信息表
-	//(id,roadId,roadId,roadId,roadId)
-	std::vector<std::vector<int> > crossList;
-
-	//Car调度任务表
-	std::vector<std::vector<int> > carTask;
 
 	//路径列表
 	std::vector<std::vector<int> > carPathList;

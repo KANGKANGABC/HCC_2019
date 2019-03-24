@@ -8,17 +8,20 @@
 #include <cmath>
 #include <vector>
 #include <assert.h>
+#include <deque>
 
 #include "lib_io.h"
 
 #define _DEBUG
 
-#define MAX_ROAD_NUM    200 //最大ROAD条数
-#define MAX_CAR_NUM    20000 //最大CAR条数
-#define MAX_CROSS_NUM    100 //最大CROSS条数
+#define MAX_ROAD_NUM    1000 //最大ROAD条数
+#define MAX_CAR_NUM    50000 //最大CAR条数
+#define MAX_CROSS_NUM    1000 //最大CROSS条数
 
 #define INT_MAX 0x7fffffff
 #define FLT_MAX 3.402823466e+38F
+
+#define PARA_PERIOD 70
 
 #ifdef _DEBUG
 #define PRINT   printf

@@ -49,22 +49,27 @@ int main(int argc, char *argv[])
 	dc.reorderCars();//按照时间重排序车辆
 
 	Scheduler sd(dc);
+  
 	//dc.getPath();
 	sd.getPathByTime_reorderCars();//获得车辆的路径信息
+	sd.getStartTime(700);
+	//dc.writeResultWithTime(answer_file);
+	//sd.ReOrderStartByTime(PARA_PERIOD);
+	//dc.writeResult(answer_file);
+	//int para = sd.getParaByScheduler();
+	//sd.getPathByTime();//获得车辆的路径信息
+
 	//dc.writeResult(answer_file);
 	//sd.getPathByTime();//获得车辆的路径信息
 	//dc.writeResult(answer_file);
 	//sd.getPathByScheduler();
-	dc.writeResult(answer_file);
-	//int time = sd.getSysTime();
 	//sd.getPathByScheduler();
 	//int time = sd.getSysTime();
 	//sd.getPathByTime_dynamic();//获得车辆的路径信息
 	//int time = sd.getSysTime();
-	//dc.writeResult(answer_file);
-
-	//sd.getPathByTime_reorderCars();//获得车辆的路径信息 //调试dijkstra用
-	//dc.writeResult(answer_file2);//调试dijkstra用
+	//dc.writeResultWithTime(answer_file);
+	dc.writeResult(answer_file);
+	//PRINT("para:%d\n",para);
 
 	// TODO:read input filebuf
 	// TODO:process
