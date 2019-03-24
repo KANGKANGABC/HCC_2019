@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
 	//dc.writeResultWithTime(answer_file);
 	dc.writeResult(answer_file);
 	//PRINT("para:%d\n",para);
+	PRINT("num_changeSTime:%d\n", sd.num_changeSTime);
 
 	// TODO:read input filebuf
 	// TODO:process

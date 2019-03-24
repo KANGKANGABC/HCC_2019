@@ -516,7 +516,7 @@ bool Scheduler::addCarandChangeSTime(Car car)
 	{
 		if (roads[idRoadTarget - 5000].lane[i].laneCar.size() != 0)
 		{
-			if (roads[idRoadTarget - 5000].lane[i].laneCar[roads[idRoadTarget - 5000].lane[i].laneCar.size() - 1].location > 1)
+			if (roads[idRoadTarget - 5000].lane[i].laneCar[roads[idRoadTarget - 5000].lane[i].laneCar.size() - 1].location > 2)//这里保留一个空位
 			{
 				idLaneTarget = i;
 				break;
@@ -534,16 +534,23 @@ bool Scheduler::addCarandChangeSTime(Car car)
 		carsWaitInGarage.push_back(car);
 		return false;
 	}
-	
+
 	int locationTarget = 0;
-	Car carNext = roads[idRoadTarget - 5000].lane[idLaneTarget].laneCar[roads[idRoadTarget - 5000].lane[idLaneTarget].laneCar.size() - 1];//目标车道的最后一辆车
-	if (carNext.location > std::min(car.speed, roads[idRoadTarget - 5000].speed))//不形成阻挡
+	if (roads[idRoadTarget - 5000].lane[idLaneTarget].laneCar.size() == 0)
 	{
 		locationTarget = std::min(car.speed, roads[idRoadTarget - 5000].speed);
 	}
 	else
 	{
-		locationTarget = carNext.location - 1;
+		Car carNext = roads[idRoadTarget - 5000].lane[idLaneTarget].laneCar[roads[idRoadTarget - 5000].lane[idLaneTarget].laneCar.size() - 1];//目标车道的最后一辆车
+		if (carNext.location > std::min(car.speed, roads[idRoadTarget - 5000].speed))//不形成阻挡
+		{
+			locationTarget = std::min(car.speed, roads[idRoadTarget - 5000].speed);
+		}
+		else
+		{
+			locationTarget = carNext.location - 1;
+		}
 	}
 	car.status = FINESHED;//切换car的状态
 	car.idCurRoad = idRoadTarget;
@@ -552,7 +559,6 @@ bool Scheduler::addCarandChangeSTime(Car car)
 	car.dirCross = NONE;
 	std::vector<int>::iterator itPath = car.path.begin();
 	car.path.erase(itPath);//已经驶向下一个路口，所以删除path中第一项
-	int indexCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size();//该车为末尾
 	roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.push_back(car);//将该车加入对应道路,对应车道,加入队尾
 
 	num_CarsPut += 1;
@@ -1152,14 +1158,20 @@ void Scheduler::driverCarInGarage()
 	{
 		Car car = carsWaitInGarage.front();
 		carsWaitInGarage.pop_front();
-		addCar(car, car.id - 10000);
-		car.starttime = time_Scheduler;
+		//addCar(car, car.id - 10000);
+		bool isAdded = addCarandChangeSTime(car);
+		if (isAdded)
+		{
+			cars[car.id - 10000].status = FINESHED;//切换car的状态
+			cars[car.id - 10000].starttime = time_Scheduler;
+		}
 	}
 	for (int i = 0; i < num_Cars; ++i)
 	{
 		if (cars[i].starttime == time_Scheduler && cars[i].status == SLEEPING)
 		{
-			addCar(cars[i], i);
+			//addCar(cars[i], i);
+			addCarandChangeSTime(cars[i]);
 		}
 	}
 }
