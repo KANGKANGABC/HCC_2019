@@ -628,8 +628,8 @@ void Scheduler::ReOrderStartBySpeed(int para)
 	int n2, n4, n6, n8;
 	n2 = para;
 	n4 = para;
-	n6 = para;
-	n8 = para - 5;
+	n6 = para - para/36;
+	n8 = para - para/12;
 	for (int i = 1; i <= num_Cars; ++i)//忽略第0行数据
 	{
 		switch (cars[i - 1].speed)
