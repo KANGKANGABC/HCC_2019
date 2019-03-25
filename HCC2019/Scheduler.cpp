@@ -66,7 +66,19 @@ int Scheduler::getParaByScheduler()
 	}
 	para += 4;
 	ReOrderStartBySpeed(para);
+	/*
+	int timeFinal = getSysTime();
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].timeArrived > (timeFinal - 20))
+		{
+			cars[i].starttime = cars[i].starttime - 20;
+			cars[i].starttimeAnswer = cars[i].starttime;
+		}
+	}
+	*/
 	getSysTime();
+
 	return para;
 }
 
@@ -81,7 +93,7 @@ int Scheduler::getSysTime()
 		{
 			idLaneStart = roads[i].channel;
 		}
-		for (int j = idLaneStart; j < idLaneStart + roads[i].channel; ++j)
+		for (int j = 0; j < idLaneStart + roads[i].channel; ++j)
 		{
 			if (roads[i].lane[j].laneCar.size() > 0)
 			{
@@ -163,6 +175,9 @@ int Scheduler::getSysTime()
 													isWorkingRoad = true;
 													isWorkingLane = true;
 													driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
+													//记录到达时间
+													cars[car.id - 10000].timeArrived = time_Scheduler;
+
 													break;
 													//该车准备通过路口
 												}
@@ -360,21 +375,21 @@ void Scheduler::ReOrderStartBySpeed(int para)
 {
 	int n2, n4, n6, n8;
 	n2 = para;
-	n4 = para;
-	n6 = para;
-	n8 = para;
+	n4 = para - 5;
+	n6 = para - 10;
+	n8 = para - 15;
 	for (int i = 1; i <= num_Cars; ++i)//忽略第0行数据
 	{
 		switch (cars[i - 1].speed)
 		{
 		case 2:
-			cars[i - 1].starttime = 6 * n2 + i % (2 * n2);
+			cars[i - 1].starttime = 2 * n8 + 2 * n6 + 2 * n4 + i % (2 * n2);
 			break;
 		case 4:
-			cars[i - 1].starttime = 4 * n4 + i % (2 * n4);
+			cars[i - 1].starttime = 2 * n8 + 2 * n6 + i % (2 * n4);
 			break;
 		case 6:
-			cars[i - 1].starttime = 2 * n6 + i % (2 * n6);
+			cars[i - 1].starttime = 2 * n8 + i % (2 * n6);
 			break;
 		case 8:
 			cars[i - 1].starttime = 0 * n8 + i % (2 * n8);
