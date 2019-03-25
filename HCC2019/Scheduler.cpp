@@ -10,7 +10,6 @@ Scheduler::Scheduler(DataCenter &dc)
 	roads = dc.road;
 	crosses = dc.cross;
 	cars = dc.car;
-	qcars = dc.qCar;	//按时间重排序
 	time_Scheduler = 0;//调度器初始时间设置为0
 	vexnum = dc.getCrossNum();
 	edge = dc.getRoadNum();
@@ -41,33 +40,30 @@ bool less_time(const Car & m1, const Car & m2) {
 
 int Scheduler::getParaByScheduler()
 {
-	int para = 70;
+	int para = 80;
 	int timeMax = INT_MAX;
+	ReOrderStartBySpeed(para);
+	getPathByTime();//获得车辆的路径信息
 	for (int i = 0; i < 20; ++i)//迭代20次
 	{
-		//getPlantimeByPeriod(para);
-		//getPath();//获得初始参数
-		ReOrderStartByTime(para);
-		//int time = getSysTime();
-		int time = getPathByScheduler();
+		ReOrderStartBySpeed(para);
+		int time = getSysTime();
 		if (time > 0)
 		{
 			if (time <= timeMax)
 				timeMax = time;
 			else
 				break;
-			para -= 2;
+			para -= 5;
 		}
 		else
 		{
 			break;
 		}
-
 	}
-	para += 4;
-	ReOrderStartByTime(para);
-	getPath();//获得初始参数
-	getPathByScheduler();//重跑一次路径
+	para += 5;
+	ReOrderStartBySpeed(para);
+	getSysTime();
 	return para;
 }
 
@@ -75,6 +71,21 @@ int Scheduler::getSysTime()
 {
 	time_Scheduler = 0;
 	num_CarsScheduling = num_Cars;
+	for (int i = 0; i < num_Roads; ++i)
+	{
+		int idLaneStart = 0;
+		if (roads[i].isDuplex)
+		{
+			idLaneStart = roads[i].channel;
+		}
+		for (int j = idLaneStart; j < idLaneStart + roads[i].channel; ++j)
+		{
+			if (roads[i].lane[j].laneCar.size() > 0)
+			{
+				roads[i].lane[j].laneCar.clear();
+			}
+		}
+	}
 	while (num_CarsScheduling > 0)
 	{
 		PRINT("***********time_Scheduler:%d************\n", time_Scheduler);//打印系统时间
@@ -368,6 +379,12 @@ void Scheduler::ReOrderStartBySpeed(int para)
 		default:
 			break;
 		}
+
+		cars[i - 1].idCurRoad = 0;
+		cars[i - 1].idCurLane = 0;
+		cars[i - 1].location = 0;//参数重置
+		cars[i - 1].dirCross = NONE;//参数重置
+		cars[i - 1].status= SLEEPING;//参数重置
 		cars[i - 1].starttimeAnswer = cars[i - 1].starttime;//starttimeAnswer为最终写出的出发时间，不会更改
 	}
 }
@@ -1463,6 +1480,49 @@ void Scheduler::getStartTime(int para)
 	}
 }
 
+void Scheduler::getStartTime_loadbalance(int carnum)
+{
+	//car_speed_num 为车辆速度类型数量 speedType存放速度类型的vector
+	//para参数为每个时间片可发运行时间总和
+	//car[0].time为每辆车运行时间
+
+	//carnum为同一时刻道路上的行驶的车辆总数
+	//balance是一个二维vector用来记录当前道路上的车辆情况，当值为ture的时候表明有车，false没有
+	// |	|	|	|
+	// |	|	|	|
+	// |	|	|	|
+	static vector<vector<bool> > balance(carnum, vector<bool>(1, false));
+
+	int timeStart = 1;//出发时间，从1开始安排
+	
+	while (qCar.size() > 0)
+	{
+		Car tmp;
+		//遍历当前道路上的车辆情况
+		for (int i = 0; i < carnum; i++)
+		{
+			if (balance[i][timeStart - 1] == false)//当前没有车辆，将车辆的行驶时间添加进去
+			{
+
+				if (qCar.size() == 0)
+					goto L1;
+				tmp = qCar.front();
+				if (tmp.plantime > timeStart)
+				{
+					goto L2;
+				}
+				balance[i].insert(balance[i].begin(), tmp.time, true);
+				cars[tmp.id - 10000].starttime = timeStart;//对处理过的car的starttime赋值
+				qCar.erase(qCar.begin());
+			}
+			else
+				continue;//如果
+		}
+		L2:timeStart++;
+	}
+	L1:cout << endl;
+}
+
 void Scheduler::getPathByTime() 
 {
 	int num = 0;
@@ -1525,7 +1585,7 @@ void Scheduler::getPathByTime_reorderCars()
 
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		vector<int> pathCross = graph.Dijkstra(qcars[i].idCrossFrom, qcars[i].idCrossTo, qcars[i].speed);
+		vector<int> pathCross = graph.Dijkstra(qCar[i].idCrossFrom, qCar[i].idCrossTo, qCar[i].speed);
 
 		//统计车辆情况，每100辆车更新一次jamDegree的矩阵
 		num++;
@@ -1613,15 +1673,15 @@ void Scheduler::getPathByTime_reorderCars()
 
 			oFile3.close();
 		}
-		qcars[i].path = pathRoad;
-		cars[qcars[i].id - 10000].path = qcars[i].path;	//将qcars得到的路径赋值到cars的path变量中
+		qCar[i].path = pathRoad;
+		cars[qCar[i].id - 10000].path = qCar[i].path;	//将qcars得到的路径赋值到cars的path变量中
 	}
 }
 
 
-void Scheduler ::getPathByTime_dynamic()
+void Scheduler::getPathByTime_dynamic()
 {
-	static int num = 0;
+	int num = 0;
 	//static int flag[100] = { 0 };
 
 	Graph_DG graph(vexnum, edge);
@@ -1630,11 +1690,11 @@ void Scheduler ::getPathByTime_dynamic()
 
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		vector<int> pathCross = graph.DijkstraNor(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed);
+		vector<int> pathCross = graph.DijkstraNor(qCar[i].idCrossFrom, qCar[i].idCrossTo, qCar[i].speed);
 
 		num++;
 		//定时更新交通拥堵邻接矩阵jamDegreeLongBefore
-		if (num == 200)
+		if (num == 100)
 		{
 			num = 0;
 			graph.upDateJamStatic();
@@ -1650,46 +1710,62 @@ void Scheduler ::getPathByTime_dynamic()
 
 		graph.upDateJamDynamic();
 
-		//if (num == 100)
-		//{
-		//	ofstream oFile;
-		//	oFile.open("test.csv", ios::out | ios::trunc);
-		//	for (int i=0; i < 100; i++)
-		//	{
-		//		oFile << flag[i] << endl;
-		//	}
-		//	
-		//	for (int i = 0; i < 64; i++)
-		//	{
-		//		flag[i] = 0;
-		//	}
-		//	graph.upDateJam();
-		//	oFile.close();
-		//}
-
-		///*写出100~200辆车的统计情况*/
-		//if (num == 200)
-		//{
-		//	ofstream oFile;
-		//	oFile.open("test2.csv", ios::out | ios::trunc);
-		//	for (int i = 0; i < 100; i++)
-		//	{
-		//		oFile << flag[i] << endl;
-		//	}
-
-		//	oFile.close();
-		//}
-
 		vector<int> pathRoad(pathCross.size() - 1);
 		for (int j = 0; j < pathRoad.size(); ++j)
 		{
 			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
 			//assert(pathRoad[j] != 0);
 		}
-		cars[i].path = pathRoad;
+
+		qCar[i].path = pathRoad;
+		cars[qCar[i].id - 10000].path = qCar[i].path;	//将qcars得到的路径赋值到cars的path变量中
 	}
 }
 
+void Scheduler::swap(int i, int j)
+{
+	Car tmp;
+	tmp = qCar[i];
+	qCar[i] = qCar[j];
+	qCar[j] = tmp;
+}
+
+void Scheduler::quicksort(int begin, int end)
+{
+	int i, j;
+	i = begin + 1;
+	j = end;
+	if (begin < end)
+	{
+		while (i < j)
+		{
+			if (qCar[i].plantime > qCar[begin].plantime)
+			{
+				swap(i, j);
+				j--;
+			}
+			else
+				i++;
+		}
+		if (qCar[i].plantime > qCar[begin].plantime)
+			i--;
+		swap(i, begin);
+		quicksort(begin, i - 1);
+		quicksort(i + 1, end);
+	}
+}
+
+void Scheduler::reorderCars()
+{
+	for (int i = 0; i < num_Cars; i++)
+	{
+		qCar.push_back(cars[i]);//将id顺序的车辆放到qcar的vector中
+	}
+
+	int begin = 0;
+	int end = qCar.size() - 1;
+	quicksort(begin, end);
+}
 bool CompDirMap(const Car &a, const Car &b)
 {
 	return a.dirMap > b.dirMap;

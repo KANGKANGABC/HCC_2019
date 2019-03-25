@@ -83,7 +83,6 @@ public:
 	//将车辆按时间进行重排序
 	void reorderCars();
 
-	vector<Car> qCar;	//按照出发时间将车辆重排序
 
 private:
 	char **inputRoadData;//输入道路数据

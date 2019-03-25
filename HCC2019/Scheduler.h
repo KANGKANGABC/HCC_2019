@@ -21,10 +21,14 @@ public:
 	void getPathWeightOne();
 	//获得路径后，规划出发时间,para为参数
 	void getStartTime(int para);
+	void getStartTime_loadbalance(int carnum);
 	//获得路径,为每辆车规划路径，基于时间
 	void getPathByTime();
 	void getPathByTime_reorderCars();//车辆按出发时间重排序后进行静态规划
 	void getPathByTime_dynamic(); //根据1-100 和101-199车的轨迹，更新第200辆车的邻接矩阵
+	void swap(int i, int j);
+	void quicksort(int begin, int end);
+	void reorderCars();
 	void getTimeByDir(int para);//根据车的行驶方向发车（++）和（--）的一起跑 （+-）和（-+）的一起跑 
 	void ReOrderStartByTime(int para);//根据行驶时间重新安排出发时间
 	void ReOrderStartBySpeed(int para);//根据行驶时间重新安排出发时间
@@ -45,7 +49,7 @@ private:
 	Cross *crosses;//所有的路口（路口对象数组的指针）
 	Car *cars;//所有的车
   
-	vector<Car> qcars;//按时间重排序
+	vector<Car> qCar;	//按照出发时间将车辆重排序
 
 	//存储车辆的速度种类的向量
 	std::vector<int> speedType;
