@@ -1661,9 +1661,9 @@ void Scheduler::getPathByTime_reorderCars()
 }
 
 
-void Scheduler ::getPathByTime_dynamic()
+void Scheduler::getPathByTime_dynamic()
 {
-	static int num = 0;
+	int num = 0;
 	//static int flag[100] = { 0 };
 
 	Graph_DG graph(vexnum, edge);
@@ -1672,11 +1672,11 @@ void Scheduler ::getPathByTime_dynamic()
 
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		vector<int> pathCross = graph.DijkstraNor(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed);
+		vector<int> pathCross = graph.DijkstraNor(qcars[i].idCrossFrom, qcars[i].idCrossTo, qcars[i].speed);
 
 		num++;
 		//定时更新交通拥堵邻接矩阵jamDegreeLongBefore
-		if (num == 200)
+		if (num == 100)
 		{
 			num = 0;
 			graph.upDateJamStatic();
@@ -1692,43 +1692,15 @@ void Scheduler ::getPathByTime_dynamic()
 
 		graph.upDateJamDynamic();
 
-		//if (num == 100)
-		//{
-		//	ofstream oFile;
-		//	oFile.open("test.csv", ios::out | ios::trunc);
-		//	for (int i=0; i < 100; i++)
-		//	{
-		//		oFile << flag[i] << endl;
-		//	}
-		//	
-		//	for (int i = 0; i < 64; i++)
-		//	{
-		//		flag[i] = 0;
-		//	}
-		//	graph.upDateJam();
-		//	oFile.close();
-		//}
-
-		///*写出100~200辆车的统计情况*/
-		//if (num == 200)
-		//{
-		//	ofstream oFile;
-		//	oFile.open("test2.csv", ios::out | ios::trunc);
-		//	for (int i = 0; i < 100; i++)
-		//	{
-		//		oFile << flag[i] << endl;
-		//	}
-
-		//	oFile.close();
-		//}
-
 		vector<int> pathRoad(pathCross.size() - 1);
 		for (int j = 0; j < pathRoad.size(); ++j)
 		{
 			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
 			//assert(pathRoad[j] != 0);
 		}
-		cars[i].path = pathRoad;
+
+		qcars[i].path = pathRoad;
+		cars[qcars[i].id - 10000].path = qcars[i].path;	//将qcars得到的路径赋值到cars的path变量中
 	}
 }
 
