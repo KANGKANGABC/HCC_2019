@@ -8,4 +8,7 @@
     <LocalDebuggerCommandArguments>train1\car.txt train1\road.txt train1\cross.txt train1\answer.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup>
+    <ShowAllFiles>false</ShowAllFiles>
+  </PropertyGroup>
 </Project>
