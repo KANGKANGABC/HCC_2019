@@ -63,8 +63,9 @@ int Scheduler::getParaByScheduler()
 		PRINT("result:%d para:%d\n", v.first,v.second);
 	}
 	map<int, int>::iterator it;
-	
-	para = mapResult.begin()->second;
+	it = mapResult.begin();
+	//it++;
+	para = it->second;
 	ReOrderStartBySpeed(para);
 	/*
 	int timeFinal = getSysTime();
@@ -79,6 +80,38 @@ int Scheduler::getParaByScheduler()
 	*/
 	getSysTime();
 
+	return para;
+}
+
+int Scheduler::getPathByScheduler(int w)
+{
+	std::map<int, int> mapResult;
+	int para = 80;
+	int timeMax = INT_MAX;
+	getPath();//获得最短路径
+	ReOrderStartBySpeed(para);
+	for (int i = 0; i < 15; ++i)//迭代20次
+	{
+		ReOrderStartBySpeed(para);
+		getPath();
+		int time = getSysTimeChangePath(w);
+		if (time == false)
+			time = INT_MAX;
+		mapResult.insert(pair<int, int>(time, para));
+		para -= 4;
+	}
+	for (auto &v : mapResult)
+	{
+		PRINT("result:%d para:%d\n", v.first, v.second);
+	}
+	map<int, int>::iterator it;
+	it = mapResult.begin();
+	it++;
+	para = it->second;
+	ReOrderStartBySpeed(para);
+	getPath();
+	int time = getSysTimeChangePath(w);
+	getSysTime();
 	return para;
 }
 
@@ -890,8 +923,8 @@ bool Scheduler::addCar(Car car, int i)
 	}
 	if (idLaneTarget == -1)
 	{
-		//carsWaitInGarage.push_back(car);
-		cars[car.id - 10000].starttime += 1;
+		carsWaitInGarage.push_back(car);
+		//cars[car.id - 10000].starttime += 1;
 		return false;
 	}
 
@@ -1166,25 +1199,14 @@ bool Scheduler::isCanDriveToNextRoad(Car car, int dir, int idCross)
 
 void Scheduler::driverCarInGarage()
 {
-	/*
+	
 	int numCarsWait = carsWaitInGarage.size();
 	for (int j = 0; j < numCarsWait; ++j)
 	{
 		Car car = carsWaitInGarage.front();
 		carsWaitInGarage.pop_front();
 		addCar(car, car.id - 10000);
-		
-	
-		bool isAdded = addCarandChangeSTime(car);
-		if (isAdded)
-		{
-			cars[car.id - 10000].status = FINESHED;//切换car的状态
-			//cars[car.id - 10000].starttime = time_Scheduler;
-		}
-		
 	}
-	*/
-	
 	for (int i = 0; i < num_Cars; ++i)
 	{
 		if (cars[i].starttime == time_Scheduler && cars[i].status == SLEEPING)
@@ -1197,6 +1219,13 @@ void Scheduler::driverCarInGarage()
 
 void Scheduler::driverCarInGarageDynamic(Graph_DG &graph,int para)
 {
+	int numCarsWait = carsWaitInGarage.size();
+	for (int j = 0; j < numCarsWait; ++j)
+	{
+		Car car = carsWaitInGarage.front();
+		carsWaitInGarage.pop_front();
+		addCar(car, car.id - 10000);
+	}
 	for (int i = 0; i < num_Cars; ++i)
 	{
 		if (cars[i].starttime == time_Scheduler && cars[i].status == SLEEPING)
@@ -1836,7 +1865,6 @@ void Scheduler::quicksort(int begin, int end)
 		quicksort(i + 1, end);
 	}
 }
-
 void Scheduler::reorderCars()
 {
 	for (int i = 0; i < num_Cars; i++)
@@ -1924,34 +1952,4 @@ void Scheduler::getTimeByDir(int para)
 			cars[i].starttimeAnswer = cars[i].plantime;
 		}
 	}
-}
-
-int Scheduler::getPathByScheduler(int w)
-{
-
-	std::map<int, int> mapResult;
-	int para = 80;
-	int timeMax = INT_MAX;
-	getPath();//获得最短路径
-	ReOrderStartBySpeed(para);
-	for (int i = 0; i < 15; ++i)//迭代20次
-	{
-		ReOrderStartBySpeed(para);
-		getPath();
-		int time = getSysTimeChangePath(w);
-		if (time == false)
-			time = INT_MAX;
-		mapResult.insert(pair<int, int>(time, para));
-		para -= 4;
-	}
-	for (auto &v : mapResult)
-	{
-		PRINT("result:%d para:%d\n", v.first, v.second);
-	}
-	para = mapResult.begin()->second;
-	ReOrderStartBySpeed(para);
-	getPath();
-	int time = getSysTimeChangePath(w);
-	getSysTime();
-	return para;
 }
