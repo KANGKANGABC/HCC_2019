@@ -13,8 +13,9 @@ public:
 	~Scheduler();
 	int getParaByScheduler();//请将初始参数设置为70以上
 	int getSysTime();
+	int getSysTimeChangePath(int para);
 	//基于动态调度器规划路径
-	int getPathByScheduler();
+	int getPathByScheduler(int para);
 	//获得路径,为每辆车规划路径
 	void getPath();
 	//获得路径,所有权重为1
@@ -66,8 +67,6 @@ private:
 	/*所有road上的车辆行进，直到该车辆行驶变成等待状态或者终止状态*/
 	void driveAllCarsJustOnRoadToEndState();
 	
-	/*让该车前进*/
-	int driveCar(Car car, int indexCar);//indexCar为该车在车道的位置
 
 	int driveCarNew(Car car);
 
@@ -105,7 +104,7 @@ private:
 	void driverCarInGarage();
 
 	//车库中的车辆上路行驶,动态更新其路径
-	void driverCarInGarageDynamic(Graph_DG &graph);
+	void driverCarInGarageDynamic(Graph_DG &graph,int para);
 
 	//打印车辆状态
 	void putCarStatus(Car car);

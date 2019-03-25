@@ -60,7 +60,10 @@ int main(int argc, char *argv[])
 	//dc.writeResultWithTime(answer_file);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//dc.writeResult(answer_file);
-	int para = sd.getParaByScheduler();
+	int time = 0;
+	int para = 0;
+	//para = sd.getParaByScheduler();
+	time = sd.getPathByScheduler(5);
 	//sd.getPathByTime();//获得车辆的路径信息
 	//sd.reorderCars();//按照时间重排序车辆
 	//sd.getStartTime_loadbalance(550);
@@ -75,7 +78,8 @@ int main(int argc, char *argv[])
 	//int time = sd.getSysTime();
 	//dc.writeResultWithTime(answer_file);
 	dc.writeResult(answer_file);
-	PRINT("para:%d\n",para);
+	PRINT("para:%d\n", para);
+	PRINT("time:%d\n", time);
 
 	// TODO:read input filebuf
 	// TODO:process
