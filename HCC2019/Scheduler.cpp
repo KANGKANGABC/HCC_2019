@@ -1937,6 +1937,7 @@ int Scheduler::getPathByScheduler(int w)
 	for (int i = 0; i < 15; ++i)//迭代20次
 	{
 		ReOrderStartBySpeed(para);
+		getPath();
 		int time = getSysTimeChangePath(w);
 		if (time == false)
 			time = INT_MAX;
@@ -1949,6 +1950,8 @@ int Scheduler::getPathByScheduler(int w)
 	}
 	para = mapResult.begin()->second;
 	ReOrderStartBySpeed(para);
+	getPath();
+	int time = getSysTimeChangePath(w);
 	getSysTime();
 	return para;
 }
