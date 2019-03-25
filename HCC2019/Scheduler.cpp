@@ -836,11 +836,22 @@ int Scheduler::isCanEnter(int idRoad, int idCross)
 				{
 					return j;
 				}
+				else
+				{
+					if (carNext.status == WAITTING)
+						return j;
+				}
 			}
 			else
 			{
 				return j;//存在空位，可加入,返回车道id
 			}
+		}
+		else
+		{
+			Car carNext = roads[idRoad - 5000].lane[j].laneCar[roads[idRoad - 5000].lane[j].laneCar.size() - 1];
+			if (carNext.status == WAITTING)
+				return j;
 		}
 	}
 	return idStartLane + roads[idRoad - 5000].channel - 1;//如果无空位返回最后一个车道
@@ -983,6 +994,7 @@ bool Scheduler::isCanDriveToNextRoad(Car car, int dir, int idCross)
 	int idNextLane = isCanEnter(idNextRoad, idNextCross);
 
 	int disNextRoad = getCrossDistance(car, car.idCurRoad, idNextRoad);
+	assert(disNextRoad!=0);
 	if (disNextRoad == 0)//可行驶距离为0，则停在当前路口
 	{
 		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = roads[car.idCurRoad - 5000].length;

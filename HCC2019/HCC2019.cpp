@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
   
 	//sd.getPath();
 	sd.getPathWeightOne();
-	sd.ReOrderStartBySpeed(65);
+	//sd.ReOrderStartBySpeed(65);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//sd.getPathByTime_reorderCars();//获得车辆的路径信息
 	sd.getTimeByDir(90);
