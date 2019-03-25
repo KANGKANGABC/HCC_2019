@@ -51,32 +51,31 @@ int main(int argc, char *argv[])
 	Scheduler sd(dc);
   
 	//sd.getPath();
-	sd.getPathWeightOne();
+	//sd.getPathWeightOne();
 	//sd.ReOrderStartBySpeed(65);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//sd.getPathByTime_reorderCars();//获得车辆的路径信息
-	sd.getTimeByDir(90);
+	//sd.getTimeByDir(90);
 	//sd.getStartTime(470);
 	//dc.writeResultWithTime(answer_file);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//dc.writeResult(answer_file);
-	//int para = sd.getParaByScheduler();
-	sd.getPathByTime();//获得车辆的路径信息
-	sd.reorderCars();//按照时间重排序车辆
-	sd.getStartTime_loadbalance(550);
+	int para = sd.getParaByScheduler();
+	//sd.getPathByTime();//获得车辆的路径信息
+	//sd.reorderCars();//按照时间重排序车辆
+	//sd.getStartTime_loadbalance(550);
 
 	//dc.writeResult(answer_file);
 	//sd.getPathByTime();//获得车辆的路径信息
 	//dc.writeResult(answer_file);
 	//sd.getPathByScheduler();
 	//sd.getPathByScheduler();
-	int time = sd.getSysTime();
+	//int time = sd.getSysTime();
 	//sd.getPathByTime_dynamic();//获得车辆的路径信息
 	//int time = sd.getSysTime();
 	//dc.writeResultWithTime(answer_file);
 	//dc.writeResult(answer_file);
-	//PRINT("para:%d\n",para);
-	PRINT("num_changeSTime:%d\n", sd.num_changeSTime);
+	PRINT("para:%d\n",para);
 
 	// TODO:read input filebuf
 	// TODO:process

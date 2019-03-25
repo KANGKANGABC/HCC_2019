@@ -40,33 +40,30 @@ bool less_time(const Car & m1, const Car & m2) {
 
 int Scheduler::getParaByScheduler()
 {
-	int para = 70;
+	int para = 80;
 	int timeMax = INT_MAX;
+	ReOrderStartBySpeed(para);
+	getPathByTime();//获得车辆的路径信息
 	for (int i = 0; i < 20; ++i)//迭代20次
 	{
-		//getPlantimeByPeriod(para);
-		//getPath();//获得初始参数
-		ReOrderStartByTime(para);
-		//int time = getSysTime();
-		int time = getPathByScheduler();
+		ReOrderStartBySpeed(para);
+		int time = getSysTime();
 		if (time > 0)
 		{
 			if (time <= timeMax)
 				timeMax = time;
 			else
 				break;
-			para -= 2;
+			para -= 5;
 		}
 		else
 		{
 			break;
 		}
-
 	}
-	para += 4;
-	ReOrderStartByTime(para);
-	getPath();//获得初始参数
-	getPathByScheduler();//重跑一次路径
+	para += 5;
+	ReOrderStartBySpeed(para);
+	getSysTime();
 	return para;
 }
 
@@ -74,6 +71,21 @@ int Scheduler::getSysTime()
 {
 	time_Scheduler = 0;
 	num_CarsScheduling = num_Cars;
+	for (int i = 0; i < num_Roads; ++i)
+	{
+		int idLaneStart = 0;
+		if (roads[i].isDuplex)
+		{
+			idLaneStart = roads[i].channel;
+		}
+		for (int j = idLaneStart; j < idLaneStart + roads[i].channel; ++j)
+		{
+			if (roads[i].lane[j].laneCar.size() > 0)
+			{
+				roads[i].lane[j].laneCar.clear();
+			}
+		}
+	}
 	while (num_CarsScheduling > 0)
 	{
 		PRINT("***********time_Scheduler:%d************\n", time_Scheduler);//打印系统时间
@@ -367,6 +379,12 @@ void Scheduler::ReOrderStartBySpeed(int para)
 		default:
 			break;
 		}
+
+		cars[i - 1].idCurRoad = 0;
+		cars[i - 1].idCurLane = 0;
+		cars[i - 1].location = 0;//参数重置
+		cars[i - 1].dirCross = NONE;//参数重置
+		cars[i - 1].status= SLEEPING;//参数重置
 		cars[i - 1].starttimeAnswer = cars[i - 1].starttime;//starttimeAnswer为最终写出的出发时间，不会更改
 	}
 }
@@ -1672,7 +1690,7 @@ void Scheduler::getPathByTime_dynamic()
 
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		vector<int> pathCross = graph.DijkstraNor(qcars[i].idCrossFrom, qcars[i].idCrossTo, qcars[i].speed);
+		vector<int> pathCross = graph.DijkstraNor(qCar[i].idCrossFrom, qCar[i].idCrossTo, qCar[i].speed);
 
 		num++;
 		//定时更新交通拥堵邻接矩阵jamDegreeLongBefore
@@ -1699,8 +1717,8 @@ void Scheduler::getPathByTime_dynamic()
 			//assert(pathRoad[j] != 0);
 		}
 
-		qcars[i].path = pathRoad;
-		cars[qcars[i].id - 10000].path = qcars[i].path;	//将qcars得到的路径赋值到cars的path变量中
+		qCar[i].path = pathRoad;
+		cars[qCar[i].id - 10000].path = qCar[i].path;	//将qcars得到的路径赋值到cars的path变量中
 	}
 }
 

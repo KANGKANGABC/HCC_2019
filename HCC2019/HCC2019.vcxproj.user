@@ -5,10 +5,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>train1\car.txt train1\road.txt train1\cross.txt train1\answer.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>train2\car.txt train2\road.txt train2\cross.txt train2\answer.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
 </Project>
