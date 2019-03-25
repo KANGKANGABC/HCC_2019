@@ -78,7 +78,8 @@ int Scheduler::getParaByScheduler()
 		}
 	}
 	*/
-	getSysTime();
+	int time = getSysTime();
+	PRINT("timeFinal:%d\n",time);
 
 	return para;
 }
@@ -119,6 +120,7 @@ int Scheduler::getSysTime()
 {
 	time_Scheduler = 0;
 	num_CarsScheduling = num_Cars;
+	carsWaitInGarage.clear();
 	for (int i = 0; i < num_Roads; ++i)
 	{
 		int idLaneStart = 0;
@@ -335,6 +337,7 @@ int Scheduler::getSysTimeChangePath(int para)
 	graph.createArcRoadvGraph(tmp1);
 	time_Scheduler = 0;
 	num_CarsScheduling = num_Cars;
+	carsWaitInGarage.clear();
 	for (int i = 0; i < num_Roads; ++i)
 	{
 		int idLaneStart = 0;
