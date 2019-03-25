@@ -1339,12 +1339,12 @@ void Scheduler::getStartTime_loadbalance(int carnum)
 		for (int i = 0; i < carnum; i++)
 		{
 			if (balance[i][timeStart - 1] == false)//当前没有车辆，将车辆的行驶时间添加进去
-				{
+			{
 
 				if (qCar.size() == 0)
 					goto L1;
 				tmp = qCar.front();
-				if (tmp.plantime < timeStart)
+				if (tmp.plantime > timeStart)
 				{
 					goto L2;
 				}
