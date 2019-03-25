@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//dc.writeResult(answgetParaBySchedulerer_file);
 
-	para = sd.getParaByScheduler();
-	//time = sd.getPathByScheduler(5);
+	//para = sd.getParaByScheduler();
+	time = sd.getPathByScheduler(9);
 	//sd.getPathByTime();//获得车辆的路径信息
 	//sd.reorderCars();//按照时间重排序车辆
 	//sd.getStartTime_loadbalance(550);

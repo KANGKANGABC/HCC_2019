@@ -89,8 +89,6 @@ int Scheduler::getPathByScheduler(int w)
 	std::map<int, int> mapResult;
 	int para = 80;
 	int timeMax = INT_MAX;
-	getPath();//获得最短路径
-	ReOrderStartBySpeed(para);
 	for (int i = 0; i < 15; ++i)//迭代20次
 	{
 		ReOrderStartBySpeed(para);
@@ -107,7 +105,7 @@ int Scheduler::getPathByScheduler(int w)
 	}
 	map<int, int>::iterator it;
 	it = mapResult.begin();
-	it++;
+	//it++;
 	para = it->second;
 	ReOrderStartBySpeed(para);
 	getPath();
