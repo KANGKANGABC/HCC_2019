@@ -342,6 +342,36 @@ void Scheduler::ReOrderStartByTime(int para)
 	}
 }
 
+void Scheduler::ReOrderStartBySpeed(int para)
+{
+	int n2, n4, n6, n8;
+	n2 = para;
+	n4 = para;
+	n6 = para;
+	n8 = para;
+	for (int i = 1; i <= num_Cars; ++i)//忽略第0行数据
+	{
+		switch (cars[i - 1].speed)
+		{
+		case 2:
+			cars[i - 1].starttime = cars[i - 1].plantime + 6 * n2 + i % (2 * n2 - 10);
+			break;
+		case 4:
+			cars[i - 1].starttime = cars[i - 1].plantime + 4 * n4 + i % (2 * n4 - 10);
+			break;
+		case 6:
+			cars[i - 1].starttime = cars[i - 1].plantime + 2 * n6 + i % (2 * n6 - 10);
+			break;
+		case 8:
+			cars[i - 1].starttime = cars[i - 1].plantime + 0 * n8 + i % (2 * n8 - 10);
+			break;
+		default:
+			break;
+		}
+		cars[i - 1].starttimeAnswer = cars[i - 1].starttime;//starttimeAnswer为最终写出的出发时间，不会更改
+	}
+}
+
 bool Scheduler::addCarandChangeSTime(Car car)
 {
 	assert(car.status == SLEEPING);//只有SLEEPING状态的车可以加入地图行驶
