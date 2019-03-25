@@ -46,24 +46,23 @@ int main(int argc, char *argv[])
 	dc.readRoadData();
 	dc.readCarData();
 	dc.readCrossData();
-	//dc.reorderCars();//按照时间重排序车辆
 
 	Scheduler sd(dc);
   
-	//sd.getPath();
-	sd.getPathWeightOne();
+	sd.getPath();
+	//sd.getPathWeightOne();
 	//sd.ReOrderStartBySpeed(65);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//sd.getPathByTime_reorderCars();//获得车辆的路径信息
-	sd.getTimeByDir(90);
+	//sd.getTimeByDir(90);
 	//sd.getStartTime(470);
 	//dc.writeResultWithTime(answer_file);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//dc.writeResult(answer_file);
 	//int para = sd.getParaByScheduler();
-	sd.getPathByTime();//获得车辆的路径信息
+	//sd.getPathByTime();//获得车辆的路径信息
 	sd.reorderCars();//按照时间重排序车辆
-	sd.getStartTime_loadbalance(550);
+	sd.getStartTime_loadbalance(500);
 
 	//dc.writeResult(answer_file);
 	//sd.getPathByTime();//获得车辆的路径信息
