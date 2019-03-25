@@ -127,10 +127,10 @@ int Scheduler::getSysTime()
 											int dirTarget = 0;
 											int idNextCross = 0;
 											std::vector<Car>::iterator itCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.begin();
-											switch (roads[idRoad - 5000].lane[m].laneCar[0].dirCross)
+											switch (car.dirCross)
 											{
 											case NONE:
-
+												PRINT("WARNNING!!!\n");
 												break;
 											case DD://直行>左转>右转
 												//根据官方说明，即将到达终点的车以直行方式进入路口
@@ -164,8 +164,9 @@ int Scheduler::getSysTime()
 												else
 												{
 													isConflict = true;
-													goto CONFLICT;
+													goto CONFLICT; 
 												}
+												
 												//判断转入的road是否可以行驶
 
 												break;
@@ -189,6 +190,11 @@ int Scheduler::getSysTime()
 														isConflict = true;
 														goto CONFLICT;
 													}
+												}
+												else
+												{
+													isConflict = true;
+													goto CONFLICT;
 												}
 												break;
 											case RIGHT://右转优先级最低
@@ -217,9 +223,20 @@ int Scheduler::getSysTime()
 															goto CONFLICT;
 														}
 													}
+													else
+													{
+														isConflict = true;
+														goto CONFLICT;
+													}
+												}
+												else
+												{
+													isConflict = true;
+													goto CONFLICT;
 												}
 												break;
 											default:
+												PRINT("WARNNING!!!\n");
 												break;
 											}
 										}
@@ -248,182 +265,6 @@ int Scheduler::getSysTime()
 	return time_Scheduler;
 }
 
-int Scheduler::getPathByScheduler()
-{
-	Graph_DG graph(vexnum, edge);
-	graph.createArcGraph(tmp);
-	graph.createArcRoadvGraph(tmp1);
-	time_Scheduler = 0;
-	num_CarsScheduling = num_Cars;
-	while (num_CarsScheduling > 0)
-	{
-		PRINT("***********time_Scheduler:%d************\n", time_Scheduler);//打印系统时间
-
-		/*第一步：先处理所有道路上的车辆，进行遍历扫描*/
-		driveAllCarsJustOnRoadToEndState();
-
-		/*第二步：先处理所有道路上的车辆，进行遍历扫描*/
-		while (1)//终止条件为：一个循环后，没有任何车被调度
-		{
-			bool isWorkingCross = false;//标志变量，如果一个循环后没有任何一辆车被调度，则退出循环
-			for (int i = 0; i < num_Crosses; ++i)////按照升序调度所有路口
-			{
-				int idCross = crosses[i].id;//获得路口ID
-				while (1)//循环调度路口四个方向的车，直到全部车辆完成调度，或者阻塞
-				{
-					bool isWorkingRoad = false;
-					bool isConflict = false;
-					for (int j = 0; j < 4; ++j)//这里按要求是根据道路id进行升序调度
-					{
-					CONFLICT:
-						if (isConflict)
-						{
-							isConflict = false;
-							j++;
-						}
-						if (j >= 4)
-							break;
-						int idRoad = getFirstRoadFromCross(idCross, j);
-						if (idRoad != -1)
-						{
-							int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
-							if (roads[idRoad - 5000].idFrom == crosses[i].id)//如果cross为道路的入方向
-							{
-								idStartLane = roads[idRoad - 5000].channel;
-								if (roads[idRoad - 5000].isDuplex != 1)
-									continue;//如果非双车道，退出本次循环
-							}
-							while (1)
-							{
-								bool isWorkingLane = false;
-								for (int m = idStartLane; m < idStartLane + roads[idRoad - 5000].channel; ++m)//遍历所有lane
-								{
-									if (roads[idRoad - 5000].lane[m].laneCar.size() != 0)
-									{
-										Car car = roads[idRoad - 5000].lane[m].laneCar[0];
-										if (car.status == WAITTING)//只处理在路口且为等待状态的车
-										{
-											assert(car.status == WAITTING);//车辆在路口调度时一定要是WAITTING状态
-											int dirConflict = 0;
-											int dirTarget = 0;
-											int idNextCross = 0;
-											std::vector<Car>::iterator itCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.begin();
-											switch (roads[idRoad - 5000].lane[m].laneCar[0].dirCross)
-											{
-											case NONE:
-												if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//逆向
-													idNextCross = roads[car.idCurRoad - 5000].idFrom;//此车即将驶入的路口
-												else
-													idNextCross = roads[car.idCurRoad - 5000].idTo;//此车即将驶入的路口
-												//根据假设AA，此时可能有车辆驶入终点
-												if (idNextCross == car.idCrossTo)//如果此车将要驶出出口
-												{
-													num_CarsScheduling -= 1;//正在调度的车辆数减一
-													roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.erase(itCar);//删除该道路第一辆车
-													isWorkingCross = true;
-													isWorkingRoad = true;
-													isWorkingLane = true;
-													driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
-													//该车准备通过路口
-												}
-												break;
-											case DD://直行>左转>右转
-												dirTarget = getDirByRoadCrossDir(idCross, idRoad) + 2;//目标方向
-												if (dirTarget > 3) dirTarget -= 4;//修正方向
-												if (isCanDriveToNextRoad(car, dirTarget, idCross))
-												{
-													isWorkingCross = true;
-													isWorkingRoad = true;
-													isWorkingLane = true;
-													driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
-												}
-												else
-												{
-													isConflict = true;
-													goto CONFLICT;
-												}
-												//判断转入的road是否可以行驶
-
-												break;
-											case LEFT://左转>右转
-												//判断即将转入的方向是否有直行进入的车辆
-												dirConflict = getDirByRoadCrossDir(idCross, idRoad) - 1;//冲突方向
-												if (dirConflict < 0) dirConflict += 4;//修正方向
-												if (!isBeDD(crosses[i].roadID[dirConflict], idCross))
-												{
-													dirTarget = getDirByRoadCrossDir(idCross, idRoad) + 1;//目标方向
-													if (dirTarget > 3) dirTarget -= 4;//修正方向
-													if (isCanDriveToNextRoad(car, dirTarget, idCross))//判断转入的road是否可以行驶
-													{
-														isWorkingCross = true;
-														isWorkingRoad = true;
-														isWorkingLane = true;
-														driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
-													}
-													else
-													{
-														isConflict = true;
-														goto CONFLICT;
-													}
-												}
-												break;
-											case RIGHT://右转优先级最低
-												//判断即将转入的方向是否有直行进入的车辆
-												dirConflict = getDirByRoadCrossDir(idCross, idRoad) + 1;//冲突方向
-												if (dirConflict > 3) dirConflict -= 4;//修正方向
-												if (!isBeDD(crosses[i].roadID[dirConflict], idCross))
-												{
-													dirConflict = getDirByRoadCrossDir(idCross, idRoad) + 2;//冲突方向
-													if (dirConflict > 3) dirConflict -= 4;//修正方向
-													//判断即将转入的方向是否有左转进入的车辆
-													if (!isBeLEFT(crosses[i].roadID[dirConflict], idCross))
-													{
-														dirTarget = getDirByRoadCrossDir(idCross, idRoad) - 1;//目标方向
-														if (dirTarget < 0) dirTarget += 4;//修正方向
-														if (isCanDriveToNextRoad(car, dirTarget, idCross))//判断转入的road是否可以行驶
-														{
-															isWorkingCross = true;
-															isWorkingRoad = true;
-															isWorkingLane = true;
-															driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
-														}
-														else
-														{
-															isConflict = true;
-															goto CONFLICT;
-														}
-													}
-												}
-												break;
-											default:
-												break;
-											}
-										}
-									}
-								}
-								if (!isWorkingLane)
-									break;
-							}
-						}
-					}
-					if (!isWorkingRoad)
-						break;
-				}
-			}
-			if (!isWorkingCross)//如果一个循环后没有任何一辆车被调度，则退出调度循环
-				break;
-		}
-
-		driverCarInGarageDynamic(graph);
-		putAllCarStatus();//输出所有车的状态
-		if (!putAllCarStatus())//输出所有车的状态
-			return false;//发生死锁
-		time_Scheduler++;//更新调度器时间
-		putAllRoadStatus();
-	}
-	return time_Scheduler;
-}
-
 void Scheduler::ReOrderStartByTime(int para)
 {
 
@@ -432,7 +273,7 @@ void Scheduler::ReOrderStartByTime(int para)
 		if (cars[j].speed == 8 && cars[j].status == SLEEPING)
 			carsInGarage.push_back(cars[j]);
 	}
-	std::sort(carsInGarage.begin(), carsInGarage.end(), less_time);
+	//std::sort(carsInGarage.begin(), carsInGarage.end(), less_time);
 	int size = carsInGarage.size();
 	for (int i = 0; i < size; i++)
 	{
@@ -450,7 +291,7 @@ void Scheduler::ReOrderStartByTime(int para)
 		if (cars[j].speed == 6 && cars[j].status == SLEEPING)
 			carsInGarage.push_back(cars[j]);
 	}
-	std::sort(carsInGarage.begin(), carsInGarage.end(), less_time);
+	//std::sort(carsInGarage.begin(), carsInGarage.end(), less_time);
 	size = carsInGarage.size();
 	for (int i = 0; i < size; i++)
 	{
@@ -468,7 +309,7 @@ void Scheduler::ReOrderStartByTime(int para)
 		if (cars[j].speed == 4 && cars[j].status == SLEEPING)
 			carsInGarage.push_back(cars[j]);
 	}
-	std::sort(carsInGarage.begin(), carsInGarage.end(), less_time);
+	//std::sort(carsInGarage.begin(), carsInGarage.end(), less_time);
 	size = carsInGarage.size();
 	for (int i = 0; i < size; i++)
 	{
@@ -486,7 +327,7 @@ void Scheduler::ReOrderStartByTime(int para)
 		if (cars[j].speed == 2 && cars[j].status == SLEEPING)
 			carsInGarage.push_back(cars[j]);
 	}
-	std::sort(carsInGarage.begin(), carsInGarage.end(), less_time);
+	//std::sort(carsInGarage.begin(), carsInGarage.end(), less_time);
 	size = carsInGarage.size();
 	for (int i = 0; i < size; i++)
 	{
@@ -500,6 +341,100 @@ void Scheduler::ReOrderStartByTime(int para)
 	}
 }
 
+void Scheduler::ReOrderStartBySpeed(int para)
+{
+	int n2, n4, n6, n8;
+	n2 = para;
+	n4 = para;
+	n6 = para;
+	n8 = para;
+	for (int i = 1; i <= num_Cars; ++i)//忽略第0行数据
+	{
+		switch (cars[i - 1].speed)
+		{
+		case 2:
+			cars[i - 1].starttime = cars[i - 1].plantime + 6 * n2 + i % (2 * n2 - 10);
+			break;
+		case 4:
+			cars[i - 1].starttime = cars[i - 1].plantime + 4 * n4 + i % (2 * n4 - 10);
+			break;
+		case 6:
+			cars[i - 1].starttime = cars[i - 1].plantime + 2 * n6 + i % (2 * n6 - 10);
+			break;
+		case 8:
+			cars[i - 1].starttime = cars[i - 1].plantime + 0 * n8 + i % (2 * n8 - 10);
+			break;
+		default:
+			break;
+		}
+		cars[i - 1].starttimeAnswer = cars[i - 1].starttime;//starttimeAnswer为最终写出的出发时间，不会更改
+	}
+}
+
+bool Scheduler::addCarandChangeSTime(Car car)
+{
+	assert(car.status == SLEEPING);//只有SLEEPING状态的车可以加入地图行驶
+	int idRoadTarget = car.path[0];//获取目标道路
+	int idCrossTarget = car.idCrossFrom;//获得该车出发路口
+	int idLaneStart = 0;
+	int idLaneTarget = -1;//初始车道设置为-1，如果无车道可加入，则推迟
+	if (idCrossTarget == roads[idRoadTarget - 5000].idTo)
+	{
+		idLaneStart = roads[idRoadTarget - 5000].channel;
+	}
+	for (int i = idLaneStart; i < idLaneStart + roads[idRoadTarget - 5000].channel; ++i)
+	{
+		if (roads[idRoadTarget - 5000].lane[i].laneCar.size() != 0)
+		{
+			if (roads[idRoadTarget - 5000].lane[i].laneCar[roads[idRoadTarget - 5000].lane[i].laneCar.size() - 1].location > 1)//留下一个空位
+			{
+				idLaneTarget = i;
+				break;
+			}
+		}
+		else
+		{
+			//如果该车道为空
+			idLaneTarget = i;
+			break;
+		}
+	}
+	if (idLaneTarget == -1)
+	{
+		carsWaitInGarage.push_back(car);
+		return false;
+	}
+
+	int locationTarget = 0;
+	if (roads[idRoadTarget - 5000].lane[idLaneTarget].laneCar.size() == 0)
+	{
+		locationTarget = std::min(car.speed, roads[idRoadTarget - 5000].speed);
+	}
+	else
+	{
+		Car carNext = roads[idRoadTarget - 5000].lane[idLaneTarget].laneCar[roads[idRoadTarget - 5000].lane[idLaneTarget].laneCar.size() - 1];//目标车道的最后一辆车
+		if (carNext.location > std::min(car.speed, roads[idRoadTarget - 5000].speed))//不形成阻挡
+		{
+			locationTarget = std::min(car.speed, roads[idRoadTarget - 5000].speed);
+		}
+		else
+		{
+			locationTarget = carNext.location - 1;
+		}
+	}
+	car.status = FINESHED;//切换car的状态
+	car.idCurRoad = idRoadTarget;
+	car.idCurLane = idLaneTarget;
+	car.location = locationTarget;
+	car.dirCross = NONE;
+	std::vector<int>::iterator itPath = car.path.begin();
+	car.path.erase(itPath);//已经驶向下一个路口，所以删除path中第一项
+	roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.push_back(car);//将该车加入对应道路,对应车道,加入队尾
+
+	num_CarsPut += 1;
+	return true;
+}
+
 void Scheduler::driveAllCarsJustOnRoadToEndState()
 {
 	for (int i = 0; i < num_Roads; ++i)//按道路ID升序进行调度
@@ -510,16 +445,14 @@ void Scheduler::driveAllCarsJustOnRoadToEndState()
 			{
 				for (int m = 0; m < roads[i].lane[j].laneCar.size(); ++m)
 				{
-					if (roads[i].lane[j].laneCar[m].dirCross == NONE)
-					{
-						int result = driveCar(roads[i].lane[j].laneCar[m], m);//从第一辆车开始往后调度
-					}
-					//0320如果前车到达终点，被删除，索引的时候会遗漏一辆车
+					//此阶段所有车都是终止状态
+					driveCarStep1(roads[i].lane[j].laneCar[m], m);//从第一辆车开始往后调度
 				}
 			}
 		}
 	}
 }
+
 
 int Scheduler::driveCar(Car car, int indexCar)
 {
@@ -691,37 +624,186 @@ int Scheduler::driveCarNew(Car car)
 	return true;
 }
 
-void Scheduler::addCar(Car car, int i)
+Car Scheduler::getCarFromRoad(int idRoad, int dir)
+{
+
+	return Car();
+}
+
+void Scheduler::driveCarStep1(Car car, int indexCar)
+{
+	assert(car.status==FINESHED);
+	//判断此车会不会通过路口
+	if (car.location + std::min(roads[car.idCurRoad - 5000].speed, car.speed) <= roads[car.idCurRoad - 5000].length)//不会驶出路口
+	{
+		if (indexCar == 0)//是第一辆车
+		{
+			roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location += std::min(roads[car.idCurRoad - 5000].speed, car.speed);//车正常行驶
+			roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//车标记为终止状态
+			roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = NONE;
+		}
+		else//不是第一辆车
+		{
+			Car carNext = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1];
+			if (car.location + std::min(roads[car.idCurRoad - 5000].speed, car.speed) < carNext.location)
+			{//前面的车不形成阻挡
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location += std::min(roads[car.idCurRoad - 5000].speed, car.speed);//车正常行驶
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//车标记为终止状态
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = NONE;
+			}
+			else
+			{//前面的车形成阻挡
+				if (carNext.status == FINESHED)
+				{
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location = carNext.location - 1;//行驶到前车的后一个位置
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//车标记为终止状态
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = NONE;
+				}
+				else
+				{
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;//车标记为WAITTING
+				}
+			}
+		}
+
+	}
+	else//将要驶出路口
+	{
+		if (indexCar == 0)//是第一辆车
+		{
+			//此车将行驶出路口，需要判断此车在路口的方向
+			//判断车的方向
+			int idNextCross = 0;
+			if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//逆向
+				idNextCross = roads[car.idCurRoad - 5000].idFrom;//此车即将驶入的路口
+			else
+				idNextCross = roads[car.idCurRoad - 5000].idTo;//此车即将驶入的路口
+			//根据假设AA，此时可能有车辆驶入终点
+			if (idNextCross == car.idCrossTo)//如果此车将要驶出出口
+			{
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = WAITTING;
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = DD;//从NONE改为DD，直行到达终点
+			}
+			else
+			{
+				int idNextRoad = car.path[0];//此车即将驶入的道路
+				int idCurRoad = car.idCurRoad;//此车当前道路
+
+				int disNextRoad = getCrossDistance(car, car.idCurRoad, idNextRoad);
+				if (disNextRoad == 0)//可行驶距离为0，则停在当前路口
+				{
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = roads[car.idCurRoad - 5000].length;
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//车标记为终止状态
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = NONE;
+				}
+				else
+				{
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = getCrossDir(idCurRoad, idNextRoad, idNextCross);//设置路口方向
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;//此车变为等待状态
+				}
+			}
+		}
+		else//不是第一辆车
+		{
+			Car carNext = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1];
+			if (carNext.status == FINESHED)
+			{
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location = carNext.location - 1;//行驶到前车的后一个位置
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//车标记为终止状态
+				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = NONE;
+			}
+			else
+			{
+				//此车也将行驶出路口，需要判断此车在路口的方向
+				//判断车的方向
+				int idNextCross = 0;
+				if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//逆向
+					idNextCross = roads[car.idCurRoad - 5000].idFrom;//此车即将驶入的路口
+				else
+					idNextCross = roads[car.idCurRoad - 5000].idTo;//此车即将驶入的路口
+				//根据假设AA，此时可能有车辆驶入终点
+				if (idNextCross == car.idCrossTo)//如果此车将要驶出出口
+				{
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = DD;//从NONE改为DD，直行到达终点
+				}
+				else
+				{
+					int idNextRoad = car.path[0];//此车即将驶入的道路
+					int idCurRoad = car.idCurRoad;//此车当前道路
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = getCrossDir(idCurRoad, idNextRoad, idNextCross);//设置路口方向
+					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;//此车变为等待状态
+				}
+			}
+		}
+
+	}
+}
+
+bool Scheduler::addCar(Car car, int i)
 {
 	assert(car.status == SLEEPING);//只有SLEEPING状态的车可以加入地图行驶
 	int idRoadTarget = car.path[0];//获取目标道路
 	int idCrossTarget = car.idCrossFrom;//获得该车出发路口
-	int idLaneTarget = isCanEnter(idRoadTarget, idCrossTarget);
-	if (idLaneTarget >= 0)//如果该道路可加入车
+	int idLaneStart = 0;
+	int idLaneTarget = -1;//初始车道设置为-1，如果无车道可加入，则推迟
+	if (idCrossTarget == roads[idRoadTarget - 5000].idTo)
 	{
-		car.status = FINESHED;//切换car的状态
-		car.idCurRoad = idRoadTarget;
-		car.idCurLane = idLaneTarget;
-		car.location = 0;
-		car.dirCross = NONE;
-		std::vector<int>::iterator itPath = car.path.begin();
-		car.path.erase(itPath);//已经驶向下一个路口，所以删除path中第一项
-		int indexCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size();//该车为末尾
-		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.push_back(car);//将该车加入对应道路,对应车道,加入队尾
-		if (!driveCarNew(car))//car行驶 indexCar为-1，表示该车在lane中还没有位置
+		idLaneStart = roads[idRoadTarget - 5000].channel;
+	}
+	for (int i = idLaneStart; i < idLaneStart + roads[idRoadTarget - 5000].channel; ++i)
+	{
+		if (roads[idRoadTarget - 5000].lane[i].laneCar.size() != 0)
 		{
-			roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.pop_back();
+			if (roads[idRoadTarget - 5000].lane[i].laneCar[roads[idRoadTarget - 5000].lane[i].laneCar.size() - 1].location > 1)
+			{
+				idLaneTarget = i;
+				break;
+			}
 		}
-		assert(roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location != 0);
-		//cars[car.id - 10000].starttime = time_Scheduler;
-		num_CarsPut += 1;
-		//roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1].starttime = time_Scheduler;
-		//记录实际出发时间
+		else
+		{
+			//如果该车道为空
+			idLaneTarget = i;
+			break;
+		}
 	}
-	else//如果加入失败，则将出发时间延后一个1个时间片
+	if (idLaneTarget == -1)
 	{
-		carsWaitInGarage.push_back(car);
+		//carsWaitInGarage.push_back(car);
+		cars[car.id - 10000].starttime += 1;
+		return false;
 	}
+
+	int locationTarget = 0;
+	if (roads[idRoadTarget - 5000].lane[idLaneTarget].laneCar.size() == 0)
+	{
+		locationTarget = std::min(car.speed, roads[idRoadTarget - 5000].speed);
+	}
+	else
+	{
+		Car carNext = roads[idRoadTarget - 5000].lane[idLaneTarget].laneCar[roads[idRoadTarget - 5000].lane[idLaneTarget].laneCar.size() - 1];//目标车道的最后一辆车
+		if (carNext.location > std::min(car.speed, roads[idRoadTarget - 5000].speed))//不形成阻挡
+		{
+			locationTarget = std::min(car.speed, roads[idRoadTarget - 5000].speed);
+		}
+		else
+		{
+			locationTarget = carNext.location - 1;
+		}
+	}
+	car.status = FINESHED;//切换car的状态
+	car.idCurRoad = idRoadTarget;
+	car.idCurLane = idLaneTarget;
+	car.location = locationTarget;
+	car.dirCross = NONE;
+	std::vector<int>::iterator itPath = car.path.begin();
+	car.path.erase(itPath);//已经驶向下一个路口，所以删除path中第一项
+	int indexCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size();//该车为末尾
+	roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.push_back(car);//将该车加入对应道路,对应车道,加入队尾
+
+	num_CarsPut += 1;
+	return true;
 }
 
 int Scheduler::isCanEnter(int idRoad, int idCross)
@@ -740,8 +822,6 @@ int Scheduler::isCanEnter(int idRoad, int idCross)
 	{
 		idStartLane = roads[idRoad - 5000].channel;
 		assert(roads[idRoad - 5000].isDuplex == 1);//如果cross为road的出方向，但是却不是双向道，那么很可能路径规划错误
-		if (roads[idRoad - 5000].isDuplex != 1)
-			return -1;
 	}
 	for (int j = idStartLane; j < idStartLane + roads[idRoad - 5000].channel; ++j)//遍历所有lane
 	{
@@ -751,20 +831,15 @@ int Scheduler::isCanEnter(int idRoad, int idCross)
 			if (roads[idRoad - 5000].lane[j].laneCar.size() > 0)
 			{
 				Car carNext = roads[idRoad - 5000].lane[j].laneCar[roads[idRoad - 5000].lane[j].laneCar.size() - 1];
-				if (carNext.location == 1)
+				if (carNext.location > 1)
 				{
-					if (j == idStartLane + roads[idRoad - 5000].channel - 1)
-					{
-						if (carNext.status == FINESHED)
-						{
-							return -2;
-						}
-					}
-					else
-						continue;//修复此处重大bug，原本是return -1;
+					return j;
 				}
 				else
-					return j;
+				{
+					if (carNext.status == WAITTING)
+						return j;
+				}
 			}
 			else
 			{
@@ -773,20 +848,12 @@ int Scheduler::isCanEnter(int idRoad, int idCross)
 		}
 		else
 		{
-
 			Car carNext = roads[idRoad - 5000].lane[j].laneCar[roads[idRoad - 5000].lane[j].laneCar.size() - 1];
-			if (j == idStartLane + roads[idRoad - 5000].channel - 1)
-			{
-				if (carNext.status == FINESHED)
-				{
-					return -2;
-				}
-			}
-			else
-				continue;//修复此处重大bug，原本是return -1;
+			if (carNext.status == WAITTING)
+				return j;
 		}
 	}
-	return -1;//不存在空位
+	return idStartLane + roads[idRoad - 5000].channel - 1;//如果无空位返回最后一个车道
 }
 
 bool Scheduler::isBeDD(int idRoad, int idCross)//注意这里的ID不需要减1
@@ -916,47 +983,94 @@ void Scheduler::driverToNextRoad(Car car, int idNextRoad, int idNextLane, int lo
 
 bool Scheduler::isCanDriveToNextRoad(Car car, int dir, int idCross)
 {
-	if (crosses[idCross - 1].roadID[dir] != -1)
+	assert(crosses[idCross - 1].roadID[dir] != -1);//不可能进入无效路径
+	int idNextCross = 0;
+	if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//逆向
+		idNextCross = roads[car.idCurRoad - 5000].idFrom;//此车即将驶入的路口
+	else
+		idNextCross = roads[car.idCurRoad - 5000].idTo;//此车即将驶入的路口
+	int idNextRoad = car.path[0];//获取目标道路
+	int idNextLane = isCanEnter(idNextRoad, idNextCross);
+
+	int disNextRoad = getCrossDistance(car, car.idCurRoad, idNextRoad);
+	assert(disNextRoad!=0);
+	if (disNextRoad == 0)//可行驶距离为0，则停在当前路口
 	{
-		int idNextLane = isCanEnter(crosses[idCross - 1].roadID[dir], idCross);
-		if (idNextLane >= 0)
+		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = roads[car.idCurRoad - 5000].length;
+		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//车标记为终止状态
+		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = NONE;
+		return true;
+	}
+	else
+	{
+		int sizeLaneCar = roads[idNextRoad - 5000].lane[idNextLane].laneCar.size();
+		if (sizeLaneCar > 0)
 		{
-			int result = driveCar(car, -1);//该车可以转向，但是不代表该车转向后不会因为有车阻挡然后WAITTING
-			//实际上driverCar后可能有如下三种情况
-			//1.成功行驶到下个路口
-			//2.因为下个路口有车waitting,此车无法行驶
-			//3.因为行驶里程不够，只能继续等在路口
-			//if (car_original.idCurRoad != car.idCurRoad || car_original.location != car.location)//road发生变化或者location发生变化，视为转向成功
-			if (result == 1)
+			Car carNext = roads[idNextRoad - 5000].lane[idNextLane].laneCar[sizeLaneCar - 1];
+			if (disNextRoad < carNext.location)
+			{
+				driverToNextRoad(car, idNextRoad, idNextLane, disNextRoad);
 				return true;
-			//第三种情况视为成功或者不成功，对结果应该影响不大
+			}
+			else
+			{
+				if (carNext.status == WAITTING)
+				{
+					return false;
+				}
+				else
+				{
+					if (carNext.location > 1)
+					{
+						driverToNextRoad(car, idNextRoad, idNextLane, carNext.location - 1);
+						return true;
+					}
+					else
+					{
+						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = roads[car.idCurRoad - 5000].length;
+						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//车标记为终止状态
+						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = NONE;
+						return true;
+					}
+						
+				}
+			}
 		}
-		else if (idNextLane == -2)
+		else
 		{
-			roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = roads[car.idCurRoad - 5000].length;
-			roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//车标记为终止状态
-			roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = NONE;
-				return true;
+			driverToNextRoad(car, idNextRoad, idNextLane, disNextRoad);
+			return true;
 		}
 	}
-	return false;
 }
-
 
 void Scheduler::driverCarInGarage()
 {
+	/*
 	int numCarsWait = carsWaitInGarage.size();
 	for (int j = 0; j < numCarsWait; ++j)
 	{
 		Car car = carsWaitInGarage.front();
 		carsWaitInGarage.pop_front();
 		addCar(car, car.id - 10000);
+		
+	
+		bool isAdded = addCarandChangeSTime(car);
+		if (isAdded)
+		{
+			cars[car.id - 10000].status = FINESHED;//切换car的状态
+			//cars[car.id - 10000].starttime = time_Scheduler;
+		}
+		
 	}
+	*/
+	
 	for (int i = 0; i < num_Cars; ++i)
 	{
 		if (cars[i].starttime == time_Scheduler && cars[i].status == SLEEPING)
 		{
 			addCar(cars[i], i);
+			//addCarandChangeSTime(cars[i]);
 		}
 	}
 }
@@ -1014,6 +1128,8 @@ void Scheduler::putCarStatus(Car car)
 
 bool Scheduler::putAllCarStatus()
 {
+	bool isDeadLock = false;
+	vector<int> vecDLCross;
 	for (int i = 0; i < num_Roads; ++i)//按道路ID升序进行调度
 	{
 		for (int j = 0; j < roads[i].channel * (1 + roads[i].isDuplex); ++j)
@@ -1026,14 +1142,38 @@ bool Scheduler::putAllCarStatus()
 				{
 					if (lane.laneCar[m].status == WAITTING)
 					{
-						putCarStatus(lane.laneCar[m]);
-						return false;
+						int idDLCross = 0;
+						if (j > roads[i].channel)//行驶在反向车道上
+						{
+							idDLCross = roads[i].idTo;
+						}
+						else
+						{
+							idDLCross = roads[i].idFrom;
+						}
+						//putCarStatus(lane.laneCar[m]);
+						vector<int>::iterator it;
+						it = find(vecDLCross.begin(), vecDLCross.end(), idDLCross);
+						if (it == vecDLCross.end())
+						{
+							vecDLCross.push_back(idDLCross);
+						}
+						isDeadLock = true;
 					}
 				}
 			}
 		}
 	}
-	return true;
+	if (isDeadLock == true)
+	{
+		PRINT("Dead Lock Cross ID:");
+		for (auto idCross : vecDLCross)
+		{
+			PRINT("%d ",idCross);
+		}
+		PRINT("\n");
+	}
+	return !isDeadLock;
 }
 
 void Scheduler::putAllRoadStatus()
@@ -1151,19 +1291,13 @@ void Scheduler::driveAllCarsJustOnOneChannelToEndState(int idRoad, int idCross, 
 						roads[idRoad - 5000].lane[idChannel].laneCar[i].dirCross = NONE;
 					}
 				}
-				else
+				else 
 				{
+					//只处理行驶后不通过路口的车
 					if (i != 0)//如果该车不是第一辆车
 					{
 						Car carNext = roads[idRoad - 5000].lane[idChannel].laneCar[i - 1];
-						if (car.location + std::min(roads[idRoad - 5000].speed, car.speed) < carNext.location)
-						{
-							//前车不形成阻挡
-							roads[idRoad - 5000].lane[idChannel].laneCar[i].location += std::min(roads[idRoad - 5000].speed, car.speed);//车正常行驶
-							roads[idRoad - 5000].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
-							roads[idRoad - 5000].lane[idChannel].laneCar[i].dirCross = NONE;
-						}
-						else if (carNext.status == FINESHED)
+						if (carNext.status == FINESHED)
 						{
 							roads[idRoad - 5000].lane[idChannel].laneCar[i].location = carNext.location - 1;//车正常行驶
 							roads[idRoad - 5000].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
@@ -1172,33 +1306,20 @@ void Scheduler::driveAllCarsJustOnOneChannelToEndState(int idRoad, int idCross, 
 					}
 					else
 					{
-						//此车也将行驶出路口，需要判断此车在路口的方向
-						//判断车的方向
-						int idNextCross = 0;
-						if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//逆向
-							idNextCross = roads[car.idCurRoad - 5000].idFrom;//此车即将驶入的路口
-						else
-							idNextCross = roads[car.idCurRoad - 5000].idTo;//此车即将驶入的路口
-						//根据假设AA，此时可能有车辆驶入终点
-						if (idNextCross == car.idCrossTo)//如果此车将要驶出出口
-						{
-							roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = WAITTING;
-							roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = DD;
-							/*
-							num_CarsScheduling -= 1;//正在调度的车辆数减一
-							std::vector<Car>::iterator it = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.begin();
-							roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.erase(it);//删除该道路第一辆车
-							*/
-						}
-						else
+						if (car.path.size() > 0)
 						{
 							int idNextRoad = car.path[0];//此车即将驶入的道路
 							int idCurRoad = car.idCurRoad;//此车当前道路
-							roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[i].dirCross = getCrossDir(idCurRoad, idNextRoad, idNextCross);//设置路口方向
-							roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[i].status = WAITTING;//此车变为等待状态
+
+							int disNextRoad = getCrossDistance(car, car.idCurRoad, idNextRoad);
+							if (disNextRoad == 0)//可行驶距离为0，则停在当前路口
+							{
+								roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = roads[car.idCurRoad - 5000].length;
+								roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//车标记为终止状态
+								roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = NONE;
+							}
 						}
 					}
-
 				}
 			}
 		}
@@ -1258,7 +1379,29 @@ void Scheduler::getPath()//获得最短路径和该路径下的运行时间
 		cars[i].time = timeCar;
 	}
 }
+void Scheduler::getPathWeightOne()
+{
+	Graph_DG graph(vexnum, edge);
+	graph.createArcGraph(tmp);
 
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		int timeCar = 0;
+		vector<int> pathCross = graph.DijkstraWeightOne(cars[i].idCrossFrom, cars[i].idCrossTo, timeCar);
+		vector<int> pathRoad(pathCross.size() - 1);
+		for (int j = 0; j < pathRoad.size(); ++j)
+		{
+			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+			//assert(pathRoad[j] != 0);
+		}
+		cars[i].path = pathRoad;
+		cars[i].time = timeCar;
+	}
+}
+bool Comp(const int &a, const int &b)
+{
+	return a > b;
+}
 void Scheduler::getStartTime(int para)
 {
 	//car_speed_num 为车辆速度类型数量 speedType存放速度类型的vector
@@ -1267,6 +1410,8 @@ void Scheduler::getStartTime(int para)
 
 	std::deque<Car> carsDeque;//此时间片待出发的车 //deque是分配在堆中的，所以此处临时deque不会造成栈溢出
 	int timeStart = 1;//出发时间，从1开始安排
+
+	sort(speedType.begin(), speedType.end(), Comp);
 	for (auto speed : speedType)
 	{
 		assert(carsDeque.size()==0);//使用前确保deque为空
@@ -1404,69 +1549,6 @@ void Scheduler::getPathByTime()
 			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
 			//assert(pathRoad[j] != 0);
 		}
-		/*
-		//统计road的情况
-		for (int i = 0; i < pathRoad.size(); i++)
-		{
-			flag_road[pathRoad.at(i) - 5000]++;//记录road的使用情况
-		}
-
-
-		//统计cross的情况
-		if (flagnum == 200)
-		{
-			ofstream oFile;
-			oFile.open("testcross100.csv", ios::out | ios::trunc);
-			for (int i=0; i < 100; i++)
-			{
-				oFile << flag[i] << endl;
-			}
-
-			oFile.close();
-
-			for (int i = 0; i < 100; i++)
-			{
-				flag[i] = 0;
-			}
-
-			ofstream oFile1;
-			oFile1.open("testroad100.csv", ios::out | ios::trunc);
-			for (int i = 0; i < 120; i++)
-			{
-				oFile1 << flag_road[i] << endl;
-			}
-			oFile1.close();
-
-			for (int i = 0; i < 120; i++)
-			{
-				flag_road[i] = 0;
-			}
-		}
-		*/
-		/*写出100~200辆车的统计情况*/
-		/*
-		if (flagnum == 400)
-		{
-			ofstream oFile2;
-			oFile2.open("testcross200.csv", ios::out | ios::trunc);
-			for (int i = 0; i < 100; i++)
-			{
-				oFile2 << flag[i] << endl;
-			}
-
-			oFile2.close();
-
-
-			ofstream oFile3;
-			oFile3.open("testroad200.csv", ios::out | ios::trunc);
-			for (int i = 0; i < 120; i++)
-			{
-				oFile3 << flag_road[i] << endl;
-			}
-
-			oFile3.close();
-		}
-		*/
 		cars[i].path = pathRoad;
 
 	}
@@ -1650,7 +1732,6 @@ void Scheduler ::getPathByTime_dynamic()
 	}
 }
 
-
 void Scheduler::swap(int i, int j)
 {
 	Car tmp;
@@ -1694,5 +1775,257 @@ void Scheduler::reorderCars()
 	int begin = 0;
 	int end = qCar.size() - 1;
 	quicksort(begin, end);
+}
+bool CompDirMap(const Car &a, const Car &b)
+{
+	return a.dirMap > b.dirMap;
+}
 
+void Scheduler::getTimeByDir(int para)
+{
+	std::deque<Car> carsDeque;//此时间片待出发的车 //deque是分配在堆中的，所以此处临时deque不会造成栈溢出
+	int timeStart = 1;//出发时间，从1开始安排
+
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		int x1, y1, x2, y2;
+		x1 = (cars[i].idCrossFrom - 1) % 8;
+		y1 = (cars[i].idCrossFrom - 1) / 8;
+		x2 = (cars[i].idCrossTo - 1) % 8;
+		y2 = (cars[i].idCrossTo - 1) / 8;
+		if ((x2 - x1) <= 0 && (y2 - y1) <= 0)
+		{
+			cars[i].dirMap = 4;
+		}
+		else if ((x2 - x1) >= 0 && (y2 - y1) >= 0)
+		{
+			cars[i].dirMap = 3;
+		}
+		else if ((x2 - x1) >= 0 && (y2 - y1) <= 0)
+		{
+			cars[i].dirMap = 2;
+		}
+		else
+		{
+			cars[i].dirMap = 1;
+		}
+
+	}
+	sort(speedType.begin(), speedType.end(), Comp);
+	for (auto speed : speedType)
+	{
+		assert(carsDeque.size() == 0);//使用前确保deque为空
+		for (int i = 0; i < num_Cars; ++i)
+		{
+			if (cars[i].speed == speed)
+			{
+				carsDeque.push_back(cars[i]);
+			}
+		}
+		//std::sort(carsDeque.begin(), carsDeque.end(), less_time);//将deque中的车按照运行时间升序排列
+		std::sort(carsDeque.begin(), carsDeque.end(), CompDirMap);//将deque中的车按照方向分为两类
+		//当然如果不排序也是有一定道理的
+		int loadCur;//记录当前负载
+		while (carsDeque.size() > 0)
+		{
+			loadCur = 0;
+			while (loadCur < para)
+			{
+				if (carsDeque.size() == 0)
+				{
+					break;
+				}
+				Car carTime = carsDeque.front();
+				carsDeque.pop_front();
+				loadCur += carTime.time;
+				cars[carTime.id - 10000].starttimeAnswer = timeStart;
+				cars[carTime.id - 10000].starttime = cars[carTime.id - 10000].starttimeAnswer;
+			}
+			timeStart++;
+		}
+	}
+	//防止starttime早于计划时间
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].starttimeAnswer < cars[i].plantime)
+		{
+			cars[i].starttimeAnswer = cars[i].plantime;
+		}
+	}
+}
+
+int Scheduler::getPathByScheduler()
+{
+	Graph_DG graph(vexnum, edge);
+	graph.createArcGraph(tmp);
+	graph.createArcRoadvGraph(tmp1);
+	time_Scheduler = 0;
+	num_CarsScheduling = num_Cars;
+	while (num_CarsScheduling > 0)
+	{
+		PRINT("***********time_Scheduler:%d************\n", time_Scheduler);//打印系统时间
+
+		/*第一步：先处理所有道路上的车辆，进行遍历扫描*/
+		driveAllCarsJustOnRoadToEndState();
+
+		/*第二步：先处理所有道路上的车辆，进行遍历扫描*/
+		while (1)//终止条件为：一个循环后，没有任何车被调度
+		{
+			bool isWorkingCross = false;//标志变量，如果一个循环后没有任何一辆车被调度，则退出循环
+			for (int i = 0; i < num_Crosses; ++i)////按照升序调度所有路口
+			{
+				int idCross = crosses[i].id;//获得路口ID
+				while (1)//循环调度路口四个方向的车，直到全部车辆完成调度，或者阻塞
+				{
+					bool isWorkingRoad = false;
+					bool isConflict = false;
+					for (int j = 0; j < 4; ++j)//这里按要求是根据道路id进行升序调度
+					{
+					CONFLICT:
+						if (isConflict)
+						{
+							isConflict = false;
+							j++;
+						}
+						if (j >= 4)
+							break;
+						int idRoad = getFirstRoadFromCross(idCross, j);
+						if (idRoad != -1)
+						{
+							int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
+							if (roads[idRoad - 5000].idFrom == crosses[i].id)//如果cross为道路的入方向
+							{
+								idStartLane = roads[idRoad - 5000].channel;
+								if (roads[idRoad - 5000].isDuplex != 1)
+									continue;//如果非双车道，退出本次循环
+							}
+							while (1)
+							{
+								bool isWorkingLane = false;
+								for (int m = idStartLane; m < idStartLane + roads[idRoad - 5000].channel; ++m)//遍历所有lane
+								{
+									if (roads[idRoad - 5000].lane[m].laneCar.size() != 0)
+									{
+										Car car = roads[idRoad - 5000].lane[m].laneCar[0];
+										if (car.status == WAITTING)//只处理在路口且为等待状态的车
+										{
+											assert(car.status == WAITTING);//车辆在路口调度时一定要是WAITTING状态
+											int dirConflict = 0;
+											int dirTarget = 0;
+											int idNextCross = 0;
+											std::vector<Car>::iterator itCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.begin();
+											switch (roads[idRoad - 5000].lane[m].laneCar[0].dirCross)
+											{
+											case NONE:
+												if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//逆向
+													idNextCross = roads[car.idCurRoad - 5000].idFrom;//此车即将驶入的路口
+												else
+													idNextCross = roads[car.idCurRoad - 5000].idTo;//此车即将驶入的路口
+												//根据假设AA，此时可能有车辆驶入终点
+												if (idNextCross == car.idCrossTo)//如果此车将要驶出出口
+												{
+													num_CarsScheduling -= 1;//正在调度的车辆数减一
+													roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.erase(itCar);//删除该道路第一辆车
+													isWorkingCross = true;
+													isWorkingRoad = true;
+													isWorkingLane = true;
+													driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
+													//该车准备通过路口
+												}
+												break;
+											case DD://直行>左转>右转
+												dirTarget = getDirByRoadCrossDir(idCross, idRoad) + 2;//目标方向
+												if (dirTarget > 3) dirTarget -= 4;//修正方向
+												if (isCanDriveToNextRoad(car, dirTarget, idCross))
+												{
+													isWorkingCross = true;
+													isWorkingRoad = true;
+													isWorkingLane = true;
+													driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
+												}
+												else
+												{
+													isConflict = true;
+													goto CONFLICT;
+												}
+												//判断转入的road是否可以行驶
+
+												break;
+											case LEFT://左转>右转
+												//判断即将转入的方向是否有直行进入的车辆
+												dirConflict = getDirByRoadCrossDir(idCross, idRoad) - 1;//冲突方向
+												if (dirConflict < 0) dirConflict += 4;//修正方向
+												if (!isBeDD(crosses[i].roadID[dirConflict], idCross))
+												{
+													dirTarget = getDirByRoadCrossDir(idCross, idRoad) + 1;//目标方向
+													if (dirTarget > 3) dirTarget -= 4;//修正方向
+													if (isCanDriveToNextRoad(car, dirTarget, idCross))//判断转入的road是否可以行驶
+													{
+														isWorkingCross = true;
+														isWorkingRoad = true;
+														isWorkingLane = true;
+														driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
+													}
+													else
+													{
+														isConflict = true;
+														goto CONFLICT;
+													}
+												}
+												break;
+											case RIGHT://右转优先级最低
+												//判断即将转入的方向是否有直行进入的车辆
+												dirConflict = getDirByRoadCrossDir(idCross, idRoad) + 1;//冲突方向
+												if (dirConflict > 3) dirConflict -= 4;//修正方向
+												if (!isBeDD(crosses[i].roadID[dirConflict], idCross))
+												{
+													dirConflict = getDirByRoadCrossDir(idCross, idRoad) + 2;//冲突方向
+													if (dirConflict > 3) dirConflict -= 4;//修正方向
+													//判断即将转入的方向是否有左转进入的车辆
+													if (!isBeLEFT(crosses[i].roadID[dirConflict], idCross))
+													{
+														dirTarget = getDirByRoadCrossDir(idCross, idRoad) - 1;//目标方向
+														if (dirTarget < 0) dirTarget += 4;//修正方向
+														if (isCanDriveToNextRoad(car, dirTarget, idCross))//判断转入的road是否可以行驶
+														{
+															isWorkingCross = true;
+															isWorkingRoad = true;
+															isWorkingLane = true;
+															driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
+														}
+														else
+														{
+															isConflict = true;
+															goto CONFLICT;
+														}
+													}
+												}
+												break;
+											default:
+												break;
+											}
+										}
+									}
+								}
+								if (!isWorkingLane)
+									break;
+							}
+						}
+					}
+					if (!isWorkingRoad)
+						break;
+				}
+			}
+			if (!isWorkingCross)//如果一个循环后没有任何一辆车被调度，则退出调度循环
+				break;
+		}
+
+		driverCarInGarageDynamic(graph);
+		putAllCarStatus();//输出所有车的状态
+		if (!putAllCarStatus())//输出所有车的状态
+			return false;//发生死锁
+		time_Scheduler++;//更新调度器时间
+		putAllRoadStatus();
+	}
+	return time_Scheduler;
 }

@@ -17,6 +17,8 @@ public:
 	int getPathByScheduler();
 	//获得路径,为每辆车规划路径
 	void getPath();
+	//获得路径,所有权重为1
+	void getPathWeightOne();
 	//获得路径后，规划出发时间,para为参数
 	void getStartTime(int para);
 	void getStartTime_loadbalance(int carnum);
@@ -27,10 +29,15 @@ public:
 	void swap(int i, int j);
 	void quicksort(int begin, int end);
 	void reorderCars();
+	void getTimeByDir(int para);//根据车的行驶方向发车（++）和（--）的一起跑 （+-）和（-+）的一起跑 
 	void ReOrderStartByTime(int para);//根据行驶时间重新安排出发时间
+	void ReOrderStartBySpeed(int para);//根据行驶时间重新安排出发时间
+	bool addCarandChangeSTime(Car car);//往道路中添加车辆，并且通过改变出发时间留出空位
 	int vexnum, edge;
 	std::vector<std::vector<int> > tmp;
 	std::vector<std::vector<int> > tmp1;
+
+	int num_changeSTime;
 private:
 	int num_CarsScheduling;//正在调度的car数量
 	int num_CarsPut;//已经发车的car数量
@@ -64,8 +71,13 @@ private:
 
 	int driveCarNew(Car car);
 
+	Car getCarFromRoad(int idRoad,int dir);
+
+	//第一阶段车行驶
+	void driveCarStep1(Car car, int indexCar);
+
 	/*将该车加入道路行驶*/
-	void addCar(Car car,int i);//i为该车在cars[]中的下标，便于加入车失败时延后时间片
+	bool addCar(Car car,int i);//i为该车在cars[]中的下标，便于加入车失败时延后时间片
 
 	//判断某cross的某road是否可以行驶进入//输入ID为修正前的ID
 	int isCanEnter(int idRoad, int idCross);//如果返回值-1，代表不可加入，否则返回可驶入的lane ID
@@ -115,5 +127,5 @@ private:
 
 	//根据时间周期安排出发时间
 	void getPlantimeByPeriod(int period);
-};
 
+};

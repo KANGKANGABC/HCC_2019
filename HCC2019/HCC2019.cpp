@@ -50,9 +50,13 @@ int main(int argc, char *argv[])
 
 	Scheduler sd(dc);
   
-	//dc.getPath();
+	//sd.getPath();
+	sd.getPathWeightOne();
+	//sd.ReOrderStartBySpeed(65);
+	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//sd.getPathByTime_reorderCars();//获得车辆的路径信息
-	//sd.getStartTime(700);
+	sd.getTimeByDir(90);
+	//sd.getStartTime(470);
 	//dc.writeResultWithTime(answer_file);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//dc.writeResult(answer_file);
@@ -72,6 +76,7 @@ int main(int argc, char *argv[])
 	//dc.writeResultWithTime(answer_file);
 	//dc.writeResult(answer_file);
 	//PRINT("para:%d\n",para);
+	PRINT("num_changeSTime:%d\n", sd.num_changeSTime);
 
 	// TODO:read input filebuf
 	// TODO:process

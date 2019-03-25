@@ -188,7 +188,7 @@ void DataCenter::writeResult(const char *filename)
 	{
 		std::string line = "(" + std::to_string(car[i].id);
 		line += ", ";
-		line += std::to_string(car[i].starttime);
+		line += std::to_string(car[i].starttimeAnswer);
 		for (int j = 0; j < car[i].path.size(); ++j)
 		{
 			line += ", ";
@@ -203,7 +203,7 @@ void DataCenter::writeResult(const char *filename)
 
 void DataCenter::writeResultWithTime(const char *filename)
 {
-	result += "#(carId,StartTime,RoadId...)\n";
+	result += "#(carId,StartTime,RoadId,Time,StartTime,DirMap...)\n";
 	for (int i = 0; i < m_car_num; ++i)
 	{
 		std::string line = "(" + std::to_string(car[i].id);
@@ -218,6 +218,8 @@ void DataCenter::writeResultWithTime(const char *filename)
 		line += std::to_string(car[i].time);
 		line += ", ";
 		line += std::to_string(car[i].starttime);
+		line += ", ";
+		line += std::to_string(car[i].dirMap);
 		line += ")\n";
 		result += line;
 	}
@@ -225,21 +227,4 @@ void DataCenter::writeResultWithTime(const char *filename)
 	write_result(result_file, filename);
 }
 
-void DataCenter::getPath()
-{
-	Graph_DG graph(vexnum, edge);
-	graph.createArcGraph(graphRoad);
-
-	for (int i = 0; i < m_car_num; ++i)
-	{
-		vector<int> pathCross = graph.Dijkstra(car[i].idCrossFrom, car[i].idCrossTo);
-		vector<int> pathRoad(pathCross.size() - 1);
-		for (int j = 0; j < pathRoad.size(); ++j)
-		{
-			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
-			//assert(pathRoad[j] != 0);
-		}
-		car[i].path = pathRoad;
-	}
-}
 

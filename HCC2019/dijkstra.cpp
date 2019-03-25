@@ -123,7 +123,6 @@ Graph_DG::~Graph_DG() {
 	delete arcTime;
 }
 
-
 //创建路长的邻接矩阵图
 void Graph_DG::createArcGraph(vector<std::vector<int> > graphRoad) {
 	for (int i = 0; i < graphRoad.size(); i++)
@@ -195,7 +194,6 @@ void Graph_DG::printRoadv() {
 		++count_row;
 	}
 }
-
 
 //打印时间邻接矩阵
 void Graph_DG::printTimeArc() {
@@ -310,6 +308,72 @@ vector<int> Graph_DG::Dijkstra(int begin, int end) {
 		}
 	}
 	vector<int> path_tmp = dis[end - 1].path;
+	delete[] dis;
+	return path_tmp;
+}
+
+//带返回值，返回start到end的路径值，不考虑路径和时间
+vector<int> Graph_DG::DijkstraWeightOne(int begin, int end, int &timeCar) {
+	
+	for (int i = 0; i < this->vexnum; i++)
+	{
+		for (int j = 0; j < this->vexnum; j++)
+		{
+			if (arc[i][j] == INT_MAX)
+				arc[i][j] = INT_MAX;
+			else
+			{
+				arc[i][j] = 1;
+			}
+		}
+	}
+
+	//首先初始化dis数组
+	dis = new Dis[this->vexnum];
+	int i;
+	for (i = 0; i < this->vexnum; i++) {
+		//设置当前的路径
+		vector<int> tmp;
+		tmp = dis[i].path;
+		tmp.push_back(begin);
+		tmp.push_back(i + 1);
+		dis[i].path = tmp;
+		dis[i].value = arc[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
+	}
+	//设置起点到起点自己的路径为0
+	dis[begin - 1].value = 0;
+	dis[begin - 1].visit = true;
+
+	int count = 1;
+	//计算到其他各顶点的最短路径
+	while (count != this->vexnum) {
+		//temp用于保存当前dis数组中最小的那个下标
+		//min记录当前的最小值
+		int temp = 0;
+		int min = INT_MAX;
+		//这里的for循环我的理解就是算法中优先队列的作用（找目前最短的点），选择准备进行松弛的点，给下一步的for循环进行松弛操作
+		for (i = 0; i < this->vexnum; i++) {
+			if (!dis[i].visit && dis[i].value < min) {
+				min = dis[i].value;
+				temp = i;
+			}
+		}
+
+		dis[temp].visit = true;		//把上一步找到的准备进行松弛操作的点加入已找到的最短路径集合（实际上就是下次不再入优先队列，每个点至进行一次入队）
+		++count;
+		//下面这个for循环这么理解（更新的是temp指向的点的值），它是将所有的点都进行了一次松弛更新的操作，如果满足条件则更新否则不更新，在算法中写的是值操作相邻的点进行操作，因为不相邻的没有意义（这里就用无穷达来表达了这种情况！因此它直接所有点遍历，如果可以只存邻接的点那会更好！）
+		for (i = 0; i < this->vexnum; i++) {
+			if (!dis[i].visit && arc[temp][i] != INT_MAX && (dis[temp].value + arc[temp][i]) < dis[i].value) {
+				dis[i].value = dis[temp].value + arc[temp][i];
+				vector<int> tmp;
+				tmp = dis[temp].path;
+				tmp.push_back(i + 1);
+				dis[i].path = tmp;
+			}
+		}
+	}
+	vector<int> path_tmp = dis[end - 1].path;
+	timeCar = dis[end - 1].value;
 	delete[] dis;
 	return path_tmp;
 }
