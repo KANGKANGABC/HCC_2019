@@ -43,7 +43,10 @@ int Scheduler::getParaByScheduler()
 	int para = 80;
 	int timeMax = INT_MAX;
 	ReOrderStartBySpeed(para);
-	getPathByTime();//获得车辆的路径信息
+	//getPathByTime();//获得车辆的路径信息
+	reorderCars();
+	//getPathByTime();//获得车辆的路径信息
+	getPathByTime_dynamic();
 	for (int i = 0; i < 20; ++i)//迭代20次
 	{
 		ReOrderStartBySpeed(para);
@@ -54,14 +57,14 @@ int Scheduler::getParaByScheduler()
 				timeMax = time;
 			else
 				break;
-			para -= 5;
+			para -= 4;
 		}
 		else
 		{
 			break;
 		}
 	}
-	para += 5;
+	para += 4;
 	ReOrderStartBySpeed(para);
 	getSysTime();
 	return para;
@@ -365,16 +368,16 @@ void Scheduler::ReOrderStartBySpeed(int para)
 		switch (cars[i - 1].speed)
 		{
 		case 2:
-			cars[i - 1].starttime = cars[i - 1].plantime + 6 * n2 + i % (2 * n2 - 10);
+			cars[i - 1].starttime = 6 * n2 + i % (2 * n2);
 			break;
 		case 4:
-			cars[i - 1].starttime = cars[i - 1].plantime + 4 * n4 + i % (2 * n4 - 10);
+			cars[i - 1].starttime = 4 * n4 + i % (2 * n4);
 			break;
 		case 6:
-			cars[i - 1].starttime = cars[i - 1].plantime + 2 * n6 + i % (2 * n6 - 10);
+			cars[i - 1].starttime = 2 * n6 + i % (2 * n6);
 			break;
 		case 8:
-			cars[i - 1].starttime = cars[i - 1].plantime + 0 * n8 + i % (2 * n8 - 10);
+			cars[i - 1].starttime = 0 * n8 + i % (2 * n8);
 			break;
 		default:
 			break;
@@ -385,6 +388,10 @@ void Scheduler::ReOrderStartBySpeed(int para)
 		cars[i - 1].location = 0;//参数重置
 		cars[i - 1].dirCross = NONE;//参数重置
 		cars[i - 1].status= SLEEPING;//参数重置
+		if (cars[i - 1].starttime < cars[i - 1].plantime)
+		{
+			cars[i - 1].starttime = cars[i - 1].plantime;
+		}
 		cars[i - 1].starttimeAnswer = cars[i - 1].starttime;//starttimeAnswer为最终写出的出发时间，不会更改
 	}
 }
