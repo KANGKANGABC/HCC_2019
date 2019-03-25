@@ -1672,7 +1672,7 @@ void Scheduler::getPathByTime_dynamic()
 
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		vector<int> pathCross = graph.DijkstraNor(qcars[i].idCrossFrom, qcars[i].idCrossTo, qcars[i].speed);
+		vector<int> pathCross = graph.DijkstraNor(qCar[i].idCrossFrom, qCar[i].idCrossTo, qCar[i].speed);
 
 		num++;
 		//定时更新交通拥堵邻接矩阵jamDegreeLongBefore
@@ -1699,8 +1699,8 @@ void Scheduler::getPathByTime_dynamic()
 			//assert(pathRoad[j] != 0);
 		}
 
-		qcars[i].path = pathRoad;
-		cars[qcars[i].id - 10000].path = qcars[i].path;	//将qcars得到的路径赋值到cars的path变量中
+		qCar[i].path = pathRoad;
+		cars[qCar[i].id - 10000].path = qCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
 	}
 }
 
