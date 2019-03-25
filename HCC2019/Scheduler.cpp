@@ -110,7 +110,19 @@ int Scheduler::getPathByScheduler(int w)
 	ReOrderStartBySpeed(para);
 	getPath();
 	int time = getSysTimeChangePath(w);
-	getSysTime();
+	//getSysTime();
+	int timeFinal = getSysTime();
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].timeArrived > (timeFinal - 20))
+		{
+			cars[i].starttime = cars[i].starttime - 20;
+			cars[i].starttimeAnswer = cars[i].starttime;
+		}
+	}
+	time = getSysTime();
+	PRINT("timeFinal:%d\n", time);
+
 	return para;
 }
 
