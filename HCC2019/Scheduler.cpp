@@ -1495,6 +1495,7 @@ void Scheduler::getStartTime_loadbalance(int carnum)
 				}
 				balance[i].insert(balance[i].begin(), tmp.time, true);
 				cars[tmp.id - 10000].starttime = timeStart;//对处理过的car的starttime赋值
+				cars[tmp.id - 10000].starttimeAnswer = cars[tmp.id - 10000].starttime;
 				qCar.erase(qCar.begin());
 			}
 			else
