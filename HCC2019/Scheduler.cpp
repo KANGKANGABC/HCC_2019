@@ -40,6 +40,7 @@ bool less_time(const Car & m1, const Car & m2) {
 
 int Scheduler::getParaByScheduler()
 {
+	std::map<int, int> mapResult;
 	int para = 80;
 	int timeMax = INT_MAX;
 	ReOrderStartBySpeed(para);
@@ -47,24 +48,22 @@ int Scheduler::getParaByScheduler()
 	reorderCars();
 	//getPathByTime();//获得车辆的路径信息
 	getPathByTime_dynamic();
-	for (int i = 0; i < 20; ++i)//迭代20次
+	for (int i = 0; i < 15; ++i)//迭代20次
 	{
 		ReOrderStartBySpeed(para);
 		int time = getSysTime();
-		if (time > 0)
-		{
-			if (time <= timeMax)
-				timeMax = time;
-			else
-				break;
-			para -= 4;
-		}
-		else
-		{
-			break;
-		}
+		if (time == false)
+			time = INT_MAX;
+		para -= 4;
+		mapResult.insert(pair<int, int>(time,para));
 	}
-	para += 4;
+	for (auto &v : mapResult)
+	{
+		PRINT("result:%d para:%d\n", v.first,v.second);
+	}
+	map<int, int>::iterator it;
+	
+	para = mapResult.begin()->second;
 	ReOrderStartBySpeed(para);
 	/*
 	int timeFinal = getSysTime();
@@ -103,7 +102,7 @@ int Scheduler::getSysTime()
 	}
 	while (num_CarsScheduling > 0)
 	{
-		PRINT("***********time_Scheduler:%d************\n", time_Scheduler);//打印系统时间
+		//PRINT("***********time_Scheduler:%d************\n", time_Scheduler);//打印系统时间
 
 		/*第一步：先处理所有道路上的车辆，进行遍历扫描*/
 		driveAllCarsJustOnRoadToEndState();
@@ -290,7 +289,7 @@ int Scheduler::getSysTime()
 			return false;//发生死锁
 		//putAllRoadStatus();
 		time_Scheduler++;//更新调度器时间
-		putAllRoadStatus();
+		//putAllRoadStatus();
 	}
 	return time_Scheduler;
 }
@@ -375,9 +374,9 @@ void Scheduler::ReOrderStartBySpeed(int para)
 {
 	int n2, n4, n6, n8;
 	n2 = para;
-	n4 = para - 5;
-	n6 = para - 10;
-	n8 = para - 15;
+	n4 = para;
+	n6 = para;
+	n8 = para - 5;
 	for (int i = 1; i <= num_Cars; ++i)//忽略第0行数据
 	{
 		switch (cars[i - 1].speed)
@@ -493,146 +492,10 @@ void Scheduler::driveAllCarsJustOnRoadToEndState()
 	}
 }
 
-
-int Scheduler::driveCar(Car car, int indexCar)
-{
-	//这里假设AA：如果某辆车从路口驶入下一道路，不可能在一个时间片内驶完下一道路全程
-	//也就是说只有处于NONE状态WAITTING的车才有可能即将到达终点
-	if (car.dirCross == NONE)//该车不是在路口等待
-	{
-		assert(indexCar != -1);//此情况下indexCar不能为-1
-		assert(roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size() != 0);//断言该车道上至少有自己一辆车
-		assert(indexCar < roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size());//断言车的序号小于车道上车数量
-		if (indexCar == 0 || roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size() == 1)//该车为该车道的第一辆车，且上个时间片不准备通过路口
-		{
-			//判断此车会不会通过路口
-			if (car.location + std::min(roads[car.idCurRoad - 5000].speed, car.speed) <= roads[car.idCurRoad - 5000].length)//不会驶出路口
-			{
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location += std::min(roads[car.idCurRoad - 5000].speed, car.speed);//车正常行驶
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//车标记为终止状态
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = NONE;
-			}
-			else
-			{
-				//此车也将行驶出路口，需要判断此车在路口的方向
-				//判断车的方向
-				int idNextCross = 0;
-				if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//逆向
-					idNextCross = roads[car.idCurRoad - 5000].idFrom;//此车即将驶入的路口
-				else
-					idNextCross = roads[car.idCurRoad - 5000].idTo;//此车即将驶入的路口
-				//根据假设AA，此时可能有车辆驶入终点
-				if (idNextCross == car.idCrossTo)//如果此车将要驶出出口
-				{
-					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = WAITTING;
-					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = DD;//从NONE改为DD，直行到达终点
-					/*
-					num_CarsScheduling -= 1;//正在调度的车辆数减一
-					std::vector<Car>::iterator it = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.begin();
-					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.erase(it);//删除该道路第一辆车
-					return 2;//代表前面一辆车到达终点
-					*/
-				}
-				else
-				{
-					int idNextRoad = car.path[0];//此车即将驶入的道路
-					int idCurRoad = car.idCurRoad;//此车当前道路
-					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = getCrossDir(idCurRoad, idNextRoad, idNextCross);//设置路口方向
-					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;//此车变为等待状态
-				}
-			}
-		}
-		else//该车前面有车
-		{
-			Car carNext = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar - 1];
-			if (car.location + std::min(roads[car.idCurRoad - 5000].speed, car.speed) < carNext.location)
-			{//前面的车不形成阻挡
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location += std::min(roads[car.idCurRoad - 5000].speed, car.speed);//车正常行驶
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//车标记为终止状态
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = NONE;
-			}
-			else
-			{//前面的车形成阻挡
-				if (carNext.status == FINESHED)
-				{
-					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].location = carNext.location - 1;//行驶到前车的后一个位置
-					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = FINESHED;//车标记为终止状态
-					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].dirCross = NONE;
-				}
-				else
-				{
-					roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[indexCar].status = WAITTING;//车标记为WAITTING
-				}
-			}
-		}
-	}
-	else//该车准备驶出路口
-	{
-		assert(car.status == WAITTING);//只有处于等待状态的车才能出路口
-		int idNextCross = 0;
-		if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//逆向
-			idNextCross = roads[car.idCurRoad - 5000].idFrom;//此车即将驶入的路口
-		else
-			idNextCross = roads[car.idCurRoad - 5000].idTo;//此车即将驶入的路口
-		assert(idNextCross != car.idCrossTo);
-		int idNextRoad = car.path[0];//获取目标道路
-		int idNextLane = isCanEnter(idNextRoad, idNextCross);
-		if (idNextLane >= 0)//如果该道路可加入车
-		{
-			int disNextRoad = getCrossDistance(car, car.idCurRoad, idNextRoad);
-			if (disNextRoad == 0)//可行驶距离为0，则停在当前路口
-			{
-				//此时比较特殊，因为没有发生Road变化，所以car依然在当前lane，但是其location需要更新
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = roads[car.idCurRoad - 5000].length;
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//该车调度完成，等待下一时间片再行驶
-				roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = NONE;
-				return 1;
-			}
-			else
-			{
-				if (roads[idNextRoad - 5000].lane[idNextLane].laneCar.size() != 0)//如果该车道有车
-				{
-					//判断对应车道车的位置
-					Car carNext = roads[idNextRoad - 5000].lane[idNextLane].laneCar[roads[idNextRoad - 5000].lane[idNextLane].laneCar.size() - 1];
-					if (disNextRoad < carNext.location)//不形成阻挡
-					{
-						driverToNextRoad(car, idNextRoad, idNextLane, disNextRoad);//行驶到下个路口
-						return 1;
-					}
-					else//形成阻挡
-					{
-						if (carNext.status = FINESHED)
-						{
-							driverToNextRoad(car, idNextRoad, idNextLane, carNext.location - 1);//行驶到下个路口，前车之后
-							assert(carNext.location > 1);
-							return 1;
-						}
-						//如果前车处于等待状态，那么此车也不行驶，继续等待
-					}
-				}
-				else//如果该车道没有阻挡
-				{
-					driverToNextRoad(car, idNextRoad, idNextLane, disNextRoad);//行驶到下个路口
-					return 1;
-				}
-			}
-		}
-		else if(idNextLane == -2)
-		{
-			roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = roads[car.idCurRoad - 5000].length;
-			roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//车标记为终止状态
-			roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = NONE;
-			return 1;
-		}
-		//如果目标车道无法驶入，保持WAITTING状态
-	}
-	return false;
-}
-
 int Scheduler::driveCarNew(Car car)
 {
 	int indexCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size() - 1;
-	if (roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size() == 1)//该车为该车道的第一辆车，且上个时间片不准备通过路口
+	if (roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.size() == 1)//该车为该车道的第一辆车
 	{
 		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location += std::min(roads[car.idCurRoad - 5000].speed, car.speed);//车正常行驶
 		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//车标记为终止状态
@@ -1761,7 +1624,7 @@ void Scheduler::quicksort(int begin, int end)
 	{
 		while (i < j)
 		{
-			if (qCar[i].plantime > qCar[begin].plantime)
+			if (qCar[i].starttime > qCar[begin].starttime)
 			{
 				swap(i, j);
 				j--;
@@ -1769,7 +1632,7 @@ void Scheduler::quicksort(int begin, int end)
 			else
 				i++;
 		}
-		if (qCar[i].plantime > qCar[begin].plantime)
+		if (qCar[i].starttime > qCar[begin].starttime)
 			i--;
 		swap(i, begin);
 		quicksort(begin, i - 1);
