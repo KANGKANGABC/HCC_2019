@@ -20,6 +20,7 @@ public:
 	//获得路径,为每辆车规划路径
 	//尝试解决死锁
 	int unlockDead(int para);
+	int getTimeByNoSameStartCross(int para);
 	void getPath();
 	//获得路径,所有权重为1
 	void getPathWeightOne();

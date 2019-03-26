@@ -9,6 +9,7 @@
 #include <vector>
 #include <assert.h>
 #include <deque>
+#include <queue>
 #include <map>
 
 #include "lib_io.h"

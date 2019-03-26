@@ -787,11 +787,7 @@ void Scheduler::ReOrderStartBySpeedAndStartCross(int para)
 			}
 			
 		}
-
-		if (!qspeed.empty())
-			cout << " qspeednotempty" << speed << endl;
 	}
-
 }
 
 bool Scheduler::addCarandChangeSTime(Car car)
@@ -1717,6 +1713,48 @@ int Scheduler::unlockDead(int para)
 	carsDeadLock.clear();//清空死锁队列
 }
 
+int Scheduler::getTimeByNoSameStartCross(int para)
+{
+	std::map<int, int> mapResult;
+	int time = 0;
+	for (int i = 0; i < 15; ++i)//迭代15次
+	{
+		ReOrderStartBySpeedAndStartCross(para);
+		reorderCars();
+		getPathByTime_dynamic();
+		int time = getSysTime();
+		if (time == false)
+			time = INT_MAX;
+		mapResult.insert(pair<int, int>(time, para));
+		para -= 2;
+	}
+	for (auto &v : mapResult)
+	{
+		PRINT("result:%d para:%d\n", v.first, v.second);
+	}
+	map<int, int>::iterator it;
+	it = mapResult.begin();
+	para = it->second;
+	ReOrderStartBySpeedAndStartCross(para);
+	reorderCars();
+	getPathByTime_dynamic();
+	int timeFinal = getSysTime();
+	/*
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].timeArrived > (timeFinal - 20))
+		{
+			cars[i].starttime = cars[i].starttime - 20;
+			cars[i].starttimeAnswer = cars[i].starttime;
+		}
+	}
+	*/
+	time = getSysTime();
+	PRINT("timeFinal:%d\n", time);
+
+	return 0;
+}
+
 void Scheduler::getPath()//获得最短路径和该路径下的运行时间
 {
 	Graph_DG graph(vexnum, edge);
@@ -2096,6 +2134,8 @@ void Scheduler::quicksort(int begin, int end)
 }
 void Scheduler::reorderCars()
 {
+	qCar.clear();
+
 	for (int i = 0; i < num_Cars; i++)
 	{
 		qCar.push_back(cars[i]);//将id顺序的车辆放到qcar的vector中
