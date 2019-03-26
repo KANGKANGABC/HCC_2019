@@ -1285,6 +1285,7 @@ bool Scheduler::putAllCarStatus()
 					if (lane.laneCar[m].status == WAITTING)
 					{
 						int idDLCross = 0;
+						carsDeadLock.push_back(lane.laneCar[m]);//将死锁的车加入队列
 						if (j > roads[i].channel)//行驶在反向车道上
 						{
 							idDLCross = roads[i].idTo;
@@ -1500,6 +1501,57 @@ void Scheduler::getPlantimeByPeriod(int period)
 		cars[i].idCurRoad = 0;
 		cars[i].idCurLane = 0;
 	}
+}
+
+void Scheduler::unlockDead(int para)
+{
+	std::map<int, int> mapResult;
+	int para = 80;
+	int timeMax = INT_MAX;
+	for (int i = 0; i < 15; ++i)//迭代20次
+	{
+		ReOrderStartBySpeed(para);
+		getPath();
+		int time = getSysTimeChangePath(w);
+		if (time == false)
+			time = INT_MAX;
+		mapResult.insert(pair<int, int>(time, para));
+		para -= 4;
+	}
+	for (auto &v : mapResult)
+	{
+		PRINT("result:%d para:%d\n", v.first, v.second);
+	}
+	map<int, int>::iterator it;
+	it = mapResult.begin();
+	//it++;
+	para = it->second;
+	ReOrderStartBySpeed(para);
+	getPath();
+	int time = getSysTimeChangePath(w);
+	//getSysTime();
+	int timeFinal = getSysTime();
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].timeArrived > (timeFinal - 20))
+		{
+			cars[i].starttime = cars[i].starttime - 20;
+			cars[i].starttimeAnswer = cars[i].starttime;
+		}
+	}
+	time = getSysTime();
+	PRINT("timeFinal:%d\n", time);
+
+	para = para - 4;
+	//修改死锁车的出发时间
+	for (auto car : carsDeadLock)
+	{
+		cars[car.id - 10000].starttime = car.starttime + car.id % 20;//出发时间重安排
+		cars[car.id - 10000].starttimeAnswer = cars[car.id - 10000].starttime;
+	}
+	getSysTime();//重新跑一下看是不是死锁
+	
+	carsDeadLock.clear();//清空死锁队列
 }
 
 void Scheduler::getPath()//获得最短路径和该路径下的运行时间
