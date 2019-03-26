@@ -46,21 +46,37 @@ int main(int argc, char *argv[])
 	dc.readRoadData();
 	dc.readCarData();
 	dc.readCrossData();
-	//dc.reorderCars();//按照时间重排序车辆
 
 	Scheduler sd(dc);
+
+	//测试路径拥堵探测函数
+	bool b;
+	std::vector<int > path;
+	path.push_back(5011);
+	path.push_back(5021);
+	path.push_back(5031);
+	std::map<string, float > mapstr;	//存储道路的拥挤程度
+	cout << mapstr.size() << endl;
+	sd.mapUpdate(mapstr, 5031, 0.8);
+	cout << mapstr.size() << endl;
+	cout << mapstr[to_string(5031)] << endl;
+	b = sd.judgement(mapstr, path);
+	cout << b << endl;
+
 
 	int time = 0;
 	int para = 0;
   
 	//sd.getPath();
 	//sd.getPathWeightOne();
+
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//sd.getPathByTime_reorderCars();//获得车辆的路径信息
 	//sd.getTimeByDir(90);
 	//sd.getStartTime(470);
 	//dc.writeResultWithTime(answer_file);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
+
 	//dc.writeResult(answgetParaBySchedulerer_file);
 
 	//para = sd.getParaByScheduler();

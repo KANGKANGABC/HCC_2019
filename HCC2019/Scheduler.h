@@ -3,6 +3,7 @@
 #include "Road.h"
 #include "DataCenter.h"
 #include "dijkstra.h"
+#include "map"
 
 class DataCenter;
 
@@ -39,6 +40,11 @@ public:
 	int vexnum, edge;
 	std::vector<std::vector<int> > tmp;
 	std::vector<std::vector<int> > tmp1;
+
+	std::map<string, float > mapForJamDegree;	//存储道路的拥挤程度
+	//对拥挤度map的两个操作
+	bool judgement(map<string, float > &mapForJamDegree, vector<int> path);
+	void mapUpdate(map<string, float > &mapForJamDegree, int RoadId, float percent);
 
 	int num_changeSTime;
 private:

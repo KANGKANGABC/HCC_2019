@@ -844,3 +844,5 @@ void  Graph_DG::normalizedFloat( float**temp )   //归一化后存回原矩阵
 	}
 
 }
+
+
