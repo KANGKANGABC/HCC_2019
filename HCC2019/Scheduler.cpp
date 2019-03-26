@@ -1,5 +1,6 @@
 ﻿#include "Scheduler.h"
 #include "fstream"
+#include <queue>
 
 Scheduler::Scheduler(DataCenter &dc)
 {
@@ -369,6 +370,123 @@ void Scheduler::ReOrderStartBySpeed(int para)
 		}
 		cars[i - 1].starttimeAnswer = cars[i - 1].starttime;//starttimeAnswer为最终写出的出发时间，不会更改
 	}
+}
+
+bool Comp(const int &a, const int &b);
+void Scheduler::ReOrderStartBySpeedAndStartCross(int para)
+{
+	int n2, n4, n6, n8;
+	n2 = para;
+	n4 = para;
+	n6 = para;
+	n8 = para;
+
+	sort(speedType.begin(), speedType.end(), Comp);  //speedType里存的是速度类型
+
+	for (auto speed : speedType)
+	{
+		std::queue<Car> qspeed;		//将car按speed顺序依次入队列qspeed
+
+		assert(qspeed.size() == 0);		//确保qspeed为空
+
+		for (int i = 1; i <= num_Cars; ++i)			//将car按速度先后入队列，每次队列里只有一种速度的车
+		{
+			if (cars[ i-1].speed == speed)
+			{
+				qspeed.push(cars[i - 1]);
+			}
+		}
+
+		int timebegin, timeend;
+		switch (speed)				//选择不同速度的开始发车和终止发车时刻
+		{
+		case 8:
+			timebegin = 1;
+			timeend = 2 * n8;
+			break;
+		case 6:
+			timebegin = 2 * n8 + 1;
+			timeend = 2 * (n8 + n6);
+			break;
+		case 4:
+			timebegin = 2 * (n8 + n6) + 1;
+			timeend = 2 * (n8 + n6 + n4);
+			break;
+		case 2:
+			timebegin = 2 * (n8 + n6 + n4) + 1;
+			timeend = 2 * (n8 + n6 + n4 + n2);
+			break;
+		default:
+			break;
+		}
+
+		int carStartPerSec = qspeed.size() / (timeend - timebegin) + 1;  //计算每时间片需要发出的车数量，加一是为了防止发不完，可能会导致不同速度发车批次间有间隔
+		for (int time = timebegin; time <= timeend; time++)		//同一时间片同一地点的车只发一辆
+		{
+			if (qspeed.empty())			//如果qspeed空了，说明该速度的车分配完了，退出当前循环
+				break;
+
+			vector <int>fromCross;				//用于存储每一时间片已分配车辆的出发地，每一时间片都要初始化为0
+			fromCross.resize(num_Crosses);
+			for (int i = 0; i < num_Crosses; i++)
+			{
+				fromCross[i] = 0;
+			}
+
+			for (int carAssigned = 0; carAssigned < carStartPerSec; carAssigned++)
+			{
+				//队列中的车辆数目小于carStartPerSec
+				if (qspeed.empty())			//如果qspeed空了，说明该速度的车分配完了，退出当前循环
+					break;
+
+				//队列中还有可发的车
+				bool carIsAssigned = false;
+				int frequence = 0;			//用于记录循环进行次数也即队列中已有多少车被访问过
+				while (carIsAssigned == false)			//如果安排了一辆车，则结束，安排下一辆车
+				{
+					++frequence;
+					int carOrder = qspeed.front().id - 10000;        //用于记录队首的car的下标
+
+					if (qspeed.front().plantime <= time && fromCross[qspeed.front().idCrossFrom -1 ] < 1)
+					{
+						//若队首的car的plantime小于等于当前时刻且该出发地只有一辆，则将该车starttimeAnswer设为此刻，并从qspeed队列中弹出，carIsAssigned设为true，fromCross当前出发地加一
+						cars[carOrder].starttimeAnswer = time;
+						cars[carOrder].starttime = time;
+						fromCross[qspeed.front().idCrossFrom -1] ++;
+						qspeed.pop();
+						carIsAssigned = true;
+					}
+					else if (qspeed.front().plantime > time)		//plantime在time之后或已有相同出发地的车发出了的情况，前者直接往后排，后者要看是否遍历完一次队列了
+					{
+						qspeed.pop();
+						qspeed.push(cars[carOrder]);
+					}
+					else      //已有相同出发地的车发出了的情况，若此时没有遍历完一次队列了，则继续遍历，否则定下发车时间，此时会有不止一辆车从出发地发出
+					{
+						if (frequence < qspeed.size())
+						{
+							qspeed.pop();
+							qspeed.push(cars[carOrder]);
+						}
+						else
+						{
+							cars[carOrder].starttimeAnswer = time;
+							cars[carOrder].starttime = time;
+							fromCross[qspeed.front().idCrossFrom -1] ++;
+							qspeed.pop();
+							carIsAssigned = true;
+						}
+						
+					}
+				}
+			}
+			
+		}
+
+		if (!qspeed.empty())
+			cout << " qspeednotempty" << speed << endl;
+	}
+
 }
 
 bool Scheduler::addCarandChangeSTime(Car car)
@@ -1721,7 +1839,7 @@ void Scheduler::quicksort(int begin, int end)
 	{
 		while (i < j)
 		{
-			if (qCar[i].plantime > qCar[begin].plantime)
+			if (qCar[i].starttime > qCar[begin].starttime)
 			{
 				swap(i, j);
 				j--;
@@ -1729,7 +1847,7 @@ void Scheduler::quicksort(int begin, int end)
 			else
 				i++;
 		}
-		if (qCar[i].plantime > qCar[begin].plantime)
+		if (qCar[i].starttime > qCar[begin].starttime)
 			i--;
 		swap(i, begin);
 		quicksort(begin, i - 1);

@@ -46,13 +46,17 @@ int main(int argc, char *argv[])
 	dc.readRoadData();
 	dc.readCarData();
 	dc.readCrossData();
-	dc.reorderCars();//按照时间重排序车辆
 
 	Scheduler sd(dc);
-  
+
+	sd.ReOrderStartBySpeed(39);
+	//sd.ReOrderStartBySpeedAndStartCross(39);
+	sd.reorderCars();//按照时间重排序车辆
+
+
 	//sd.getPath();
 	//sd.getPathWeightOne();
-	sd.ReOrderStartBySpeed(65);
+	//sd.ReOrderStartBySpeed(45);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//sd.getPathByTime_reorderCars();//获得车辆的路径信息
 	//sd.getTimeByDir(90);
@@ -72,12 +76,13 @@ int main(int argc, char *argv[])
 	//sd.getPathByScheduler();
 	//int time = sd.getSysTime();
 	//sd.getPathByTime_reorderCars();//获得车辆的路径信息
+	
+	//dc.writeResultWithTime(answer_file);
 	sd.getPathByTime_dynamic();//获得车辆的路径信息
 	int time = sd.getSysTime();
-	//dc.writeResultWithTime(answer_file);
-	//dc.writeResult(answer_file);
-	//PRINT("para:%d\n",para);
-	PRINT("num_changeSTime:%d\n", sd.num_changeSTime);
+	dc.writeResult(answer_file);
+	PRINT("time:%d\n",time);
+	//PRINT("num_changeSTime:%d\n", sd.num_changeSTime);
 
 	// TODO:read input filebuf
 	// TODO:process

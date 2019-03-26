@@ -24,14 +24,16 @@ public:
 	void getStartTime_loadbalance(int carnum);
 	//获得路径,为每辆车规划路径，基于时间
 	void getPathByTime();
-	void getPathByTime_reorderCars();//车辆按出发时间重排序后进行静态规划
+	void getPathByTime_reorderCars();
+	void reorderCars();
+	//车辆按出发时间重排序后进行静态规划
 	void getPathByTime_dynamic(); //根据1-100 和101-199车的轨迹，更新第200辆车的邻接矩阵
 	void swap(int i, int j);
 	void quicksort(int begin, int end);
-	void reorderCars();
 	void getTimeByDir(int para);//根据车的行驶方向发车（++）和（--）的一起跑 （+-）和（-+）的一起跑 
 	void ReOrderStartByTime(int para);//根据行驶时间重新安排出发时间
 	void ReOrderStartBySpeed(int para);//根据行驶时间重新安排出发时间
+	void ReOrderStartBySpeedAndStartCross(int para);//根据速度和出发点重新安排出发时间
 	bool addCarandChangeSTime(Car car);//往道路中添加车辆，并且通过改变出发时间留出空位
 	int vexnum, edge;
 	std::vector<std::vector<int> > tmp;
