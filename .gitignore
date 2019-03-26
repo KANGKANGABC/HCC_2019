@@ -4,6 +4,9 @@
 # User Output files (LiYing)
 road_graph.txt
 
+# User Output files (ZhaoKang)
+answer.txt
+
 # User-specific files
 *.suo
 #*.user
@@ -267,3 +270,4 @@ __pycache__/
 /HCC2019/train1/answer.txt
 /HCC2019/train2/answer.txt
 /HCC2019/config_test/answer.txt
+/HCC2019/train2_test/answer2.txt

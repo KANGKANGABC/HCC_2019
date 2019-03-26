@@ -5,12 +5,8 @@
 #include "define.h"
 #include "Road.h"
 #include "dijkstra.h"
+#include "vector"
 
-class TimeGraph
-{
-public:
-	std ::vector < std :: vector< float> >timeGraph;  //时间邻接矩阵
-};
 
 class DataCenter
 {
@@ -30,33 +26,24 @@ public:
 	void readCarData();
 	void readCrossData();
 
-	//统计car.txt中的各车辆速度类型到Vector speedType中
-	void getCarSpeedType ();
-
-	//计算输入速度下时间邻接矩阵
-	void getTimeGraph (int order, int speed );
-
-	//计算得到所有速度下的时间邻接矩阵
-	void getAllTimeGraph();
-
-	//Dijkstra算法，输入点begin，输出点begin到各点的最短时间
-	std :: vector<int>  Dijkstra(int begin ,int end ,int speed );
-
 	//获取点和边的数量
 	int getRoadNum();
 	int getCrossNum();
 
-	//获得邻接矩阵
+	//获得路长邻接矩阵
 	std::vector<std::vector<int> > getArc();
+	//获得道路限速邻接矩阵
+	std::vector<std::vector<int> > getRoadvArc();
 
 	//将结果写出到result.txt
-	void writeResult(char *filename);
+	void writeResult(const char *filename);
 
-	//获得规划的路径
-	void getPath();
+	void writeResultWithTime(const char *filename);
 
-	//获得规划的路径
-	void getPathBytime();
+
+	//快速排序用
+	void swap(int i, int j);
+	void quicksort(int begin, int end);
 
 	enum
 	{// 车辆运行状态 //请参考论坛中关于任务调度的解释
@@ -75,17 +62,29 @@ public:
 	//所有Car的指针
 	Car * car;
 
+	//经过排序的car的指针
+	vector<Car*> carOrderTime;
+
 	int m_road_num;//ROAD数量
 	int m_car_num;//CAR数量
 	int m_cross_num;//CROSS数量
-	int car_speed_num; //car 的速度种类在getCarSpeedType()中被赋值
+	int car_speed_num; //car可能的速度类型
 
 	std::string result;//输出结果存储矩阵
 	int vexnum, edge;
 	std::vector<std::vector<int> > tmp;
 
-private:
+	//根据速度存储车辆
+	std::vector<std::vector<Car> > carsBySpeed;
 
+	//动态调度器计算出来的道路情况矩阵
+	std::vector<std::vector<float> > graphRoadStatusByDS;
+
+	//将车辆按时间进行重排序
+	void reorderCars();
+
+
+private:
 	char **inputRoadData;//输入道路数据
 	char **inputCarData;//输入道路数据
 	char **inputCrossData;//输入道路数据
@@ -98,23 +97,8 @@ private:
 	//存储车辆的速度种类的向量
 	std::vector<int> speedType;
 
-	//存储速度种类个时间邻接矩阵的指针
-	TimeGraph * timeGraphPoint;
-
-	//Dijkstra算法中记录各个顶点的最短路径信息
-	//Dijkstra算法里用到的结构体
-
-	DisFloat * dis;
-
 	//CrossToRoad转换表
 	std::vector<std::vector<int> > graphC2R;
-
-	//路口信息表
-	//(id,roadId,roadId,roadId,roadId)
-	std::vector<std::vector<int> > crossList;
-
-	//Car调度任务表
-	std::vector<std::vector<int> > carTask;
 
 	//路径列表
 	std::vector<std::vector<int> > carPathList;

@@ -10,11 +10,15 @@ public:
 	int speed;
 	int plantime;//计划驶出时间
 	int starttime;//真实驶出时间
+	int starttimeAnswer;//写出answer的starttime
+	int timeArrived;//记录车辆到达时间
 	int idCurRoad;//当前车所在的道路ID
 	int idCurLane;//当前车所在的车道ID
 	int dirCross;//标志在路口的状态 
 	int idCrossFrom;//车的出发路口
 	int idCrossTo;//车的终止路口
+	int time;
+	int dirMap;//车在地图上的方向，分为（++）（--）（+-）（-+）四种
 	std::vector<int> path;
 }; 
 
