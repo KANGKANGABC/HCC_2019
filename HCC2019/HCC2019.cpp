@@ -49,6 +49,10 @@ int main(int argc, char *argv[])
 
 	Scheduler sd(dc);
 
+	sd.ReOrderStartBySpeed(39);
+	//sd.ReOrderStartBySpeedAndStartCross(39);
+	sd.reorderCars();//按照时间重排序车辆
+
 	//测试路径拥堵探测函数
 	/*
 	bool b;
@@ -77,7 +81,6 @@ int main(int argc, char *argv[])
 	//sd.getStartTime(470);
 	//dc.writeResultWithTime(answer_file);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
-
 	//dc.writeResult(answgetParaBySchedulerer_file);
 
 	//para = sd.getParaByScheduler();
@@ -94,10 +97,14 @@ int main(int argc, char *argv[])
 	//sd.getPathByScheduler();
 	//sd.getPathByTime_dynamic();//获得车辆的路径信息
 	//int time = sd.getSysTime();
+	//sd.getPathByTime_reorderCars();//获得车辆的路径信息
+	
 	//dc.writeResultWithTime(answer_file);
+
+	sd.getPathByTime_dynamic();//获得车辆的路径信息
+	int time = sd.getSysTime();
 	dc.writeResult(answer_file);
-	PRINT("para:%d\n", para);
-	PRINT("time:%d\n", time);
+	PRINT("time:%d\n",time);
 
 	// TODO:read input filebuf
 	// TODO:process
