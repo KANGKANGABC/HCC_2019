@@ -17,6 +17,8 @@ public:
 	//基于动态调度器规划路径
 	int getPathByScheduler(int para);
 	//获得路径,为每辆车规划路径
+	//尝试解决死锁
+	int unlockDead(int para);
 	void getPath();
 	//获得路径,所有权重为1
 	void getPathWeightOne();
@@ -128,7 +130,5 @@ private:
 	//根据时间周期安排出发时间
 	void getPlantimeByPeriod(int period);
 
-	//尝试解决死锁
-	void unlockDead(int para);
 
 };

@@ -64,7 +64,8 @@ int main(int argc, char *argv[])
 	//dc.writeResult(answgetParaBySchedulerer_file);
 
 	//para = sd.getParaByScheduler();
-	time = sd.getPathByScheduler(9);
+	//time = sd.getPathByScheduler(9);
+	time = sd.unlockDead(80);
 	//sd.getPathByTime();//获得车辆的路径信息
 	//sd.reorderCars();//按照时间重排序车辆
 	//sd.getStartTime_loadbalance(550);

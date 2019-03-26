@@ -131,6 +131,7 @@ int Scheduler::getSysTime()
 	time_Scheduler = 0;
 	num_CarsScheduling = num_Cars;
 	carsWaitInGarage.clear();
+	carsDeadLock.clear();
 	for (int i = 0; i < num_Roads; ++i)
 	{
 		int idLaneStart = 0;
@@ -348,6 +349,7 @@ int Scheduler::getSysTimeChangePath(int para)
 	time_Scheduler = 0;
 	num_CarsScheduling = num_Cars;
 	carsWaitInGarage.clear();
+	carsDeadLock.clear();
 	for (int i = 0; i < num_Roads; ++i)
 	{
 		int idLaneStart = 0;
@@ -1309,7 +1311,7 @@ bool Scheduler::putAllCarStatus()
 	}
 	if (isDeadLock == true)
 	{
-		PRINT("Dead Lock Cross ID:");
+		PRINT("Dead Time:%d  Dead Lock Cross ID:",time_Scheduler);
 		for (auto idCross : vecDLCross)
 		{
 			PRINT("%d ",idCross);
@@ -1503,11 +1505,12 @@ void Scheduler::getPlantimeByPeriod(int period)
 	}
 }
 
-void Scheduler::unlockDead(int para)
+int Scheduler::unlockDead(int para)
 {
 	std::map<int, int> mapResult;
-	int para = 80;
 	int timeMax = INT_MAX;
+	int time, timeFinal;
+	int w = 9;
 	for (int i = 0; i < 15; ++i)//迭代20次
 	{
 		ReOrderStartBySpeed(para);
@@ -1524,13 +1527,56 @@ void Scheduler::unlockDead(int para)
 	}
 	map<int, int>::iterator it;
 	it = mapResult.begin();
-	//it++;
 	para = it->second;
+
+	para = para - 4;
 	ReOrderStartBySpeed(para);
 	getPath();
-	int time = getSysTimeChangePath(w);
-	//getSysTime();
-	int timeFinal = getSysTime();
+	time = getSysTimeChangePath(w);
+	//修改死锁车的出发时间
+	for (int i = 0; i < carsDeadLock.size() / 2; ++i)
+	{
+		Car car = carsDeadLock[i];
+		cars[car.id - 10000].starttime += car.id % 60;//出发时间重安排
+		cars[car.id - 10000].starttimeAnswer = cars[car.id - 10000].starttime;
+	}
+	time = getSysTimeChangePath(w);//重新跑一下看是不是死锁
+	PRINT("timeUnlock1:%d\n", time);
+	for (int i = 0; i < carsDeadLock.size() / 2; ++i)
+	{
+		Car car = carsDeadLock[i];
+		cars[car.id - 10000].starttime += car.id % 100;//出发时间重安排
+		cars[car.id - 10000].starttimeAnswer = cars[car.id - 10000].starttime;
+	}
+	time = getSysTimeChangePath(w);//重新跑一下看是不是死锁
+	PRINT("timeUnlock2:%d\n", time);
+	for (int i = 0; i < carsDeadLock.size() / 2; ++i)
+	{
+		Car car = carsDeadLock[i];
+		cars[car.id - 10000].starttime += car.id % 100;//出发时间重安排
+		cars[car.id - 10000].starttimeAnswer = cars[car.id - 10000].starttime;
+	}
+	time = getSysTimeChangePath(w);//重新跑一下看是不是死锁
+	PRINT("timeUnlock3:%d\n", time);
+	for (int i = 0; i < carsDeadLock.size() / 2; ++i)
+	{
+		Car car = carsDeadLock[i];
+		cars[car.id - 10000].starttime += car.id % 100;//出发时间重安排
+		cars[car.id - 10000].starttimeAnswer = cars[car.id - 10000].starttime;
+	}
+	time = getSysTimeChangePath(w);//重新跑一下看是不是死锁
+	PRINT("timeUnlock4:%d\n", time);
+	for (int i = 0; i < carsDeadLock.size() / 2; ++i)
+	{
+		Car car = carsDeadLock[i];
+		cars[car.id - 10000].starttime += car.id % 100;//出发时间重安排
+		cars[car.id - 10000].starttimeAnswer = cars[car.id - 10000].starttime;
+	}
+	time = getSysTimeChangePath(w);//重新跑一下看是不是死锁
+	PRINT("timeUnlock5:%d\n", time);
+	time = getSysTime();
+	PRINT("timeFinal:%d\n", time);
+	/*
 	for (int i = 0; i < num_Cars; ++i)
 	{
 		if (cars[i].timeArrived > (timeFinal - 20))
@@ -1541,16 +1587,8 @@ void Scheduler::unlockDead(int para)
 	}
 	time = getSysTime();
 	PRINT("timeFinal:%d\n", time);
+	*/
 
-	para = para - 4;
-	//修改死锁车的出发时间
-	for (auto car : carsDeadLock)
-	{
-		cars[car.id - 10000].starttime = car.starttime + car.id % 20;//出发时间重安排
-		cars[car.id - 10000].starttimeAnswer = cars[car.id - 10000].starttime;
-	}
-	getSysTime();//重新跑一下看是不是死锁
-	
 	carsDeadLock.clear();//清空死锁队列
 }
 
