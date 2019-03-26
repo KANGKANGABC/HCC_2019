@@ -1,5 +1,7 @@
 ﻿#include "Scheduler.h"
 #include "fstream"
+#include<string>
+#include "map"
 
 Scheduler::Scheduler(DataCenter &dc)
 {
@@ -1360,6 +1362,7 @@ void Scheduler::getPlantimeByPeriod(int period)
 	}
 }
 
+
 void Scheduler::getPath()//获得最短路径和该路径下的运行时间
 {
 	Graph_DG graph(vexnum, edge);
@@ -2001,4 +2004,39 @@ int Scheduler::getPathByScheduler()
 		putAllRoadStatus();
 	}
 	return time_Scheduler;
+}
+
+//拥挤度map的两个操作，可以发车返回true，不能发车返回false
+bool Scheduler::judgement(map<string, float >& mapForJamDegree, vector<int> path)
+{
+	float threshold = 0.8;
+	map<string, float>::iterator iter1;
+	for (int i = 0; i < path.size(); i++)
+	{
+		iter1 = mapForJamDegree.find(to_string(path[i]));
+		if (iter1 == mapForJamDegree.end())//如果第i条路不存在map中或这存在但是其拥堵程度小于阈值，则说明path中第i条road可以加车
+			continue;//继续判断path的下一条road
+		else if (mapForJamDegree[to_string(path[i])] < threshold)
+			continue;
+		else
+			return false;//发现这条路存在拥堵，则整个path都是由堵车风险的，直接判断不能加车
+	}
+	return true;//path全部检查完毕后返回可以加车
+}
+
+//如果map中存在此键，则更新；不存在，则插入新键值
+void Scheduler::mapUpdate(map<string, float > &mapForJamDegree, int RoadId, float percent)
+{
+	map<string, float>::iterator iter2;
+	iter2 = mapForJamDegree.find(to_string(RoadId));//搜索键是否在map中
+	if (iter2 == mapForJamDegree.end())//如果不存在
+	{
+		pair<string, float> value(string(to_string(RoadId)), percent);//新键键值对
+		mapForJamDegree.insert(value);//将键值对插入map中
+	}
+	else
+	{
+		iter2->second = percent;//更新实值，由于iter2已经进行了find，所以这里当找到了，直接对其value更新
+	}
+
 }
