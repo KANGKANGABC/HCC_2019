@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
 	Scheduler sd(dc);
 
 	//测试路径拥堵探测函数
+	/*
 	bool b;
 	std::vector<int > path;
 	path.push_back(5011);
@@ -62,7 +63,7 @@ int main(int argc, char *argv[])
 	cout << mapstr[to_string(5031)] << endl;
 	b = sd.judgement(mapstr, path);
 	cout << b << endl;
-
+	*/
 
 	int time = 0;
 	int para = 0;

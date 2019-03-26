@@ -1329,7 +1329,7 @@ void Scheduler::putAllRoadStatus()
 	for (int i = 0; i < num_Roads; ++i)
 	{
 		float perRoad = 0;
-		float threshold = 0.8;
+		float threshold = 0.5;
 		if (roads[i].isDuplex)
 		{
 			for (int j = 0; j < roads[i].channel; ++j)
@@ -1340,7 +1340,9 @@ void Scheduler::putAllRoadStatus()
 			perRoad = perRoad / roads[i].channel;
 			graphRoadStatusByDS[roads[i].idFrom - 1][roads[i].idTo - 1] = perRoad;//更新拥堵情况矩阵
 			if (perRoad > threshold)
-				//PRINT("crossID:%d  %f\n", roads[i].idFrom, perRoad);
+			{
+				mapUpdate(mapForJamDegree, roads[i].id, perRoad);
+			}
 			perRoad = 0;
 			for (int j = roads[i].channel; j < 2 * roads[i].channel; ++j)
 			{
@@ -1350,7 +1352,9 @@ void Scheduler::putAllRoadStatus()
 			perRoad = perRoad / roads[i].channel;
 			graphRoadStatusByDS[roads[i].idTo - 1][roads[i].idFrom - 1] = perRoad;//更新拥堵情况矩阵
 			if (perRoad > threshold)
-				//PRINT("crossID:%d  %f\n", roads[i].idTo, perRoad);
+			{
+				mapUpdate(mapForJamDegree, roads[i].id, perRoad);
+			}
 			perRoad = 0;
 		}
 		else
@@ -1363,7 +1367,9 @@ void Scheduler::putAllRoadStatus()
 			perRoad = perRoad / roads[i].channel;
 			graphRoadStatusByDS[roads[i].idFrom - 1][roads[i].idTo - 1] = perRoad;//更新拥堵情况矩阵
 			if (perRoad > threshold)
-				//PRINT("crossID:%d  %f\n", roads[i].idFrom, perRoad);
+			{
+				mapUpdate(mapForJamDegree, roads[i].id, perRoad);
+			}
 			perRoad = 0;
 		}
 	}
