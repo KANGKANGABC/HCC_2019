@@ -125,6 +125,7 @@ void DataCenter::readCarData()
 		car[i - 1].plantime = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
 		car[i - 1].status = SLEEPING;//车的初始状态为SLEEPING
 		car[i - 1].dirCross = NONE;//车的过路口状态为NONE
+		car[i - 1].starttime = 0;
 
 		vector<int>::iterator it;
 		it = find(speedType.begin(), speedType.end(), car[i - 1].speed);

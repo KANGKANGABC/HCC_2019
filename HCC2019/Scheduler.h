@@ -15,6 +15,7 @@ public:
 	int getParaByScheduler();//请将初始参数设置为70以上
 	int getSysTime();
 	int getSysTimeChangePath(int para);
+	int getSysTimeChangeTime(int para);//边跑调度器边修改出发时间
 	//基于动态调度器规划路径
 	int getPathByScheduler(int para);
 	//获得路径,为每辆车规划路径
@@ -117,6 +118,9 @@ private:
 
 	//车库中的车辆上路行驶,动态更新其路径
 	void driverCarInGarageDynamic(Graph_DG &graph,int para);
+
+	//车库中的车辆上路行驶,动态更新其出发时间
+	void driverCarInGarageChangeTime(Graph_DG &graph, int para);
 
 	//打印车辆状态
 	void putCarStatus(Car car);
