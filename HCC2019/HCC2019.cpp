@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 	dc.readCrossData();
 
 	Scheduler sd(dc);
-	
+
 	//测试路径拥堵探测函数
 	bool b;
 	std::vector<int > path;
@@ -63,33 +63,40 @@ int main(int argc, char *argv[])
 	b = sd.judgement(mapstr, path);
 	cout << b << endl;
 
+
+	int time = 0;
+	int para = 0;
+  
 	//sd.getPath();
 	//sd.getPathWeightOne();
-	//sd.ReOrderStartBySpeed(65);
+
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//sd.getPathByTime_reorderCars();//获得车辆的路径信息
 	//sd.getTimeByDir(90);
 	//sd.getStartTime(470);
 	//dc.writeResultWithTime(answer_file);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
-	//dc.writeResult(answer_file);
-	//int para = sd.getParaByScheduler();
+
+	//dc.writeResult(answgetParaBySchedulerer_file);
+
+	//para = sd.getParaByScheduler();
+	//time = sd.getPathByScheduler(9);
+	time = sd.unlockDead(80);
 	//sd.getPathByTime();//获得车辆的路径信息
 	//sd.reorderCars();//按照时间重排序车辆
-	//sd.getStartTime_loadbalance(500);
+	//sd.getStartTime_loadbalance(550);
 
 	//dc.writeResult(answer_file);
 	//sd.getPathByTime();//获得车辆的路径信息
 	//dc.writeResult(answer_file);
 	//sd.getPathByScheduler();
 	//sd.getPathByScheduler();
-	//int time = sd.getSysTime();
 	//sd.getPathByTime_dynamic();//获得车辆的路径信息
 	//int time = sd.getSysTime();
 	//dc.writeResultWithTime(answer_file);
-	//dc.writeResult(answer_file);
-	//PRINT("para:%d\n",para);
-	//PRINT("num_changeSTime:%d\n", sd.num_changeSTime);
+	dc.writeResult(answer_file);
+	PRINT("para:%d\n", para);
+	PRINT("time:%d\n", time);
 
 	// TODO:read input filebuf
 	// TODO:process

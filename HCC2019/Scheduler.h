@@ -14,9 +14,12 @@ public:
 	~Scheduler();
 	int getParaByScheduler();//请将初始参数设置为70以上
 	int getSysTime();
+	int getSysTimeChangePath(int para);
 	//基于动态调度器规划路径
-	int getPathByScheduler();
+	int getPathByScheduler(int para);
 	//获得路径,为每辆车规划路径
+	//尝试解决死锁
+	int unlockDead(int para);
 	void getPath();
 	//获得路径,所有权重为1
 	void getPathWeightOne();
@@ -62,6 +65,7 @@ private:
 
 	std::deque<Car> carsWaitInGarage;//上一时间片未驶出，等待驶出的车
 	std::deque<Car> carsInGarage;//此时间片待出发的车
+	std::deque<Car> carsDeadLock;//死锁的车
 
 	//CrossToRoad转换表
 	std::vector<std::vector<int> > graphC2R;
@@ -72,8 +76,6 @@ private:
 	/*所有road上的车辆行进，直到该车辆行驶变成等待状态或者终止状态*/
 	void driveAllCarsJustOnRoadToEndState();
 	
-	/*让该车前进*/
-	int driveCar(Car car, int indexCar);//indexCar为该车在车道的位置
 
 	int driveCarNew(Car car);
 
@@ -111,7 +113,7 @@ private:
 	void driverCarInGarage();
 
 	//车库中的车辆上路行驶,动态更新其路径
-	void driverCarInGarageDynamic(Graph_DG &graph);
+	void driverCarInGarageDynamic(Graph_DG &graph,int para);
 
 	//打印车辆状态
 	void putCarStatus(Car car);
@@ -133,5 +135,6 @@ private:
 
 	//根据时间周期安排出发时间
 	void getPlantimeByPeriod(int period);
+
 
 };
