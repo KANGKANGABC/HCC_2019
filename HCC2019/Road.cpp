@@ -29,7 +29,6 @@ void Road::CreateLane()
 	{
 		lane[i].dir = FORWARD;//正向
 		lane[i].idLane = i;//id按照升序，先正向的原则（升序符合调度的顺序）
-		//lane[i].laneCar.resize(this->length);
 	}
 	if (this->isDuplex)
 	{
