@@ -156,6 +156,9 @@ private:
 	int id2indexCross(int id);
 	
 	//调度器初始化
+	int SchedulerInit();
+	//调度器主要逻辑代码，便于多算法复用
+	int SchedulerCore();
 
 };
 
