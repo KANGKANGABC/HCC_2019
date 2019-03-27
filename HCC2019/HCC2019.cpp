@@ -59,8 +59,8 @@ int main(int argc, char *argv[])
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 
 	//para = sd.getParaByScheduler();
-	//time = sd.getPathByScheduler(9);
-	time = sd.unlockDead(80);
+	time = sd.getPathByScheduler(9);
+	//time = sd.unlockDead(80);
 	//sd.reorderCars();//按照时间重排序车辆
 	//sd.getStartTime_loadbalance(550);
 
