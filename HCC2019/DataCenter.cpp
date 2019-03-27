@@ -8,7 +8,7 @@ DataCenter::DataCenter()
 {
 }
 
-DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_car[MAX_CAR_NUM], int car_count, char *data_cross[MAX_CROSS_NUM], int cross_count)
+DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM], int road_count, char *data_car[MAX_CAR_NUM], int car_count, char *data_cross[MAX_CROSS_NUM], int cross_count)
 {
 	inputRoadData = data_road;
 	m_road_num = road_count - 1;//忽略第一行注释
@@ -23,7 +23,7 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM],int road_count, char *data_
 	{
 		graphMaxSpeed[i].resize(m_cross_num);
 	}
-  
+
 	vexnum = getCrossNum();
 	edge = getRoadNum();
 
@@ -76,33 +76,34 @@ void DataCenter::readRoadData()
 		std::string roadInfo = inputRoadData[i];
 		std::vector<std::string> sp = Tools::split(roadInfo, ", ");
 
-		this->road[i - 1].id = std::stoi(sp[0].substr(1));//去除左括号
-		this->road[i - 1].length = std::stoi(sp[1]);
-		this->road[i - 1].speed = std::stoi(sp[2]);
-		this->road[i - 1].channel = std::stoi(sp[3]);
-		this->road[i - 1].idFrom = std::stoi(sp[4]);
-		this->road[i - 1].idTo = std::stoi(sp[5]);
-		this->road[i - 1].isDuplex = std::stoi(sp[6].substr(0, sp[6].size() - 1));//去除右括号
+		road[i - 1].index = i - 1;//index一定是连续的，且从0开始的
+		road[i - 1].id = std::stoi(sp[0].substr(1));//去除左括号
+		road[i - 1].length = std::stoi(sp[1]);
+		road[i - 1].speed = std::stoi(sp[2]);
+		road[i - 1].channel = std::stoi(sp[3]);
+		road[i - 1].idFrom = std::stoi(sp[4]);
+		road[i - 1].idTo = std::stoi(sp[5]);
+		road[i - 1].isDuplex = std::stoi(sp[6].substr(0, sp[6].size() - 1));//去除右括号
 
 		//初始化每个Road中Lane
 		this->road[i - 1].CreateLane();
 
 		if (sp[6].substr(0, 1) == "1")
 		{
-			graphRoad[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[1]);
-			graphRoad[std::stoi(sp[5]) - 1][std::stoi(sp[4]) - 1] = std::stoi(sp[1]);
+			graphRoad[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].length;
+			graphRoad[road[i - 1].idTo - 1][road[i - 1].idFrom - 1] = road[i - 1].length;
 
-			graphMaxSpeed[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[2]);
-			graphMaxSpeed[std::stoi(sp[5]) - 1][std::stoi(sp[4]) - 1] = std::stoi(sp[2]);
-      
-			graphC2R[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = this->road[i - 1].id;
-			graphC2R[std::stoi(sp[5]) - 1][std::stoi(sp[4]) - 1] = this->road[i - 1].id;
+			graphMaxSpeed[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].speed;
+			graphMaxSpeed[road[i - 1].idTo - 1][road[i - 1].idFrom - 1] = road[i - 1].speed;
+
+			graphC2R[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].id;
+			graphC2R[road[i - 1].idTo - 1][road[i - 1].idFrom - 1] = road[i - 1].id;
 		}
 		else
 		{
-			graphRoad[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[1]);
-			graphMaxSpeed[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = std::stoi(sp[2]);
-			graphC2R[std::stoi(sp[4]) - 1][std::stoi(sp[5]) - 1] = this->road[i - 1].id;
+			graphRoad[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].length;
+			graphMaxSpeed[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].speed;
+			graphC2R[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].id;
 		}
 	}
 	printf("readRoadData done!\n");
@@ -111,13 +112,12 @@ void DataCenter::readRoadData()
 void DataCenter::readCarData()
 {
 	printf("readCarData\n");
-	// |   0     1    2     3       4        5           6         7   |
-    // | 车辆ID 起点 终点 车辆速度 出发时间 当前道路ID 当前道路位置 当前状态|
+
 	for (int i = 1; i <= m_car_num; ++i)//忽略第0行数据
 	{
 		std::string carInfo = inputCarData[i];
 		std::vector<std::string> sp = Tools::split(carInfo, ", ");
-    
+		car[i - 1].index = i - 1;//这里写入一个连续,且从0开始的index号，便于索引
 		car[i - 1].id = std::stoi(sp[0].substr(1));//去除左括号
 		car[i - 1].idCrossFrom = std::stoi(sp[1]);
 		car[i - 1].idCrossTo = std::stoi(sp[2]);
@@ -135,7 +135,7 @@ void DataCenter::readCarData()
 		}
 	}
 
-	sort(speedType.begin(), speedType.end());
+	sort(speedType.begin(), speedType.end());//获得速度的种类和对应的速度值
 	car_speed_num = speedType.size();
 	printf("readCarData done!\n");
 }
@@ -148,6 +148,7 @@ void DataCenter::readCrossData()
 		std::string crossInfo = inputCrossData[i];
 		std::vector<std::string> sp = Tools::split(crossInfo, ", ");
 
+		cross[i - 1].index = i - 1;//这里写入一个连续,且从0开始的index号，便于索引
 		cross[i - 1].id = std::stoi(sp[0].substr(1));//去除左括号
 		cross[i - 1].roadID_T = std::stoi(sp[1]);
 		cross[i - 1].roadID_R = std::stoi(sp[2]);
@@ -227,5 +228,3 @@ void DataCenter::writeResultWithTime(const char *filename)
 	const char *result_file = result.c_str();
 	write_result(result_file, filename);
 }
-
-

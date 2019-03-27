@@ -53,13 +53,13 @@ int main(int argc, char *argv[])
 	int time = 0;
 	int para = 0;
 
-	time = sd.getSysTimeChangeTime(0);
+	//time = sd.getSysTimeChangeTime(0);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//sd.getPathByTime_reorderCars();//获得车辆的路径信息
 	//sd.getTimeByDir(90);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 
-	//para = sd.getParaByScheduler();
+	para = sd.getParaByScheduler();
 	//time = sd.getPathByScheduler(9);
 	//time = sd.unlockDead(80);
 	//sd.reorderCars();//按照时间重排序车辆

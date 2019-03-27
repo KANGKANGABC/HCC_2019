@@ -4,6 +4,7 @@
 class Car
 {
 public:
+	int index;
 	int id;
 	int location;
 	int status;
@@ -25,6 +26,7 @@ public:
 class Cross
 {
 public:
+	int index;
 	int id;
 	int roadID_T; //顺时针第1个 Top
 	int roadID_R; //顺时针第2个 Right
@@ -51,6 +53,7 @@ public:
 	//创建车道信息
 	void CreateLane();
 
+	int index;
 	int id;
 	int length;
 	int speed;

@@ -134,6 +134,7 @@ int Scheduler::getSysTime()
 	num_CarsScheduling = num_Cars;
 	carsWaitInGarage.clear();
 	carsDeadLock.clear();
+	vec_numCarsInRoadPerTime.clear();
 	for (int i = 0; i < num_Roads; ++i)
 	{
 		int idLaneStart = 0;
@@ -336,7 +337,6 @@ int Scheduler::getSysTime()
 		driverCarInGarage();
 		if (!putAllCarStatus())//输出所有车的状态
 			return false;//发生死锁
-		//putAllRoadStatus();
 		time_Scheduler++;//更新调度器时间
 		putAllRoadStatus();
 	}
@@ -352,6 +352,7 @@ int Scheduler::getSysTimeChangePath(int para)
 	num_CarsScheduling = num_Cars;
 	carsWaitInGarage.clear();
 	carsDeadLock.clear();
+	vec_numCarsInRoadPerTime.clear();
 	for (int i = 0; i < num_Roads; ++i)
 	{
 		int idLaneStart = 0;
@@ -569,6 +570,7 @@ int Scheduler::getSysTimeChangeTime(int para)
 	num_CarsScheduling = num_Cars;
 	carsWaitInGarage.clear();
 	carsDeadLock.clear();
+	vec_numCarsInRoadPerTime.clear();
 	for (int i = 0; i < num_Roads; ++i)
 	{
 		int idLaneStart = 0;
@@ -1707,6 +1709,7 @@ bool Scheduler::putAllCarStatus()
 void Scheduler::putAllRoadStatus()
 {
 	int num_road_jam = 0;//堵住的道路数量，per高于0.7则认为堵车
+	int num_cars_road = 0;
 	for (int i = 0; i < num_Roads; ++i)
 	{
 		float perRoad = 0;
@@ -1717,6 +1720,7 @@ void Scheduler::putAllRoadStatus()
 			{
 				float per = (float)roads[i].lane[j].laneCar.size() / (float)roads[i].length;
 				perRoad += per;
+				num_cars_road += roads[i].lane[j].laneCar.size();
 			}
 			perRoad = perRoad / roads[i].channel;
 			graphRoadStatusByDS[roads[i].idFrom - 1][roads[i].idTo - 1] = perRoad;//更新拥堵情况矩阵
@@ -1729,6 +1733,7 @@ void Scheduler::putAllRoadStatus()
 			{
 				float per = (float)roads[i].lane[j].laneCar.size() / (float)roads[i].length;
 				perRoad += per;
+				num_cars_road += roads[i].lane[j].laneCar.size();
 			}
 			perRoad = perRoad / roads[i].channel;
 			graphRoadStatusByDS[roads[i].idTo - 1][roads[i].idFrom - 1] = perRoad;//更新拥堵情况矩阵
@@ -1744,6 +1749,7 @@ void Scheduler::putAllRoadStatus()
 			{
 				float per = (float)roads[i].lane[j].laneCar.size() / (float)roads[i].length;
 				perRoad += per;
+				num_cars_road += roads[i].lane[j].laneCar.size();
 			}
 			perRoad = perRoad / roads[i].channel;
 			graphRoadStatusByDS[roads[i].idFrom - 1][roads[i].idTo - 1] = perRoad;//更新拥堵情况矩阵
@@ -1754,6 +1760,7 @@ void Scheduler::putAllRoadStatus()
 			perRoad = 0;
 		}
 	}
+	vec_numCarsInRoadPerTime.push_back(num_cars_road);
 }
 
 int Scheduler::getFirstRoadFromCross(int idCross, int index)

@@ -51,6 +51,9 @@ public:
 	void mapUpdate(map<string, float > &mapForJamDegree, int RoadId, float percent);
 
 	int num_changeSTime;
+
+	//反映调度器状态的数据结构
+	std::vector<int> vec_numCarsInRoadPerTime;//每个时间片车的数量
 private:
 	int num_CarsScheduling;//正在调度的car数量
 	int num_CarsPut;//已经发车的car数量

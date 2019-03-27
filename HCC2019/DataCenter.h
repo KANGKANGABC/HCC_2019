@@ -80,10 +80,6 @@ public:
 	//动态调度器计算出来的道路情况矩阵
 	std::vector<std::vector<float> > graphRoadStatusByDS;
 
-	//将车辆按时间进行重排序
-	void reorderCars();
-
-
 private:
 	char **inputRoadData;//输入道路数据
 	char **inputCarData;//输入道路数据
