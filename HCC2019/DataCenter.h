@@ -65,6 +65,11 @@ public:
 	//经过排序的car的指针
 	vector<Car*> carOrderTime;
 
+	//通过id查找index
+	map<int, int> mapId2IndexCar;
+	map<int, int> mapId2IndexRoad;
+	map<int, int> mapId2IndexCross;
+
 	int m_road_num;//ROAD数量
 	int m_car_num;//CAR数量
 	int m_cross_num;//CROSS数量

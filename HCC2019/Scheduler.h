@@ -64,6 +64,11 @@ private:
 	Road *roads;//所有的道路（道路对象数组的指针）
 	Cross *crosses;//所有的路口（路口对象数组的指针）
 	Car *cars;//所有的车
+
+	//通过id查找index
+	map<int, int> mapId2IndexCar;
+	map<int, int> mapId2IndexRoad;
+	map<int, int> mapId2IndexCross;
   
 	vector<Car> qCar;	//按照出发时间将车辆重排序
 
@@ -146,5 +151,10 @@ private:
 	//根据时间周期安排出发时间
 	void getPlantimeByPeriod(int period);
 
+	int id2indexCar(int id);
+	int id2indexRoad(int id);
+	int id2indexCross(int id);
+	
+	//调度器初始化
 
 };

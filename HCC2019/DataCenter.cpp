@@ -85,6 +85,7 @@ void DataCenter::readRoadData()
 		road[i - 1].idTo = std::stoi(sp[5]);
 		road[i - 1].isDuplex = std::stoi(sp[6].substr(0, sp[6].size() - 1));//去除右括号
 
+		mapId2IndexRoad.insert(pair<int, int>(road[i - 1].id, road[i - 1].index));//建立Id到Index的索引
 		//初始化每个Road中Lane
 		this->road[i - 1].CreateLane();
 
@@ -127,6 +128,8 @@ void DataCenter::readCarData()
 		car[i - 1].dirCross = NONE;//车的过路口状态为NONE
 		car[i - 1].starttime = 0;
 
+		mapId2IndexCar.insert(pair<int, int>(car[i - 1].id, car[i - 1].index));//建立Id到Index的索引
+
 		vector<int>::iterator it;
 		it = find(speedType.begin(), speedType.end(), car[i - 1].speed);
 		if (it == speedType.end())
@@ -156,7 +159,9 @@ void DataCenter::readCrossData()
 		cross[i - 1].roadID_L = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
 		cross[i - 1].roadID.resize(4);
 		cross[i - 1].roadID = { cross[i - 1].roadID_T ,cross[i - 1].roadID_R ,cross[i - 1].roadID_D ,cross[i - 1].roadID_L };
+		mapId2IndexCross.insert(pair<int, int>(cross[i - 1].id, cross[i - 1].index));//建立Id到Index的索引
 	}
+
 	printf("readCrossData done!\n");
 }
 

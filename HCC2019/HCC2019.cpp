@@ -49,7 +49,6 @@ int main(int argc, char *argv[])
 
 	Scheduler sd(dc);
 
-
 	int time = 0;
 	int para = 0;
 
@@ -59,9 +58,9 @@ int main(int argc, char *argv[])
 	//sd.getTimeByDir(90);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 
-	para = sd.getParaByScheduler();
+	//para = sd.getParaByScheduler();
 	//time = sd.getPathByScheduler(9);
-	//time = sd.unlockDead(80);
+	time = sd.unlockDead(80);
 	//sd.reorderCars();//按照时间重排序车辆
 	//sd.getStartTime_loadbalance(550);
 

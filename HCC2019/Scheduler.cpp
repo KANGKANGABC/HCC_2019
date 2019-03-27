@@ -22,6 +22,10 @@ Scheduler::Scheduler(DataCenter &dc)
 	num_CarsPut = 0;//已经发车的数量预置为0
 	graphRoadStatusByDS = dc.graphRoadStatusByDS;
 	speedType = dc.speedType;
+	mapId2IndexCar = dc.mapId2IndexCar;
+	mapId2IndexRoad = dc.mapId2IndexRoad;
+	mapId2IndexCross = dc.mapId2IndexCross;
+
 	for (int i = 0; i < graphRoadStatusByDS.size(); i++)
 	{
 		for (int j = 0; j < graphRoadStatusByDS[0].size(); j++)
@@ -164,8 +168,9 @@ int Scheduler::getSysTime()
 			for (int i = 0; i < num_Crosses; ++i)////按照升序调度所有路口
 			{
 				int idCross = crosses[i].id;//获得路口ID
-				while (1)//循环调度路口四个方向的车，直到全部车辆完成调度，或者阻塞
-				{
+				int indexCross = i;
+				//while (1)//循环调度路口四个方向的车，直到全部车辆完成调度，或者阻塞
+				//{
 					bool isWorkingRoad = false;
 					bool isConflict = false;
 					for (int j = 0; j < 4; ++j)//这里按要求是根据道路id进行升序调度
@@ -325,9 +330,9 @@ int Scheduler::getSysTime()
 									break;
 							}
 						}
-					}
-					if (!isWorkingRoad)
-						break;
+					//}
+					//if (!isWorkingRoad)
+						//break;
 				}
 			}
 			if (!isWorkingCross)//如果一个循环后没有任何一辆车被调度，则退出调度循环
@@ -382,8 +387,8 @@ int Scheduler::getSysTimeChangePath(int para)
 			for (int i = 0; i < num_Crosses; ++i)////按照升序调度所有路口
 			{
 				int idCross = crosses[i].id;//获得路口ID
-				while (1)//循环调度路口四个方向的车，直到全部车辆完成调度，或者阻塞
-				{
+				//while (1)//循环调度路口四个方向的车，直到全部车辆完成调度，或者阻塞
+				//{
 					bool isWorkingRoad = false;
 					bool isConflict = false;
 					for (int j = 0; j < 4; ++j)//这里按要求是根据道路id进行升序调度
@@ -543,9 +548,9 @@ int Scheduler::getSysTimeChangePath(int para)
 									break;
 							}
 						}
-					}
-					if (!isWorkingRoad)
-						break;
+					//}
+					//if (!isWorkingRoad)
+					//	break;
 				}
 			}
 			if (!isWorkingCross)//如果一个循环后没有任何一辆车被调度，则退出调度循环
@@ -1724,10 +1729,8 @@ void Scheduler::putAllRoadStatus()
 			}
 			perRoad = perRoad / roads[i].channel;
 			graphRoadStatusByDS[roads[i].idFrom - 1][roads[i].idTo - 1] = perRoad;//更新拥堵情况矩阵
-			if (perRoad > threshold)
-			{
-				mapUpdate(mapForJamDegree, roads[i].id, perRoad);
-			}
+
+			mapUpdate(mapForJamDegree, roads[i].id, perRoad);
 			perRoad = 0;
 			for (int j = roads[i].channel; j < 2 * roads[i].channel; ++j)
 			{
@@ -1737,10 +1740,8 @@ void Scheduler::putAllRoadStatus()
 			}
 			perRoad = perRoad / roads[i].channel;
 			graphRoadStatusByDS[roads[i].idTo - 1][roads[i].idFrom - 1] = perRoad;//更新拥堵情况矩阵
-			if (perRoad > threshold)
-			{
-				mapUpdate(mapForJamDegree, -roads[i].id, perRoad);//道路反方向的路况以id的负值来存储
-			}
+
+			mapUpdate(mapForJamDegree, -roads[i].id, perRoad);//道路反方向的路况以id的负值来存储
 			perRoad = 0;
 		}
 		else
@@ -1753,11 +1754,8 @@ void Scheduler::putAllRoadStatus()
 			}
 			perRoad = perRoad / roads[i].channel;
 			graphRoadStatusByDS[roads[i].idFrom - 1][roads[i].idTo - 1] = perRoad;//更新拥堵情况矩阵
-			if (perRoad > threshold)
-			{
-				mapUpdate(mapForJamDegree, roads[i].id, perRoad);
-			}
-			perRoad = 0;
+			mapUpdate(mapForJamDegree, roads[i].id, perRoad);
+
 		}
 	}
 	vec_numCarsInRoadPerTime.push_back(num_cars_road);
@@ -1899,6 +1897,30 @@ void Scheduler::getPlantimeByPeriod(int period)
 		cars[i].idCurRoad = 0;
 		cars[i].idCurLane = 0;
 	}
+}
+
+int Scheduler::id2indexCar(int id)
+{
+	map<int, int>::iterator it;
+	it = mapId2IndexCar.find(id);
+	assert(it!= mapId2IndexCar.end());
+	return it->second;
+}
+
+int Scheduler::id2indexRoad(int id)
+{
+	map<int, int>::iterator it;
+	it = mapId2IndexRoad.find(id);
+	assert(it != mapId2IndexRoad.end());
+	return it->second;
+}
+
+int Scheduler::id2indexCross(int id)
+{
+	map<int, int>::iterator it;
+	it = mapId2IndexCross.find(id);
+	assert(it != mapId2IndexCross.end());
+	return it->second;
 }
 
 int Scheduler::unlockDead(int para)
