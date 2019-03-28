@@ -83,7 +83,7 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 {
 	std::map<int, int> mapResult;
-	int para = 80;
+	int para = 300;
 	int time = 0;
 	Scheduler sd(*m_dc);
 
