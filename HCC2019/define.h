@@ -11,6 +11,7 @@
 #include <deque>
 #include <queue>
 #include <map>
+#include <stack>
 
 #include "lib_io.h"
 

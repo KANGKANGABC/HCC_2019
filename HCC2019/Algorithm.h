@@ -27,6 +27,7 @@ private:
 	std::vector<int> speedType;
 	//按照出发时间将车辆重排序
 	vector<Car> qCar;
+	vector<Car> reorderCar;
 
 //Functions
 public:
@@ -54,9 +55,8 @@ private:
 	void ReOrderStartBySpeedAndStartCross(int para);//根据速度和出发点重新安排出发时间
 
 	/*辅助函数*/
-
-	void swap(int i, int j);
-	void quicksort(int begin, int end);
+	int getPartition(vector<Car> &reorderCar, int begin, int end);
+	void quicksort(vector<Car> &reorderCar, int begin, int end);
 	void reorderCars();
 
 

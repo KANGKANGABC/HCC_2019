@@ -184,7 +184,7 @@ void Algorithm::getPath_StaticAnalysis()
 
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		vector<int> pathCross = graph.DijkstraNor(qCar[i].idCrossFrom, qCar[i].idCrossTo, qCar[i].speed);
+		vector<int> pathCross = graph.DijkstraNor(reorderCar[i].idCrossFrom, reorderCar[i].idCrossTo, reorderCar[i].speed);
 
 		num++;
 		//定时更新交通拥堵邻接矩阵jamDegreeLongBefore
@@ -209,8 +209,8 @@ void Algorithm::getPath_StaticAnalysis()
 			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
 		}
 
-		qCar[i].path = pathRoad;
-		cars[qCar[i].index].path = qCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
+		reorderCar[i].path = pathRoad;
+		cars[reorderCar[i].index].path = reorderCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
 	}
 }
 
@@ -360,48 +360,70 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 	}
 }
 
-void Algorithm::swap(int i, int j)
+int Algorithm::getPartition(vector<Car> &reorderCar, int begin, int end)
 {
-	Car tmp;
-	tmp = qCar[i];
-	qCar[i] = qCar[j];
-	qCar[j] = tmp;
+	int keyVal = reorderCar[begin].speed;
+	while (begin < end)
+	{
+		while (begin < end && reorderCar[end].speed >= keyVal)
+			end--;
+		reorderCar[begin] = reorderCar[end];
+		while (begin < end && reorderCar[begin].speed <= keyVal)
+			begin++;
+		reorderCar[end] = reorderCar[begin];
+	}
+	reorderCar[begin].speed = keyVal;
+	return begin;
 }
 
-void Algorithm::quicksort(int begin, int end)
+void Algorithm::quicksort(vector<Car> &reorderCar, int begin, int end)
 {
-	int i, j;
-	i = begin + 1;
-	j = end;
+	stack<int> s;
 	if (begin < end)
 	{
-		while (i < j)
+		int mid = getPartition(reorderCar, begin, end);
+		if (mid - 1 > begin)
 		{
-			if (qCar[i].starttime > qCar[begin].starttime)
-			{
-				swap(i, j);
-				j--;
-			}
-			else
-				i++;
+			s.push(begin);
+			s.push(mid - 1);
 		}
-		if (qCar[i].starttime > qCar[begin].starttime)
-			i--;
-		swap(i, begin);
-		quicksort(begin, i - 1);
-		quicksort(i + 1, end);
+		if (mid + 1 < end)
+		{
+			s.push(mid + 1);
+			s.push(end);
+		}
+
+		while (!s.empty())
+		{
+			int qHeight = s.top();
+			s.pop();
+			int pLow = s.top();
+			s.pop();
+			int pqMid = getPartition(reorderCar, pLow, qHeight);
+			if (pqMid - 1 > pLow)
+			{
+				s.push(pLow);
+				s.push(pqMid - 1);
+			}
+			if (pqMid + 1 < qHeight)
+			{
+				s.push(pqMid + 1);
+				s.push(qHeight);
+			}
+		}
 	}
 }
 
 void Algorithm::reorderCars()
 {
-	qCar.clear();
+	reorderCar.clear();
+
 	for (int i = 0; i < num_Cars; i++)
 	{
-		qCar.push_back(cars[i]);//将id顺序的车辆放到qcar的vector中
+		reorderCar.push_back(cars[i]);//将id顺序的车辆放到qcar的vector中
 	}
-	int begin = 0;
-	int end = qCar.size() - 1;
-	quicksort(begin, end);
-}
 
+	int begin = 0;
+	int end = reorderCar.size() - 1;
+	quicksort(reorderCar, begin, end);
+}
