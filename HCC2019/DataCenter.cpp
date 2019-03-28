@@ -18,26 +18,26 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM], int road_count, char *data
 	m_cross_num = cross_count - 1;//忽略第一行注释
 
 	//将速度邻接矩阵大小设置为36，不邻接的点初值为0
-	graphMaxSpeed.resize(m_cross_num);
+	graphRoadMaxSpeed.resize(m_cross_num);
 	for (int i = 0; i < m_cross_num; ++i)
 	{
-		graphMaxSpeed[i].resize(m_cross_num);
+		graphRoadMaxSpeed[i].resize(m_cross_num);
 	}
 
 	vexnum = getCrossNum();
 	edge = getRoadNum();
 
 	//将邻接矩阵大小设置为36*36
-	graphRoad.resize(m_cross_num);
+	graphRoadLength.resize(m_cross_num);
 	for (int i = 0; i < m_cross_num; ++i) {
-		graphRoad[i].resize(m_cross_num);
+		graphRoadLength[i].resize(m_cross_num);
 	}
 
 	for (int i = 0; i < m_cross_num; ++i)
 	{
 		for (int j = 0; j < m_cross_num; ++j)
 		{
-			graphRoad[i][j] = INT_MAX;
+			graphRoadLength[i][j] = INT_MAX;
 		}
 	}
 
@@ -110,6 +110,11 @@ void DataCenter::readRoadData()
 	printf("readRoadData done!\n");
 }
 
+bool UpInt(const int &a, const int &b)
+{
+	return a > b;
+}
+
 void DataCenter::readCarData()
 {
 	printf("readCarData\n");
@@ -138,7 +143,7 @@ void DataCenter::readCarData()
 		}
 	}
 
-	sort(speedType.begin(), speedType.end());//获得速度的种类和对应的速度值
+	sort(speedType.begin(), speedType.end(), UpInt);//获得速度的种类和对应的速度值,并且从大到小排序
 	car_speed_num = speedType.size();
 	printf("readCarData done!\n");
 }
@@ -179,13 +184,13 @@ int DataCenter::getCrossNum()
 //获取路长邻接矩阵
 std::vector<std::vector<int> > DataCenter::getArc()
 {
-	return graphRoad;
+	return graphRoadLength;
 }
 
 //获取道路限速邻接矩阵
 std::vector<std::vector<int> > DataCenter::getRoadvArc()
 {
-	return graphMaxSpeed;
+	return graphRoadMaxSpeed;
 }
 
 void DataCenter::writeResult(const char *filename)

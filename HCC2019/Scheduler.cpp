@@ -2,7 +2,6 @@
 #include "fstream"
 #include<string>
 
-
 Scheduler::Scheduler(DataCenter &dc)
 {
 	num_CarsScheduling = dc.m_car_num;//获得需要调度的车数量
@@ -34,6 +33,38 @@ Scheduler::Scheduler(DataCenter &dc)
 		}
 	}
 
+}
+
+Scheduler::Scheduler(DataCenter * dc)
+{
+	num_CarsScheduling = dc->m_car_num;//获得需要调度的车数量
+	num_Roads = dc->m_road_num;
+	num_Crosses = dc->m_cross_num;
+	num_Cars = dc->m_car_num;
+	roads = dc->road;
+	crosses = dc->cross;
+	cars = dc->car;
+	time_Scheduler = 0;//调度器初始时间设置为0
+	vexnum = dc->getCrossNum();
+	edge = dc->getRoadNum();
+	tmp = dc->getArc(); //得到邻接矩阵
+	tmp1 = dc->getRoadvArc(); //得到道路限速邻接矩阵
+	//将graphC2R大小设置为36*36
+	graphC2R = dc->graphC2R;
+	num_CarsPut = 0;//已经发车的数量预置为0
+	graphRoadStatusByDS = dc->graphRoadStatusByDS;
+	speedType = dc->speedType;
+	mapId2IndexCar = dc->mapId2IndexCar;
+	mapId2IndexRoad = dc->mapId2IndexRoad;
+	mapId2IndexCross = dc->mapId2IndexCross;
+
+	for (int i = 0; i < graphRoadStatusByDS.size(); i++)
+	{
+		for (int j = 0; j < graphRoadStatusByDS[0].size(); j++)
+		{
+			graphRoadStatusByDS[i][j] = 0;
+		}
+	}
 }
 
 Scheduler::~Scheduler()
@@ -766,9 +797,9 @@ int Scheduler::isCanEnter(int idRoad, int idCross)
 
 bool Scheduler::isBeDD(int idRoad, int idCross)//注意这里的ID不需要减1
 {
-	int indexRoad = id2indexRoad(idRoad);
 	if (idRoad == -1)//如果冲突方向无道路，则任务无冲突车辆
 		return false;
+	int indexRoad = id2indexRoad(idRoad);
 	int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
 	if (roads[indexRoad].idFrom == crosses[idCross - 1].id)//如果cross为道路的出方向
 	{
@@ -1335,6 +1366,14 @@ int Scheduler::SchedulerInit()
 			roads[i].lane[j].laneCar.clear();
 		}
 	}//道路中车辆归零
+	for (int i = 0; i < num_Cars; ++i)//忽略第0行数据
+	{
+		cars[i].idCurRoad = 0;//参数重置
+		cars[i].idCurLane = 0;//参数重置
+		cars[i].location = 0;//参数重置
+		cars[i].dirCross = NONE;//参数重置
+		cars[i].status = SLEEPING;//参数重置
+	}//车辆信息归零
 	return 0;
 }
 
@@ -1964,7 +2003,6 @@ void Scheduler::getPathByTime_reorderCars()
 void Scheduler::getPathByTime_dynamic()
 {
 	int num = 0;
-	//static int flag[100] = { 0 };
 
 	Graph_DG graph(vexnum, edge);
 	graph.createArcGraph(tmp);

@@ -11,6 +11,7 @@ class Scheduler
 {
 public:
 	Scheduler(DataCenter &dc);
+	Scheduler(DataCenter *dc);
 	~Scheduler();
 	int getParaByScheduler();//请将初始参数设置为70以上
 	int getSysTime();

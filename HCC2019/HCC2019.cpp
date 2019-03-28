@@ -7,6 +7,7 @@
 #include "DataCenter.h"
 #include "dijkstra.h"
 #include "Scheduler.h"
+#include "Algorithm.h"
 
 using namespace std;
 
@@ -47,11 +48,14 @@ int main(int argc, char *argv[])
 	dc.readCarData();
 	dc.readCrossData();
 
-	Scheduler sd(dc);
+	//Scheduler sd(dc);
+	Algorithm alg(dc);
 
 	int time = 0;
 	int para = 0;
 
+	//alg.ShortestTime_SpeedBasic_AutoPara();
+	alg.StaticAnalysis_SpeedBasic_AutoPara();
 	//time = sd.getSysTimeChangeTime(0);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//sd.getPathByTime_reorderCars();//获得车辆的路径信息
@@ -59,7 +63,7 @@ int main(int argc, char *argv[])
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 
 	//para = sd.getParaByScheduler();
-	time = sd.getPathByScheduler(9);
+	//time = sd.getPathByScheduler(9);
 	//time = sd.unlockDead(80);
 	//sd.reorderCars();//按照时间重排序车辆
 	//sd.getStartTime_loadbalance(550);
@@ -71,7 +75,7 @@ int main(int argc, char *argv[])
 	
 	//dc.writeResultWithTime(answer_file);
 
-	time = sd.getSysTime();
+	//time = sd.getSysTime();
 	dc.writeResult(answer_file);
 	PRINT("time:%d\n",time);
 
