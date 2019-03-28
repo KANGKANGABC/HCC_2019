@@ -85,6 +85,21 @@ int Scheduler::getSysTime()
 	SchedulerInit();
 	while (num_CarsScheduling > 0)
 	{
+		SchedulerCore();
+		driverCarInGarage();
+		if (!putAllCarStatus())//输出所有车的状态
+			return false;//发生死锁
+		time_Scheduler++;//更新调度器时间
+		putAllRoadStatus();
+	}
+	return time_Scheduler;
+}
+
+int Scheduler::getSysTimeV2()
+{
+	SchedulerInit();
+	while (num_CarsScheduling > 0)
+	{
 		SchedulerCore_V2();
 		driverCarInGarage();
 		if (!putAllCarStatus())//输出所有车的状态
@@ -93,6 +108,30 @@ int Scheduler::getSysTime()
 		putAllRoadStatus();
 	}
 	return time_Scheduler;
+}
+
+int Scheduler::SchedulerTest()
+{
+	int para = 80;
+	getPath();
+	ReOrderStartBySpeed(71);
+	int time = getSysTime();
+	int timeV2 = getSysTimeV2();
+	PRINT("para:%d SysTime:%d   SysTimeV2:%d\n", para, time, timeV2);
+	/*
+	for (int i = 0; i < 10; ++i)//迭代5次
+	{
+		ReOrderStartBySpeed(para);
+		int time = getSysTime();
+		int timeV2 = getSysTimeV2();
+		para -= 3;
+		PRINT("para:%d SysTime:%d   SysTimeV2:%d\n",para,time,timeV2);
+	}
+	*/
+
+
+
+	return 0;
 }
 
 int Scheduler::getSysTimeChangePath(int para)

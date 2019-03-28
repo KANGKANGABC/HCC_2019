@@ -511,9 +511,4 @@ void Algorithm::reorderCars(vector<Car> &reorderCar)
 	int end = reorderCar.size() - 1;
 	//quicksort(reorderCar, begin, end);
 	std::sort(reorderCar.begin(), reorderCar.end(),less_speed);
-	for (int i = 0; i < num_Cars; i++)
-	{
-		if (reorderCar[i].id == 14989)
-			PRINT(" ");
-	}
 }

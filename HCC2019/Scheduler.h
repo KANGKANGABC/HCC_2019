@@ -15,6 +15,8 @@ public:
 	Scheduler(DataCenter *dc);
 	~Scheduler();
 	int getSysTime();
+	int getSysTimeV2();
+	int SchedulerTest();
 	int getSysTimeChangePath(int para);
 	int getSysTimeChangeTime(int para);//边跑调度器边修改出发时间
 	//基于动态调度器规划路径
