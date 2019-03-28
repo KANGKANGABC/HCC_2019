@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 	int para = 0;
 
 	//alg.ShortestTime_SpeedBasic_AutoPara();
-	alg.StaticAnalysis_SpeedBasic_AutoPara();
+	alg.StaticAnalysisNor_SpeedBasicNoSame_AutoPara(70);
 	//time = sd.getSysTimeChangeTime(0);
 	//sd.ReOrderStartByTime(PARA_PERIOD);
 	//sd.getPathByTime_reorderCars();//获得车辆的路径信息

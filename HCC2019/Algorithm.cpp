@@ -28,7 +28,7 @@ void Algorithm::ShortestTime_SpeedBasic_AutoPara()
 	Scheduler sd(*m_dc);
 
 	getPath();
-	for (int i = 0; i < 15; ++i)//迭代20次
+	for (int i = 0; i < 15; ++i)//迭代15次
 	{
 		getStartTime_BySpeed(para);
 		int time = sd.getSysTime();
@@ -58,7 +58,7 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 	getStartTime_BySpeed(para);
 	reorderCars();
 	getPath_StaticAnalysis();
-	for (int i = 0; i < 15; ++i)//迭代20次
+	for (int i = 0; i < 15; ++i)//迭代15次
 	{
 		getStartTime_BySpeed(para);
 		reorderCars();
@@ -80,6 +80,78 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 	reorderCars();
 	getPath_StaticAnalysis();
 	int time = sd.getSysTime();
+	PRINT("timeFinal:%d\n", time);
+}
+
+void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
+{
+	std::map<int, int> mapResult;
+	int para = 80;
+	int time = 0;
+	Scheduler sd(*m_dc);
+
+	for (int i = 0; i < 15; ++i)//迭代15次
+	{
+		getPath();
+		getStartTime_BySpeed(para);
+		int time = sd.getSysTimeChangePath(w);
+		if (time == false)
+			time = INT_MAX;
+		mapResult.insert(pair<int, int>(time, para));
+		para -= 3;
+	}
+	for (auto &v : mapResult)
+	{
+		PRINT("result:%d para:%d\n", v.first, v.second);
+	}
+	map<int, int>::iterator it;
+	it = mapResult.begin();
+	para = it->second;
+	getPath();
+	getStartTime_BySpeed(para);
+	time = sd.getSysTimeChangePath(w);
+	PRINT("time:%d\n", time);
+	time = sd.getSysTime();
+	PRINT("timeFinal:%d\n", time);
+}
+
+void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
+{
+	std::map<int, int> mapResult;
+	int time = 0;
+	Scheduler sd(*m_dc);
+	for (int i = 0; i < 15; ++i)//迭代15次
+	{
+		ReOrderStartBySpeedAndStartCross(para);
+		reorderCars();
+		getPath_StaticAnalysis();
+		int time = sd.getSysTime();
+		if (time == false)
+			time = INT_MAX;
+		mapResult.insert(pair<int, int>(time, para));
+		para -= 2;
+	}
+	for (auto &v : mapResult)
+	{
+		PRINT("result:%d para:%d\n", v.first, v.second);
+	}
+	map<int, int>::iterator it;
+	it = mapResult.begin();
+	it++;
+	para = it->second;
+	ReOrderStartBySpeedAndStartCross(para);
+	reorderCars();
+	getPath_StaticAnalysis();
+	int timeFinal = sd.getSysTime();
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].timeArrived > (timeFinal - 20))
+		{
+			cars[i].starttime = cars[i].starttime - 20;
+			cars[i].starttimeAnswer = cars[i].starttime;
+		}
+	}
+	time = sd.getSysTime();
 	PRINT("timeFinal:%d\n", time);
 }
 
@@ -173,6 +245,118 @@ void Algorithm::getStartTime_BySpeed(int para)
 		if (cars[i].starttime < cars[i].plantime)
 			cars[i].starttime = cars[i].plantime;
 		cars[i].starttimeAnswer = cars[i].starttime;//starttimeAnswer为最终写出的出发时间，不会更改
+	}
+}
+
+bool Comp(const int &a, const int &b);
+
+void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
+{
+	int n2, n4, n6, n8;
+	n2 = para;
+	n4 = para;
+	n6 = para;
+	n8 = para;
+
+	sort(speedType.begin(), speedType.end(), Comp);  //speedType里存的是速度类型
+
+	for (auto speed : speedType)
+	{
+		std::queue<Car> qspeed;		//将car按speed顺序依次入队列qspeed
+
+		assert(qspeed.size() == 0);		//确保qspeed为空
+
+		for (int i = 1; i <= num_Cars; ++i)			//将car按速度先后入队列，每次队列里只有一种速度的车
+		{
+			if (cars[i - 1].speed == speed)
+			{
+				qspeed.push(cars[i - 1]);
+			}
+		}
+
+		int timebegin, timeend;
+		switch (speed)				//选择不同速度的开始发车和终止发车时刻
+		{
+		case 8:
+			timebegin = 1;
+			timeend = 2 * n8;
+			break;
+		case 6:
+			timebegin = 2 * n8 + 1;
+			timeend = 2 * (n8 + n6);
+			break;
+		case 4:
+			timebegin = 2 * (n8 + n6) + 1;
+			timeend = 2 * (n8 + n6 + n4);
+			break;
+		case 2:
+			timebegin = 2 * (n8 + n6 + n4) + 1;
+			timeend = 2 * (n8 + n6 + n4 + n2);
+			break;
+		default:
+			break;
+		}
+
+		int carStartPerSec = qspeed.size() / (timeend - timebegin) + 1;  //计算每时间片需要发出的车数量，加一是为了防止发不完，可能会导致不同速度发车批次间有间隔
+		for (int time = timebegin; time <= timeend; time++)		//同一时间片同一地点的车只发一辆
+		{
+			if (qspeed.empty())			//如果qspeed空了，说明该速度的车分配完了，退出当前循环
+				break;
+
+			vector <int>fromCross;				//用于存储每一时间片已分配车辆的出发地，每一时间片都要初始化为0
+			fromCross.resize(num_Cross);
+			for (int i = 0; i < num_Cross; i++)
+			{
+				fromCross[i] = 0;
+			}
+
+			for (int carAssigned = 0; carAssigned < carStartPerSec; carAssigned++)
+			{
+				//队列中的车辆数目小于carStartPerSec
+				if (qspeed.empty())			//如果qspeed空了，说明该速度的车分配完了，退出当前循环
+					break;
+
+				//队列中还有可发的车
+				bool carIsAssigned = false;
+				int frequence = 0;			//用于记录循环进行次数也即队列中已有多少车被访问过
+				while (carIsAssigned == false)			//如果安排了一辆车，则结束，安排下一辆车
+				{
+					++frequence;
+					int carOrder = qspeed.front().index;        //用于记录队首的car的下标
+
+					if (qspeed.front().plantime <= time && fromCross[qspeed.front().idCrossFrom - 1] < 1)
+					{
+						//若队首的car的plantime小于等于当前时刻且该出发地只有一辆，则将该车starttimeAnswer设为此刻，并从qspeed队列中弹出，carIsAssigned设为true，fromCross当前出发地加一
+						cars[carOrder].starttimeAnswer = time;
+						cars[carOrder].starttime = time;
+						fromCross[qspeed.front().idCrossFrom - 1] ++;
+						qspeed.pop();
+						carIsAssigned = true;
+					}
+					else if (qspeed.front().plantime > time)		//plantime在time之后或已有相同出发地的车发出了的情况，前者直接往后排，后者要看是否遍历完一次队列了
+					{
+						qspeed.pop();
+						qspeed.push(cars[carOrder]);
+					}
+					else      //已有相同出发地的车发出了的情况，若此时没有遍历完一次队列了，则继续遍历，否则定下发车时间，此时会有不止一辆车从出发地发出
+					{
+						if (frequence < qspeed.size())
+						{
+							qspeed.pop();
+							qspeed.push(cars[carOrder]);
+						}
+						else
+						{
+							cars[carOrder].starttimeAnswer = time;
+							cars[carOrder].starttime = time;
+							fromCross[qspeed.front().idCrossFrom - 1] ++;
+							qspeed.pop();
+							carIsAssigned = true;
+						}
+					}
+				}
+			}
+		}
 	}
 }
 

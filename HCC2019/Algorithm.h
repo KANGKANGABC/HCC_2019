@@ -33,12 +33,16 @@ public:
 	Algorithm(DataCenter &dc);
 	~Algorithm();
 	//路径：最短时间路径 时间：根据速度分批出发 调参：调度器自动调参
-	//ShortestTime_SpeedBasic_AutoPara
 	void ShortestTime_SpeedBasic_AutoPara();
+
 	//路径：最短时间路径 + 静态路径优化 时间：根据速度分批出发 调参：调度器自动调参
-	//StaticAnalysis_SpeedBasic_AutoPara
 	void StaticAnalysis_SpeedBasic_AutoPara();
 
+	//路径：最短时间路径 + 调度器动态优化 时间：根据速度分批出发 调参：调度器自动调参
+	void DynamicPathByScheduler_SpeedBasic_AutoPara(int w);
+
+	//路径：最短时间路径 + 静态路径优化（归一化） 时间：根据速度分批出发+同时刻同地点只发一辆 调参：调度器自动调参
+	void StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para);
 
 private:
 	/*获得路径的方法*/
@@ -47,8 +51,10 @@ private:
 
 	/*获得出发时间的方法*/
 	void getStartTime_BySpeed(int para);
+	void ReOrderStartBySpeedAndStartCross(int para);//根据速度和出发点重新安排出发时间
 
 	/*辅助函数*/
+
 	void swap(int i, int j);
 	void quicksort(int begin, int end);
 	void reorderCars();
