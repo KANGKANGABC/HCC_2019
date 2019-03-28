@@ -287,7 +287,8 @@ void Algorithm::getPath_StaticAnalysis()
 		{
 			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
 		}
-
+		if (reorderCar[i].id == 14989)
+			PRINT("get\n");
 		reorderCar[i].path = pathRoad;
 		cars[reorderCar[i].index].path = reorderCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
 	}
@@ -493,6 +494,10 @@ void Algorithm::quicksort(vector<Car> &reorderCar, int begin, int end)
 	}
 }
 
+bool less_speed(const Car & m1, const Car & m2) {
+	return m1.speed < m2.speed;
+}
+
 void Algorithm::reorderCars(vector<Car> &reorderCar)
 {
 	reorderCar.clear();
@@ -504,5 +509,11 @@ void Algorithm::reorderCars(vector<Car> &reorderCar)
 
 	int begin = 0;
 	int end = reorderCar.size() - 1;
-	quicksort(reorderCar, begin, end);
+	//quicksort(reorderCar, begin, end);
+	std::sort(reorderCar.begin(), reorderCar.end(),less_speed);
+	for (int i = 0; i < num_Cars; i++)
+	{
+		if (reorderCar[i].id == 14989)
+			PRINT(" ");
+	}
 }
