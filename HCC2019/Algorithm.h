@@ -26,7 +26,7 @@ private:
 	//存储车辆的速度种类的向量
 	std::vector<int> speedType;
 	//按照出发时间将车辆重排序
-	vector<Car> qCar;
+
 	vector<Car> reorderCar;
 
 //Functions
@@ -45,6 +45,12 @@ public:
 	//路径：最短时间路径 + 静态路径优化（归一化） 时间：根据速度分批出发+同时刻同地点只发一辆 调参：调度器自动调参
 	void StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para);
 
+	//路径：最短时间路径  时间：根据速度分批出发+根据路况挑选合适的车 调参：调度器自动调参
+	void ShortestTime_SpeedBasicRoadStatus_AutoPara(int para);
+
+	//修改死锁
+	void unlockDead(int para);
+
 private:
 	/*获得路径的方法*/
 	void getPath();//基于最短路径算法获得路径
@@ -57,7 +63,7 @@ private:
 	/*辅助函数*/
 	int getPartition(vector<Car> &reorderCar, int begin, int end);
 	void quicksort(vector<Car> &reorderCar, int begin, int end);
-	void reorderCars();
+	void reorderCars(vector<Car> &reorderCar);
 
 
 

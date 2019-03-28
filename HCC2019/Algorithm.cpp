@@ -14,8 +14,8 @@ Algorithm::Algorithm(DataCenter &dc)
 	crosses = dc.cross;
 	graphC2R = dc.graphC2R;
 	speedType = dc.speedType;
+	reorderCars(reorderCar);
 }
-
 
 Algorithm::~Algorithm()
 {
@@ -56,12 +56,10 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 	Scheduler sd(*m_dc);
 
 	getStartTime_BySpeed(para);
-	reorderCars();
 	getPath_StaticAnalysis();
 	for (int i = 0; i < 15; ++i)//迭代15次
 	{
 		getStartTime_BySpeed(para);
-		reorderCars();
 		getPath_StaticAnalysis();
 		int time = sd.getSysTime();
 		if (time == false)
@@ -77,7 +75,6 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 	it = mapResult.begin();
 	para = it->second;
 	getStartTime_BySpeed(para);
-	reorderCars();
 	getPath_StaticAnalysis();
 	int time = sd.getSysTime();
 	PRINT("timeFinal:%d\n", time);
@@ -123,7 +120,6 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	for (int i = 0; i < 15; ++i)//迭代15次
 	{
 		ReOrderStartBySpeedAndStartCross(para);
-		reorderCars();
 		getPath_StaticAnalysis();
 		int time = sd.getSysTime();
 		if (time == false)
@@ -140,7 +136,6 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	it++;
 	para = it->second;
 	ReOrderStartBySpeedAndStartCross(para);
-	reorderCars();
 	getPath_StaticAnalysis();
 	int timeFinal = sd.getSysTime();
 	for (int i = 0; i < num_Cars; ++i)
@@ -153,6 +148,90 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	}
 	time = sd.getSysTime();
 	PRINT("timeFinal:%d\n", time);
+}
+
+void Algorithm::ShortestTime_SpeedBasicRoadStatus_AutoPara(int para)
+{
+	Scheduler sd(*m_dc);
+	int time = sd.getSysTimeChangeTime(0);
+	PRINT("time:%d\n",time);
+}
+
+void Algorithm::unlockDead(int para)
+{
+	std::map<int, int> mapResult;
+	int timeMax = INT_MAX;
+	int time, timeFinal;
+	int w = 9;
+	Scheduler sd(*m_dc);
+	for (int i = 0; i < 15; ++i)//迭代20次
+	{
+		getStartTime_BySpeed(para);
+		getPath();
+		int time = sd.getSysTimeChangePath(w);
+		if (time == false)
+			time = INT_MAX;
+		mapResult.insert(pair<int, int>(time, para));
+		para -= 4;
+	}
+	for (auto &v : mapResult)
+	{
+		PRINT("result:%d para:%d\n", v.first, v.second);
+	}
+	map<int, int>::iterator it;
+	it = mapResult.begin();
+	para = it->second;
+
+	para = para - 4;
+	getStartTime_BySpeed(para);
+	getPath();
+	time = sd.getSysTimeChangePath(w);
+	//修改死锁车的出发时间
+	for (int i = 0; i < sd.carsDeadLock.size() / 2; ++i)
+	{
+		Car car = sd.carsDeadLock[i];
+		cars[car.index].starttime += car.id % 60;//出发时间重安排
+		cars[car.index].starttimeAnswer = cars[car.index].starttime;
+	}
+	time = sd.getSysTimeChangePath(w);//重新跑一下看是不是死锁
+	PRINT("timeUnlock1:%d\n", time);
+	for (int i = 0; i < sd.carsDeadLock.size() / 2; ++i)
+	{
+		Car car = sd.carsDeadLock[i];
+		cars[car.index].starttime += car.id % 100;//出发时间重安排
+		cars[car.index].starttimeAnswer = cars[car.index].starttime;
+	}
+	time = sd.getSysTimeChangePath(w);//重新跑一下看是不是死锁
+	PRINT("timeUnlock2:%d\n", time);
+	for (int i = 0; i < sd.carsDeadLock.size() / 2; ++i)
+	{
+		Car car = sd.carsDeadLock[i];
+		cars[car.index].starttime += car.id % 100;//出发时间重安排
+		cars[car.index].starttimeAnswer = cars[car.index].starttime;
+	}
+	time = sd.getSysTimeChangePath(w);//重新跑一下看是不是死锁
+	PRINT("timeUnlock3:%d\n", time);
+	for (int i = 0; i < sd.carsDeadLock.size() / 2; ++i)
+	{
+		Car car = sd.carsDeadLock[i];
+		cars[car.index].starttime += car.id % 100;//出发时间重安排
+		cars[car.index].starttimeAnswer = cars[car.index].starttime;
+	}
+	time = sd.getSysTimeChangePath(w);//重新跑一下看是不是死锁
+	PRINT("timeUnlock4:%d\n", time);
+	for (int i = 0; i < sd.carsDeadLock.size() / 2; ++i)
+	{
+		Car car = sd.carsDeadLock[i];
+		cars[car.index].starttime += car.id % 100;//出发时间重安排
+		cars[car.index].starttimeAnswer = cars[car.index].starttime;
+	}
+	time = sd.getSysTimeChangePath(w);//重新跑一下看是不是死锁
+	PRINT("timeUnlock5:%d\n", time);
+	time = sd.getSysTime();
+	PRINT("timeFinal:%d\n", time);
+
+	sd.carsDeadLock.clear();//清空死锁队列
+
 }
 
 void Algorithm::getPath()
@@ -414,7 +493,7 @@ void Algorithm::quicksort(vector<Car> &reorderCar, int begin, int end)
 	}
 }
 
-void Algorithm::reorderCars()
+void Algorithm::reorderCars(vector<Car> &reorderCar)
 {
 	reorderCar.clear();
 

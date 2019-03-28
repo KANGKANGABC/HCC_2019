@@ -9,20 +9,18 @@ class DataCenter;
 
 class Scheduler
 {
+	friend class Algorithm;
 public:
 	Scheduler(DataCenter &dc);
 	Scheduler(DataCenter *dc);
 	~Scheduler();
-	int getParaByScheduler();//请将初始参数设置为70以上
 	int getSysTime();
 	int getSysTimeChangePath(int para);
 	int getSysTimeChangeTime(int para);//边跑调度器边修改出发时间
 	//基于动态调度器规划路径
-	int getPathByScheduler(int para);
 	//获得路径,为每辆车规划路径
 	//尝试解决死锁
 	int unlockDead(int para);
-	int getTimeByNoSameStartCross(int para);
 	void getPath();
 	//获得路径,所有权重为1
 	void getPathWeightOne();
@@ -31,16 +29,11 @@ public:
 	void getStartTime_loadbalance(int carnum);
 	//获得路径,为每辆车规划路径，基于时间
 	void getPathByTime();
-	void getPathByTime_reorderCars();
-	void reorderCars();
 	//车辆按出发时间重排序后进行静态规划
 	void getPathByTime_dynamic(); //根据1-100 和101-199车的轨迹，更新第200辆车的邻接矩阵
-	void swap(int i, int j);
-	void quicksort(int begin, int end);
 	void getTimeByDir(int para);//根据车的行驶方向发车（++）和（--）的一起跑 （+-）和（-+）的一起跑 
 	void ReOrderStartByTime(int para);//根据行驶时间重新安排出发时间
 	void ReOrderStartBySpeed(int para);//根据行驶时间重新安排出发时间
-	void ReOrderStartBySpeedAndStartCross(int para);//根据速度和出发点重新安排出发时间
 	bool addCarandChangeSTime(Car car);//往道路中添加车辆，并且通过改变出发时间留出空位
 	int vexnum, edge;
 	std::vector<std::vector<int> > tmp;
@@ -55,6 +48,12 @@ public:
 
 	//反映调度器状态的数据结构
 	std::vector<int> vec_numCarsInRoadPerTime;//每个时间片车的数量
+
+	/*辅助函数*/
+	int getPartition(vector<Car> &reorderCar, int begin, int end);
+	void quicksort(vector<Car> &reorderCar, int begin, int end);
+	void reorderCars(vector<Car> &reorderCar);
+
 private:
 	int num_CarsScheduling;//正在调度的car数量
 	int num_CarsPut;//已经发车的car数量
@@ -160,6 +159,7 @@ private:
 	int SchedulerInit();
 	//调度器主要逻辑代码，便于多算法复用
 	int SchedulerCore();
+	int SchedulerCore_V2();
 
 };
 
