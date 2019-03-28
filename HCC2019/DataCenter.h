@@ -12,6 +12,7 @@ class DataCenter
 {
 
 	friend class Graph_DG;
+	friend class Algorithm;
 public:
 	DataCenter();
 	DataCenter(char *data_road[MAX_ROAD_NUM], int road_count, char *data_car[MAX_CAR_NUM], int car_count, char *data_cross[MAX_CROSS_NUM], int cross_count);
@@ -91,8 +92,8 @@ private:
 	char **inputCrossData;//输入道路数据
 
 	//道路有向图邻接矩阵
-	std::vector<std::vector<int> > graphRoad;	//距离邻接矩阵，不邻接的点用正无穷表示
-	std::vector<std::vector<int> > graphMaxSpeed;	//道路最大速度邻接矩阵，不邻接的点用0表示
+	std::vector<std::vector<int> > graphRoadLength;	//距离邻接矩阵，不邻接的点用正无穷表示
+	std::vector<std::vector<int> > graphRoadMaxSpeed;	//道路最大速度邻接矩阵，不邻接的点用0表示
 	//std::vector<std::vector<float> > timeGraph;		// 时间邻接矩阵，不邻接的点用正无穷表示
 
 	//存储车辆的速度种类的向量

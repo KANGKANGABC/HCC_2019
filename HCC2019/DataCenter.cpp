@@ -91,19 +91,19 @@ void DataCenter::readRoadData()
 
 		if (sp[6].substr(0, 1) == "1")
 		{
-			graphRoad[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].length;
-			graphRoad[road[i - 1].idTo - 1][road[i - 1].idFrom - 1] = road[i - 1].length;
+			graphRoadLength[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].length;
+			graphRoadLength[road[i - 1].idTo - 1][road[i - 1].idFrom - 1] = road[i - 1].length;
 
-			graphMaxSpeed[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].speed;
-			graphMaxSpeed[road[i - 1].idTo - 1][road[i - 1].idFrom - 1] = road[i - 1].speed;
+			graphRoadMaxSpeed[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].speed;
+			graphRoadMaxSpeed[road[i - 1].idTo - 1][road[i - 1].idFrom - 1] = road[i - 1].speed;
 
 			graphC2R[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].id;
 			graphC2R[road[i - 1].idTo - 1][road[i - 1].idFrom - 1] = road[i - 1].id;
 		}
 		else
 		{
-			graphRoad[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].length;
-			graphMaxSpeed[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].speed;
+			graphRoadLength[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].length;
+			graphRoadMaxSpeed[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].speed;
 			graphC2R[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].id;
 		}
 	}

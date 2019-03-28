@@ -203,10 +203,10 @@ void Scheduler::ReOrderStartByTime(int para)
 		int index = i / (size /(2 * para));
 		Car car = carsInGarage.front();//先调度时间长的
 		carsInGarage.pop_front();
-		if (index >= cars[car.id - 10000].plantime)
-			cars[car.id - 10000].starttime = index;
+		if (index >= cars[car.index].plantime)
+			cars[car.index].starttime = index;
 		else
-			cars[car.id - 10000].starttime = cars[car.id - 10000].plantime;
+			cars[car.index].starttime = cars[car.index].plantime;
 	}
 
 	for (int j = 0; j < num_Cars; ++j)
@@ -221,10 +221,10 @@ void Scheduler::ReOrderStartByTime(int para)
 		int index = i / (size / (2 * para));
 		Car car = carsInGarage.front();//先调度时间长的
 		carsInGarage.pop_front();
-		if (index >= cars[car.id - 10000].plantime)
-			cars[car.id - 10000].starttime = 2 * para + index;
+		if (index >= cars[car.index].plantime)
+			cars[car.index].starttime = 2 * para + index;
 		else
-			cars[car.id - 10000].starttime = 2 * para + cars[car.id - 10000].plantime;
+			cars[car.index].starttime = 2 * para + cars[car.index].plantime;
 	}
 
 	for (int j = 0; j < num_Cars; ++j)
@@ -239,10 +239,10 @@ void Scheduler::ReOrderStartByTime(int para)
 		int index = i / (size / (2 * para));
 		Car car = carsInGarage.front();//先调度时间长的
 		carsInGarage.pop_front();
-		if (index >= cars[car.id - 10000].plantime)
-			cars[car.id - 10000].starttime = 4 * para + index;
+		if (index >= cars[car.index].plantime)
+			cars[car.index].starttime = 4 * para + index;
 		else
-			cars[car.id - 10000].starttime = 4 * para + cars[car.id - 10000].plantime;
+			cars[car.index].starttime = 4 * para + cars[car.index].plantime;
 	}
 
 	for (int j = 0; j < num_Cars; ++j)
@@ -257,10 +257,10 @@ void Scheduler::ReOrderStartByTime(int para)
 		int index = i / (size / (2 * para));
 		Car car = carsInGarage.front();//先调度时间长的
 		carsInGarage.pop_front();
-		if (index >= cars[car.id - 10000].plantime)
-			cars[car.id - 10000].starttime = 6 * para + index;
+		if (index >= cars[car.index].plantime)
+			cars[car.index].starttime = 6 * para + index;
 		else
-			cars[car.id - 10000].starttime = 6 * para + cars[car.id - 10000].plantime;
+			cars[car.index].starttime = 6 * para + cars[car.index].plantime;
 	}
 }
 
@@ -377,7 +377,7 @@ void Scheduler::ReOrderStartBySpeedAndStartCross(int para)
 				while (carIsAssigned == false)			//如果安排了一辆车，则结束，安排下一辆车
 				{
 					++frequence;
-					int carOrder = qspeed.front().id - 10000;        //用于记录队首的car的下标
+					int carOrder = qspeed.front().index;        //用于记录队首的car的下标
 
 					if (qspeed.front().plantime <= time && fromCross[qspeed.front().idCrossFrom -1 ] < 1)
 					{
@@ -677,7 +677,7 @@ bool Scheduler::addCar(Car car, int i)
 	if (idLaneTarget == -1)
 	{
 		carsWaitInGarage.push_back(car);
-		//cars[car.id - 10000].starttime += 1;
+		//cars[car.index].starttime += 1;
 		return false;
 	}
 
@@ -897,29 +897,31 @@ void Scheduler::driverToNextRoad(Car car, int idNextRoad, int idNextLane, int lo
 
 bool Scheduler::isCanDriveToNextRoad(Car car, int dir, int idCross)
 {
+	int indexCarCurRoad = id2indexRoad(car.idCurRoad);
 	assert(crosses[idCross - 1].roadID[dir] != -1);//不可能进入无效路径
 	int idNextCross = 0;
-	if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//逆向
-		idNextCross = roads[car.idCurRoad - 5000].idFrom;//此车即将驶入的路口
+	if (car.idCurLane >= roads[indexCarCurRoad].channel)//逆向
+		idNextCross = roads[indexCarCurRoad].idFrom;//此车即将驶入的路口
 	else
-		idNextCross = roads[car.idCurRoad - 5000].idTo;//此车即将驶入的路口
+		idNextCross = roads[indexCarCurRoad].idTo;//此车即将驶入的路口
 	int idNextRoad = car.path[0];//获取目标道路
+	int indexNextRoad = id2indexRoad(idNextRoad);
 	int idNextLane = isCanEnter(idNextRoad, idNextCross);
 
 	int disNextRoad = getCrossDistance(car, car.idCurRoad, idNextRoad);
 	if (disNextRoad == 0)//可行驶距离为0，则停在当前路口
 	{
-		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = roads[car.idCurRoad - 5000].length;
-		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//车标记为终止状态
-		roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = NONE;
+		roads[indexCarCurRoad].lane[car.idCurLane].laneCar[0].location = roads[indexCarCurRoad].length;
+		roads[indexCarCurRoad].lane[car.idCurLane].laneCar[0].status = FINESHED;//车标记为终止状态
+		roads[indexCarCurRoad].lane[car.idCurLane].laneCar[0].dirCross = NONE;
 		return true;
 	}
 	else
 	{
-		int sizeLaneCar = roads[idNextRoad - 5000].lane[idNextLane].laneCar.size();
+		int sizeLaneCar = roads[indexNextRoad].lane[idNextLane].laneCar.size();
 		if (sizeLaneCar > 0)
 		{
-			Car carNext = roads[idNextRoad - 5000].lane[idNextLane].laneCar[sizeLaneCar - 1];
+			Car carNext = roads[indexNextRoad].lane[idNextLane].laneCar[sizeLaneCar - 1];
 			if (disNextRoad < carNext.location)
 			{
 				driverToNextRoad(car, idNextRoad, idNextLane, disNextRoad);
@@ -940,9 +942,9 @@ bool Scheduler::isCanDriveToNextRoad(Car car, int dir, int idCross)
 					}
 					else
 					{
-						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].location = roads[car.idCurRoad - 5000].length;
-						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].status = FINESHED;//车标记为终止状态
-						roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar[0].dirCross = NONE;
+						roads[indexCarCurRoad].lane[car.idCurLane].laneCar[0].location = roads[indexCarCurRoad].length;
+						roads[indexCarCurRoad].lane[car.idCurLane].laneCar[0].status = FINESHED;//车标记为终止状态
+						roads[indexCarCurRoad].lane[car.idCurLane].laneCar[0].dirCross = NONE;
 						return true;
 					}
 						
@@ -965,7 +967,7 @@ void Scheduler::driverCarInGarage()
 	{
 		Car car = carsWaitInGarage.front();
 		carsWaitInGarage.pop_front();
-		addCar(car, car.id - 10000);
+		addCar(car, car.index);
 	}
 	for (int i = 0; i < num_Cars; ++i)
 	{
@@ -984,7 +986,7 @@ void Scheduler::driverCarInGarageDynamic(Graph_DG &graph,int para)
 	{
 		Car car = carsWaitInGarage.front();
 		carsWaitInGarage.pop_front();
-		addCar(car, car.id - 10000);
+		addCar(car, car.index);
 	}
 	for (int i = 0; i < num_Cars; ++i)
 	{
@@ -1022,7 +1024,7 @@ void Scheduler::driverCarInGarageChangeTime(Graph_DG &graph,int para)
 			for (int j = 0; j < pathRoad.size(); ++j)
 			{
 				pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
-				if (roads[pathRoad[j] - 5000].idFrom == pathCross[j])
+				if (roads[id2indexRoad(pathRoad[j])].idFrom == pathCross[j])
 					pathRoadWithDir[j] = pathRoad[j];
 				else
 					pathRoadWithDir[j] = -pathRoad[j];
@@ -1047,11 +1049,11 @@ void Scheduler::driverCarInGarageChangeTime(Graph_DG &graph,int para)
 	{
 		Car car = carsWaitInGarage.front();
 		carsWaitInGarage.pop_front();
-		addCar(car, car.id - 10000);
+		addCar(car, car.index);
 	}
 	for (auto car : carsDeparture)
 	{
-		addCar(car, car.id - 10000);
+		addCar(car, car.index);
 	}
 	carsDeparture.clear();
 }
@@ -1201,39 +1203,40 @@ int Scheduler::getDirByRoadCrossDir(int idCross, int idRoad)
 
 void Scheduler::driveAllCarsJustOnOneChannelToEndState(int idRoad, int idCross, int idChannel)
 {
-	if (roads[idRoad - 5000].lane[idChannel].laneCar.size() != 0)
+	int indexRoad = id2indexRoad(idRoad);
+	if (roads[indexRoad].lane[idChannel].laneCar.size() != 0)
 	{
-		for (int i = 0; i < roads[idRoad - 5000].lane[idChannel].laneCar.size(); ++i)
+		for (int i = 0; i < roads[indexRoad].lane[idChannel].laneCar.size(); ++i)
 		{
-			if (roads[idRoad - 5000].lane[idChannel].laneCar[i].status == WAITTING)//只处理等待状态的车
+			if (roads[indexRoad].lane[idChannel].laneCar[i].status == WAITTING)//只处理等待状态的车
 			{
-				Car car = roads[idRoad - 5000].lane[idChannel].laneCar[i];
-				if (car.location + std::min(roads[idRoad - 5000].speed, car.speed) <= roads[idRoad - 5000].length)//不会驶出路口
+				Car car = roads[indexRoad].lane[idChannel].laneCar[i];
+				if (car.location + std::min(roads[indexRoad].speed, car.speed) <= roads[indexRoad].length)//不会驶出路口
 				{
 					//只处理行驶后不通过路口的车
 					if (i != 0)//如果该车不是第一辆车
 					{
-						Car carNext = roads[idRoad - 5000].lane[idChannel].laneCar[i - 1];
-						if (car.location + std::min(roads[idRoad - 5000].speed, car.speed) < carNext.location)
+						Car carNext = roads[indexRoad].lane[idChannel].laneCar[i - 1];
+						if (car.location + std::min(roads[indexRoad].speed, car.speed) < carNext.location)
 						{
 							//前车不形成阻挡
-							roads[idRoad - 5000].lane[idChannel].laneCar[i].location += std::min(roads[idRoad - 5000].speed, car.speed);//车正常行驶
-							roads[idRoad - 5000].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
-							roads[idRoad - 5000].lane[idChannel].laneCar[i].dirCross = NONE;
+							roads[indexRoad].lane[idChannel].laneCar[i].location += std::min(roads[indexRoad].speed, car.speed);//车正常行驶
+							roads[indexRoad].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
+							roads[indexRoad].lane[idChannel].laneCar[i].dirCross = NONE;
 						}
 						else if (carNext.status == FINESHED)
 						{
-							roads[idRoad - 5000].lane[idChannel].laneCar[i].location = carNext.location - 1;//车正常行驶
-							roads[idRoad - 5000].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
-							roads[idRoad - 5000].lane[idChannel].laneCar[i].dirCross = NONE;
+							roads[indexRoad].lane[idChannel].laneCar[i].location = carNext.location - 1;//车正常行驶
+							roads[indexRoad].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
+							roads[indexRoad].lane[idChannel].laneCar[i].dirCross = NONE;
 						}
 					}
 					else
 					{
 						//前车不形成阻挡
-						roads[idRoad - 5000].lane[idChannel].laneCar[i].location += std::min(roads[idRoad - 5000].speed, car.speed);//车正常行驶
-						roads[idRoad - 5000].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
-						roads[idRoad - 5000].lane[idChannel].laneCar[i].dirCross = NONE;
+						roads[indexRoad].lane[idChannel].laneCar[i].location += std::min(roads[indexRoad].speed, car.speed);//车正常行驶
+						roads[indexRoad].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
+						roads[indexRoad].lane[idChannel].laneCar[i].dirCross = NONE;
 					}
 				}
 				else 
@@ -1241,12 +1244,12 @@ void Scheduler::driveAllCarsJustOnOneChannelToEndState(int idRoad, int idCross, 
 					//只处理行驶后不通过路口的车
 					if (i != 0)//如果该车不是第一辆车
 					{
-						Car carNext = roads[idRoad - 5000].lane[idChannel].laneCar[i - 1];
+						Car carNext = roads[indexRoad].lane[idChannel].laneCar[i - 1];
 						if (carNext.status == FINESHED)
 						{
-							roads[idRoad - 5000].lane[idChannel].laneCar[i].location = carNext.location - 1;//车正常行驶
-							roads[idRoad - 5000].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
-							roads[idRoad - 5000].lane[idChannel].laneCar[i].dirCross = NONE;
+							roads[indexRoad].lane[idChannel].laneCar[i].location = carNext.location - 1;//车正常行驶
+							roads[indexRoad].lane[idChannel].laneCar[i].status = FINESHED;//车标记为终止状态
+							roads[indexRoad].lane[idChannel].laneCar[i].dirCross = NONE;
 						}
 					}
 				}
@@ -1561,40 +1564,40 @@ int Scheduler::unlockDead(int para)
 	for (int i = 0; i < carsDeadLock.size() / 2; ++i)
 	{
 		Car car = carsDeadLock[i];
-		cars[car.id - 10000].starttime += car.id % 60;//出发时间重安排
-		cars[car.id - 10000].starttimeAnswer = cars[car.id - 10000].starttime;
+		cars[car.index].starttime += car.id % 60;//出发时间重安排
+		cars[car.index].starttimeAnswer = cars[car.index].starttime;
 	}
 	time = getSysTimeChangePath(w);//重新跑一下看是不是死锁
 	PRINT("timeUnlock1:%d\n", time);
 	for (int i = 0; i < carsDeadLock.size() / 2; ++i)
 	{
 		Car car = carsDeadLock[i];
-		cars[car.id - 10000].starttime += car.id % 100;//出发时间重安排
-		cars[car.id - 10000].starttimeAnswer = cars[car.id - 10000].starttime;
+		cars[car.index].starttime += car.id % 100;//出发时间重安排
+		cars[car.index].starttimeAnswer = cars[car.index].starttime;
 	}
 	time = getSysTimeChangePath(w);//重新跑一下看是不是死锁
 	PRINT("timeUnlock2:%d\n", time);
 	for (int i = 0; i < carsDeadLock.size() / 2; ++i)
 	{
 		Car car = carsDeadLock[i];
-		cars[car.id - 10000].starttime += car.id % 100;//出发时间重安排
-		cars[car.id - 10000].starttimeAnswer = cars[car.id - 10000].starttime;
+		cars[car.index].starttime += car.id % 100;//出发时间重安排
+		cars[car.index].starttimeAnswer = cars[car.index].starttime;
 	}
 	time = getSysTimeChangePath(w);//重新跑一下看是不是死锁
 	PRINT("timeUnlock3:%d\n", time);
 	for (int i = 0; i < carsDeadLock.size() / 2; ++i)
 	{
 		Car car = carsDeadLock[i];
-		cars[car.id - 10000].starttime += car.id % 100;//出发时间重安排
-		cars[car.id - 10000].starttimeAnswer = cars[car.id - 10000].starttime;
+		cars[car.index].starttime += car.id % 100;//出发时间重安排
+		cars[car.index].starttimeAnswer = cars[car.index].starttime;
 	}
 	time = getSysTimeChangePath(w);//重新跑一下看是不是死锁
 	PRINT("timeUnlock4:%d\n", time);
 	for (int i = 0; i < carsDeadLock.size() / 2; ++i)
 	{
 		Car car = carsDeadLock[i];
-		cars[car.id - 10000].starttime += car.id % 100;//出发时间重安排
-		cars[car.id - 10000].starttimeAnswer = cars[car.id - 10000].starttime;
+		cars[car.index].starttime += car.id % 100;//出发时间重安排
+		cars[car.index].starttimeAnswer = cars[car.index].starttime;
 	}
 	time = getSysTimeChangePath(w);//重新跑一下看是不是死锁
 	PRINT("timeUnlock5:%d\n", time);
@@ -1731,7 +1734,7 @@ void Scheduler::getStartTime(int para)
 				{
 					Car car = carsDeque.front();
 					carsDeque.pop_front();
-					cars[car.id - 10000].starttime = timeStart;
+					cars[car.index].starttime = timeStart;
 					break;
 				}
 				else if (carsDeque.size() == 0)
@@ -1743,8 +1746,8 @@ void Scheduler::getStartTime(int para)
 				carsDeque.pop_front();
 				carsDeque.pop_back();
 				loadCur += carLongTime.time + carShortTime.time;
-				cars[carLongTime.id - 10000].starttime = timeStart;
-				cars[carShortTime.id - 10000].starttime = timeStart;
+				cars[carLongTime.index].starttime = timeStart;
+				cars[carShortTime.index].starttime = timeStart;
 			}
 			timeStart++;
 		}
@@ -1791,8 +1794,8 @@ void Scheduler::getStartTime_loadbalance(int carnum)
 					goto L2;
 				}
 				balance[i].insert(balance[i].begin(), tmp.time, true);
-				cars[tmp.id - 10000].starttime = timeStart;//对处理过的car的starttime赋值
-				cars[tmp.id - 10000].starttimeAnswer = cars[tmp.id - 10000].starttime;
+				cars[tmp.index].starttime = timeStart;//对处理过的car的starttime赋值
+				cars[tmp.index].starttimeAnswer = cars[tmp.index].starttime;
 				qCar.erase(qCar.begin());
 			}
 			else
@@ -1896,7 +1899,7 @@ void Scheduler::getPathByTime_reorderCars()
 		//统计road的情况
 		for (int i = 0; i < pathRoad.size(); i++)
 		{
-			flag_road[pathRoad.at(i) - 5000]++;//记录road的使用情况
+			flag_road[id2indexRoad(pathRoad.at(i))]++;//记录road的使用情况
 		}
 
 
@@ -1954,7 +1957,7 @@ void Scheduler::getPathByTime_reorderCars()
 			oFile3.close();
 		}
 		qCar[i].path = pathRoad;
-		cars[qCar[i].id - 10000].path = qCar[i].path;	//将qcars得到的路径赋值到cars的path变量中
+		cars[qCar[i].index].path = qCar[i].path;	//将qcars得到的路径赋值到cars的path变量中
 	}
 }
 
@@ -1997,7 +2000,7 @@ void Scheduler::getPathByTime_dynamic()
 		}
 
 		qCar[i].path = pathRoad;
-		cars[qCar[i].id - 10000].path = qCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
+		cars[qCar[i].index].path = qCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
 	}
 }
 
@@ -2108,8 +2111,8 @@ void Scheduler::getTimeByDir(int para)
 				Car carTime = carsDeque.front();
 				carsDeque.pop_front();
 				loadCur += carTime.time;
-				cars[carTime.id - 10000].starttimeAnswer = timeStart;
-				cars[carTime.id - 10000].starttime = cars[carTime.id - 10000].starttimeAnswer;
+				cars[carTime.index].starttimeAnswer = timeStart;
+				cars[carTime.index].starttime = cars[carTime.index].starttimeAnswer;
 			}
 			timeStart++;
 		}
