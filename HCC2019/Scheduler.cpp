@@ -1465,9 +1465,6 @@ int Scheduler::SchedulerCore_V2()
 							if (roads[indexRoad].isDuplex != 1)
 								continue;//如果非双车道，退出本次循环
 						}
-						//在这里存入需要调度的车
-						std::vector<Car> vec_carsPerRoad;
-						std::vector<Car> vec_carsPerLine;
 						for (int m = idStartLane; m < idStartLane + roads[indexRoad].channel; ++m)//遍历所有lane
 						{
 							if (roads[indexRoad].lane[m].laneCar.size() > 0)
@@ -1480,28 +1477,6 @@ int Scheduler::SchedulerCore_V2()
 							}
 						}
 						std::sort(carsRoadWaitting.begin(), carsRoadWaitting.end(), more_location);
-						
-						for (int n = roads[indexRoad].length; n > 0; n--)
-						{
-							for (int m = idStartLane; m < idStartLane + roads[indexRoad].channel; ++m)//遍历所有lane
-							{
-								for (int t = 0; t < roads[indexRoad].lane[m].laneCar.size(); t++)
-								{
-									if (roads[indexRoad].lane[m].laneCar[t].location == n
-										&& roads[indexRoad].lane[m].laneCar[t].status == WAITTING
-										&& roads[indexRoad].lane[m].laneCar[t].dirCross != NONE)
-									{
-										vec_carsPerLine.push_back(roads[indexRoad].lane[m].laneCar[t]);
-									}
-								}
-							}
-							//std::sort(vec_carsPerLine.begin(), vec_carsPerLine.end(), more_location);
-							for (auto car : vec_carsPerLine)
-							{
-								vec_carsPerRoad.push_back(car);
-							}
-							vec_carsPerLine.clear();
-						}
 						while(carsRoadWaitting.size() > 0)
 						//for (auto car : vec_carsPerRoad)
 						{
@@ -1612,7 +1587,6 @@ int Scheduler::SchedulerCore_V2()
 								break;
 							}
 						}
-						vec_carsPerRoad.clear();
 					}
 				}
 			}

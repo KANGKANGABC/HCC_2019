@@ -87,14 +87,13 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 {
 	std::map<int, int> mapResult;
-	int para = 400;
+	int para = 340;
 	int time = 0;
 	Scheduler sd(*m_dc);
 
 
 	getStartTime_BySpeed(para);
 	reorderCarsStarttime();
-	getPath_StaticAnalysis();
 
 	for (int i = 0; i < 15; ++i)//迭代15次
 	{
@@ -107,7 +106,7 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 			time = INT_MAX;
 		}
 		mapResult.insert(pair<int, int>(time, para));
-		para -= 5;
+		para -= 4;
 	}
 	for (auto &v : mapResult)
 	{
@@ -120,7 +119,6 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	
 	getStartTime_BySpeed(para);
 	reorderCarsStarttime();
-	getPath_StaticAnalysis();
 	
 	//ReOrderStartBySpeedAndStartCross(para);
 	//reorderCarsStarttime();
