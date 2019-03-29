@@ -1145,6 +1145,11 @@ void Scheduler::driveAllCarsJustOnOneChannelToEndState(int idRoad, int idCross, 
 							roads[indexRoad].lane[idChannel].laneCar[i].dirCross = NONE;
 						}
 					}
+					else
+					{
+						carsRoadWaitting.push_back(car);
+						std::sort(carsRoadWaitting.begin(), carsRoadWaitting.end(), more_location);
+					}
 				}
 			}
 		}
@@ -1453,6 +1458,7 @@ int Scheduler::SchedulerCore_V2()
 					int idRoad = getFirstRoadFromCross(idCross, j);
 					if (idRoad != -1)
 					{
+						carsRoadWaitting.clear();
 						int indexRoad = id2indexRoad(idRoad);
 						int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
 						if (roads[indexRoad].idFrom == crosses[i].id)//如果cross为道路的入方向
@@ -1464,6 +1470,19 @@ int Scheduler::SchedulerCore_V2()
 						//在这里存入需要调度的车
 						std::vector<Car> vec_carsPerRoad;
 						std::vector<Car> vec_carsPerLine;
+						for (int m = idStartLane; m < idStartLane + roads[indexRoad].channel; ++m)//遍历所有lane
+						{
+							if (roads[indexRoad].lane[m].laneCar.size() > 0)
+							{
+								if (roads[indexRoad].lane[m].laneCar[0].status == WAITTING
+									&& roads[indexRoad].lane[m].laneCar[0].dirCross != NONE)
+								{
+									carsRoadWaitting.push_back(roads[indexRoad].lane[m].laneCar[0]);
+								}
+							}
+						}
+						std::sort(carsRoadWaitting.begin(), carsRoadWaitting.end(), more_location);
+						
 						for (int n = roads[indexRoad].length; n > 0; n--)
 						{
 							for (int m = idStartLane; m < idStartLane + roads[indexRoad].channel; ++m)//遍历所有lane
@@ -1485,8 +1504,12 @@ int Scheduler::SchedulerCore_V2()
 							}
 							vec_carsPerLine.clear();
 						}
-						for (auto car : vec_carsPerRoad)
+						while(carsRoadWaitting.size() > 0)
+						//for (auto car : vec_carsPerRoad)
 						{
+							Car car = carsRoadWaitting.front();
+							carsRoadWaitting.pop_front();
+							
 							assert(car.status == WAITTING);
 							int dirConflict = 0;
 							int dirTarget = 0;

@@ -163,5 +163,8 @@ private:
 	int SchedulerCore();
 	int SchedulerCore_V2();
 
+	//等待在路口的车
+	std::deque<Car> carsRoadWaitting;
+
 };
 
