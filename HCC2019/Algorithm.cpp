@@ -114,19 +114,19 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 
 void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 {
-	/*//根据地图选参数
+	//根据地图选参数
 	int paraFinal;
 	int carLastArrive;
 	int carTimeEarly;
 	switch (cars[0].speed)				//选择不同速度的开始发车和终止发车时刻
 	{
 	case 8:  //地图1
-		carLastArrive = 10;
+		carLastArrive = 15;
 		carTimeEarly = 50;
 		break;
 	case 6:			//地图2
 		carLastArrive = 10;
-		carTimeEarly = 50;
+		carTimeEarly =50;
 		break;
 	default:
 		break;
@@ -168,9 +168,9 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	time = sd.getSysTime();
 	PRINT("time:%d\n", timeFinal);
 	PRINT("timeFinal:%d\n", time);
-	*/
 
-	std::map<int, int> mapResult;
+
+	/*std::map<int, int> mapResult;
 	int time = 0;
 	Scheduler sd(*m_dc);
 	for (int i = 0; i < 15; ++i)//迭代15次
@@ -198,7 +198,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	int timeFinal = sd.getSysTime();
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		if (cars[i].timeArrived > (timeFinal -15))
+		if (cars[i].timeArrived > (timeFinal -10))
 		{
 				cars[i].starttime = cars[i].starttime -50;
 				cars[i].starttimeAnswer = cars[i].starttime;
@@ -207,7 +207,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	time = sd.getSysTime();
 	PRINT("time:%d\n", timeFinal);
 	PRINT("timeFinal:%d\n", time);
-	
+	*/
 }
 
 void Algorithm::ShortestTime_SpeedBasicRoadStatus_AutoPara(int para)
@@ -404,9 +404,9 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 	case 6:			//地图2
 		early2 = 0;
 		early4 = 0;
-		early6 = 0;
-		early8 = 10;
-		delay =8;
+		early6 = 2;
+		early8 = 8;
+		delay =10;
 		break;
 	default:
 		break;
