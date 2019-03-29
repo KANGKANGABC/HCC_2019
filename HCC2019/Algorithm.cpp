@@ -28,7 +28,7 @@ void Algorithm::ShortestTime_SpeedBasic_AutoPara()
 	Scheduler sd(*m_dc);
 
 	getPath();
-	for (int i = 0; i < 15; ++i)//µü´ú15´Î
+	for (int i = 0; i < 15; ++i)//è¿­ä»£15æ¬¡
 	{
 		getStartTime_BySpeed(para);
 		int time = sd.getSysTime();
@@ -58,7 +58,7 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 	getStartTime_BySpeed(para);
 	reorderCarsStarttime();
 	getPath_StaticAnalysis();
-	for (int i = 0; i < 15; ++i)//µü´ú15´Î
+	for (int i = 0; i < 15; ++i)//è¿­ä»£15æ¬¡
 	{
 		getStartTime_BySpeed(para);
 		reorderCarsStarttime();
@@ -100,7 +100,7 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	ReOrderStartBySpeedAndStartCross(para);
 	reorderCarsStarttime();
 
-	for (int i = 0; i < 15; ++i)//µü´ú15´Î
+	for (int i = 0; i < 15; ++i)//è¿­ä»£15æ¬¡
 	{
 		//getStartTime_BySpeed(para);
 		ReOrderStartBySpeedAndStartCross(para);
@@ -146,10 +146,27 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 
 void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 {
+	//æ ¹æ®åœ°å›¾é€‰å‚æ•°
+	int paraFinal;
+	int carLastArrive;
+	int carTimeEarly;
+	switch (cars[0].speed)				//é€‰æ‹©ä¸åŒé€Ÿåº¦çš„å¼€å§‹å‘è½¦å’Œç»ˆæ­¢å‘è½¦æ—¶åˆ»
+	{
+	case 8:  //åœ°å›¾1
+		carLastArrive = 15;
+		carTimeEarly = 50;
+		break;
+	case 6:			//åœ°å›¾2
+		carLastArrive = 10;
+		carTimeEarly =50;
+		break;
+	default:
+		break;
+	}
 	std::map<int, int> mapResult;
 	int time = 0;
 	Scheduler sd(*m_dc);
-	for (int i = 0; i < 15; ++i)//µü´ú15´Î
+	for (int i = 0; i < 15; ++i)//è¿­ä»£15æ¬¡
 	{
 		ReOrderStartBySpeedAndStartCross(para);
 		reorderCarsStarttime();
@@ -158,7 +175,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 		if (time == false)
 			time = INT_MAX;
 		mapResult.insert(pair<int, int>(time, para));
-		para -= 2;
+		para -=1;
 	}
 	for (auto &v : mapResult)
 	{
@@ -166,7 +183,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	}
 	map<int, int>::iterator it;
 	it = mapResult.begin();
-	it++;
+	it;
 	para = it->second;
 	ReOrderStartBySpeedAndStartCross(para);
 	reorderCarsStarttime();
@@ -174,15 +191,56 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	int timeFinal = sd.getSysTime();
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		if (cars[i].timeArrived > (timeFinal - 20))
+		if (cars[i].timeArrived > (timeFinal - carLastArrive))
 		{
-			cars[i].starttime = cars[i].starttime - 20;
+			cars[i].starttime = cars[i].starttime - carTimeEarly;
 			cars[i].starttimeAnswer = cars[i].starttime;
 		}
 	}
 	time = sd.getSysTime();
-	int timeV2 = sd.getSysTimeV2();
-	PRINT("timeFinal:V0:%d   V2:%d\n", time, timeV2);
+
+	PRINT("time:%d\n", timeFinal);
+	PRINT("timeFinal:%d\n", time);
+
+
+	/*std::map<int, int> mapResult;
+	int time = 0;
+	Scheduler sd(*m_dc);
+	for (int i = 0; i < 15; ++i)//è¿­ä»£15æ¬¡
+	{
+		ReOrderStartBySpeedAndStartCross(para);
+		reorderCarsStarttime();
+		getPath_StaticAnalysis();
+		int time = sd.getSysTime();
+		if (time == false)
+			time = INT_MAX;
+		mapResult.insert(pair<int, int>(time, para));
+		para -=1;
+	}
+	for (auto &v : mapResult)
+	{
+		PRINT("result:%d para:%d\n", v.first, v.second);
+	}
+	map<int, int>::iterator it;
+	it = mapResult.begin();
+	it;
+	para = it->second;
+	ReOrderStartBySpeedAndStartCross(para);
+	reorderCarsStarttime();
+	getPath_StaticAnalysis();
+	int timeFinal = sd.getSysTime();
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].timeArrived > (timeFinal -10))
+		{
+				cars[i].starttime = cars[i].starttime -50;
+				cars[i].starttimeAnswer = cars[i].starttime;
+		}
+	}
+	time = sd.getSysTime();
+	PRINT("time:%d\n", timeFinal);
+	PRINT("timeFinal:%d\n", time);
+	*/
 }
 
 void Algorithm::ShortestTime_SpeedBasicRoadStatus_AutoPara(int para)
@@ -199,7 +257,7 @@ void Algorithm::unlockDead(int para)
 	int time, timeFinal;
 	int w = 9;
 	Scheduler sd(*m_dc);
-	for (int i = 0; i < 15; ++i)//µü´ú20´Î
+	for (int i = 0; i < 15; ++i)//è¿­ä»£20æ¬¡
 	{
 		getStartTime_BySpeed(para);
 		getPath();
@@ -221,51 +279,51 @@ void Algorithm::unlockDead(int para)
 	getStartTime_BySpeed(para);
 	getPath();
 	time = sd.getSysTimeChangePath(w);
-	//ĞŞ¸ÄËÀËø³µµÄ³ö·¢Ê±¼ä
+	//ä¿®æ”¹æ­»é”è½¦çš„å‡ºå‘æ—¶é—´
 	for (int i = 0; i < sd.carsDeadLock.size() / 2; ++i)
 	{
 		Car car = sd.carsDeadLock[i];
-		cars[car.index].starttime += car.id % 60;//³ö·¢Ê±¼äÖØ°²ÅÅ
+		cars[car.index].starttime += car.id % 60;//å‡ºå‘æ—¶é—´é‡å®‰æ’
 		cars[car.index].starttimeAnswer = cars[car.index].starttime;
 	}
-	time = sd.getSysTimeChangePath(w);//ÖØĞÂÅÜÒ»ÏÂ¿´ÊÇ²»ÊÇËÀËø
+	time = sd.getSysTimeChangePath(w);//é‡æ–°è·‘ä¸€ä¸‹çœ‹æ˜¯ä¸æ˜¯æ­»é”
 	PRINT("timeUnlock1:%d\n", time);
 	for (int i = 0; i < sd.carsDeadLock.size() / 2; ++i)
 	{
 		Car car = sd.carsDeadLock[i];
-		cars[car.index].starttime += car.id % 100;//³ö·¢Ê±¼äÖØ°²ÅÅ
+		cars[car.index].starttime += car.id % 100;//å‡ºå‘æ—¶é—´é‡å®‰æ’
 		cars[car.index].starttimeAnswer = cars[car.index].starttime;
 	}
-	time = sd.getSysTimeChangePath(w);//ÖØĞÂÅÜÒ»ÏÂ¿´ÊÇ²»ÊÇËÀËø
+	time = sd.getSysTimeChangePath(w);//é‡æ–°è·‘ä¸€ä¸‹çœ‹æ˜¯ä¸æ˜¯æ­»é”
 	PRINT("timeUnlock2:%d\n", time);
 	for (int i = 0; i < sd.carsDeadLock.size() / 2; ++i)
 	{
 		Car car = sd.carsDeadLock[i];
-		cars[car.index].starttime += car.id % 100;//³ö·¢Ê±¼äÖØ°²ÅÅ
+		cars[car.index].starttime += car.id % 100;//å‡ºå‘æ—¶é—´é‡å®‰æ’
 		cars[car.index].starttimeAnswer = cars[car.index].starttime;
 	}
-	time = sd.getSysTimeChangePath(w);//ÖØĞÂÅÜÒ»ÏÂ¿´ÊÇ²»ÊÇËÀËø
+	time = sd.getSysTimeChangePath(w);//é‡æ–°è·‘ä¸€ä¸‹çœ‹æ˜¯ä¸æ˜¯æ­»é”
 	PRINT("timeUnlock3:%d\n", time);
 	for (int i = 0; i < sd.carsDeadLock.size() / 2; ++i)
 	{
 		Car car = sd.carsDeadLock[i];
-		cars[car.index].starttime += car.id % 100;//³ö·¢Ê±¼äÖØ°²ÅÅ
+		cars[car.index].starttime += car.id % 100;//å‡ºå‘æ—¶é—´é‡å®‰æ’
 		cars[car.index].starttimeAnswer = cars[car.index].starttime;
 	}
-	time = sd.getSysTimeChangePath(w);//ÖØĞÂÅÜÒ»ÏÂ¿´ÊÇ²»ÊÇËÀËø
+	time = sd.getSysTimeChangePath(w);//é‡æ–°è·‘ä¸€ä¸‹çœ‹æ˜¯ä¸æ˜¯æ­»é”
 	PRINT("timeUnlock4:%d\n", time);
 	for (int i = 0; i < sd.carsDeadLock.size() / 2; ++i)
 	{
 		Car car = sd.carsDeadLock[i];
-		cars[car.index].starttime += car.id % 100;//³ö·¢Ê±¼äÖØ°²ÅÅ
+		cars[car.index].starttime += car.id % 100;//å‡ºå‘æ—¶é—´é‡å®‰æ’
 		cars[car.index].starttimeAnswer = cars[car.index].starttime;
 	}
-	time = sd.getSysTimeChangePath(w);//ÖØĞÂÅÜÒ»ÏÂ¿´ÊÇ²»ÊÇËÀËø
+	time = sd.getSysTimeChangePath(w);//é‡æ–°è·‘ä¸€ä¸‹çœ‹æ˜¯ä¸æ˜¯æ­»é”
 	PRINT("timeUnlock5:%d\n", time);
 	time = sd.getSysTime();
 	PRINT("timeFinal:%d\n", time);
 
-	sd.carsDeadLock.clear();//Çå¿ÕËÀËø¶ÓÁĞ
+	sd.carsDeadLock.clear();//æ¸…ç©ºæ­»é”é˜Ÿåˆ—
 
 }
 
@@ -301,7 +359,7 @@ void Algorithm::getPath_StaticAnalysis()
 		vector<int> pathCross = graph.DijkstraNor(qCar[i].idCrossFrom, qCar[i].idCrossTo, qCar[i].speed);
 
 		num++;
-		//¶¨Ê±¸üĞÂ½»Í¨Óµ¶ÂÁÚ½Ó¾ØÕójamDegreeLongBefore
+		//å®šæ—¶æ›´æ–°äº¤é€šæ‹¥å µé‚»æ¥çŸ©é˜µjamDegreeLongBefore
 		if (num == 100)
 		{
 			num = 0;
@@ -309,7 +367,7 @@ void Algorithm::getPath_StaticAnalysis()
 			graph.cleanUpJamDegreeBefore();
 		}
 
-		//½«Í³¼ÆµÄÇé¿ö·Åµ½ jamDegreeBeforeµÄ¾ØÕóÖĞ
+		//å°†ç»Ÿè®¡çš„æƒ…å†µæ”¾åˆ° jamDegreeBeforeçš„çŸ©é˜µä¸­
 		for (int i = 0, j = 1; j < pathCross.size(); i++, j++)
 		{
 			graph.jamDegreeBefore[pathCross.at(i) - 1][pathCross.at(j) - 1]++;
@@ -323,7 +381,7 @@ void Algorithm::getPath_StaticAnalysis()
 			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
 		}
 		qCar[i].path = pathRoad;
-		cars[qCar[i].index].path = qCar[i].path;	//½«qCarµÃµ½µÄÂ·¾¶¸³Öµµ½carsµÄpath±äÁ¿ÖĞ
+		cars[qCar[i].index].path = qCar[i].path;	//å°†qCarå¾—åˆ°çš„è·¯å¾„èµ‹å€¼åˆ°carsçš„pathå˜é‡ä¸­
 	}
 }
 
@@ -335,7 +393,7 @@ void Algorithm::getStartTime_BySpeed(int para)
 	n6 = para - para / 36;
 	n8 = para - para / 12;
 
-	for (int i = 0; i < num_Cars; ++i)//ºöÂÔµÚ0ĞĞÊı¾İ
+	for (int i = 0; i < num_Cars; ++i)//å¿½ç•¥ç¬¬0è¡Œæ•°æ®
 	{
 		switch (cars[i].speed)
 		{
@@ -357,7 +415,7 @@ void Algorithm::getStartTime_BySpeed(int para)
 
 		if (cars[i].starttime < cars[i].plantime)
 			cars[i].starttime = cars[i].plantime;
-		cars[i].starttimeAnswer = cars[i].starttime;//starttimeAnswerÎª×îÖÕĞ´³öµÄ³ö·¢Ê±¼ä£¬²»»á¸ü¸Ä
+		cars[i].starttimeAnswer = cars[i].starttime;//starttimeAnswerä¸ºæœ€ç»ˆå†™å‡ºçš„å‡ºå‘æ—¶é—´ï¼Œä¸ä¼šæ›´æ”¹
 	}
 }
 
@@ -365,21 +423,43 @@ bool Comp(const int &a, const int &b);
 
 void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 {
-	int n2, n4, n6, n8;
-	n2 = para;
-	n4 = para;
-	n6 = para;
-	n8 = para;
+	int early2,early4,early6,early8;
+	int delay;
+	switch (cars[0].speed)				//é€‰æ‹©ä¸åŒé€Ÿåº¦çš„å¼€å§‹å‘è½¦å’Œç»ˆæ­¢å‘è½¦æ—¶åˆ»
+	{
+	case 8:  //åœ°å›¾1
+		early2 =0;
+		early4 =1;
+		early6 = para/36;
+		early8 =para/12;
+		delay =10;
+		break;
+	case 6:			//åœ°å›¾2
+		early2 = 0;
+		early4 = 0;
+		early6 = 2;
+		early8 = 8;
+		delay =10;
+		break;
+	default:
+		break;
+	}
 
-	sort(speedType.begin(), speedType.end(), Comp);  //speedTypeÀï´æµÄÊÇËÙ¶ÈÀàĞÍ
+	int n2, n4, n6, n8;
+	n2 = para-early2;
+	n4 = para-early4;
+	n6 = para-early6;
+	n8 = para-early8;
+
+	sort(speedType.begin(), speedType.end(), Comp);  //speedTypeé‡Œå­˜çš„æ˜¯é€Ÿåº¦ç±»å‹
 
 	for (auto speed : speedType)
 	{
-		std::queue<Car> qspeed;		//½«car°´speedË³ĞòÒÀ´ÎÈë¶ÓÁĞqspeed
+		std::queue<Car> qspeed;		//å°†caræŒ‰speedé¡ºåºä¾æ¬¡å…¥é˜Ÿåˆ—qspeed
 
-		assert(qspeed.size() == 0);		//È·±£qspeedÎª¿Õ
+		assert(qspeed.size() == 0);		//ç¡®ä¿qspeedä¸ºç©º
 
-		for (int i = 1; i <= num_Cars; ++i)			//½«car°´ËÙ¶ÈÏÈºóÈë¶ÓÁĞ£¬Ã¿´Î¶ÓÁĞÀïÖ»ÓĞÒ»ÖÖËÙ¶ÈµÄ³µ
+		for (int i = 1; i <= num_Cars; ++i)			//å°†caræŒ‰é€Ÿåº¦å…ˆåå…¥é˜Ÿåˆ—ï¼Œæ¯æ¬¡é˜Ÿåˆ—é‡Œåªæœ‰ä¸€ç§é€Ÿåº¦çš„è½¦
 		{
 			if (cars[i - 1].speed == speed)
 			{
@@ -388,7 +468,7 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 		}
 
 		int timebegin, timeend;
-		switch (speed)				//Ñ¡Ôñ²»Í¬ËÙ¶ÈµÄ¿ªÊ¼·¢³µºÍÖÕÖ¹·¢³µÊ±¿Ì
+		switch (speed)				//é€‰æ‹©ä¸åŒé€Ÿåº¦çš„å¼€å§‹å‘è½¦å’Œç»ˆæ­¢å‘è½¦æ—¶åˆ»
 		{
 		case 8:
 			timebegin = 1;
@@ -403,20 +483,20 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 			timeend = 2 * (n8 + n6 + n4);
 			break;
 		case 2:
-			timebegin = 2 * (n8 + n6 + n4) + 1;
-			timeend = 2 * (n8 + n6 + n4 + n2);
+			timebegin = 2 * (n8 + n6 + n4) + delay;
+			timeend = 2 * (n8 + n6 + n4 + n2) +delay;
 			break;
 		default:
 			break;
 		}
 
-		int carStartPerSec = qspeed.size() / (timeend - timebegin) + 1;  //¼ÆËãÃ¿Ê±¼äÆ¬ĞèÒª·¢³öµÄ³µÊıÁ¿£¬¼ÓÒ»ÊÇÎªÁË·ÀÖ¹·¢²»Íê£¬¿ÉÄÜ»áµ¼ÖÂ²»Í¬ËÙ¶È·¢³µÅú´Î¼äÓĞ¼ä¸ô
-		for (int time = timebegin; time <= timeend; time++)		//Í¬Ò»Ê±¼äÆ¬Í¬Ò»µØµãµÄ³µÖ»·¢Ò»Á¾
+		int carStartPerSec = qspeed.size() / (timeend - timebegin) + 1;  //è®¡ç®—æ¯æ—¶é—´ç‰‡éœ€è¦å‘å‡ºçš„è½¦æ•°é‡ï¼ŒåŠ ä¸€æ˜¯ä¸ºäº†é˜²æ­¢å‘ä¸å®Œï¼Œå¯èƒ½ä¼šå¯¼è‡´ä¸åŒé€Ÿåº¦å‘è½¦æ‰¹æ¬¡é—´æœ‰é—´éš”
+		for (int time = timebegin; time <= timeend; time++)		//åŒä¸€æ—¶é—´ç‰‡åŒä¸€åœ°ç‚¹çš„è½¦åªå‘ä¸€è¾†
 		{
-			if (qspeed.empty())			//Èç¹ûqspeed¿ÕÁË£¬ËµÃ÷¸ÃËÙ¶ÈµÄ³µ·ÖÅäÍêÁË£¬ÍË³öµ±Ç°Ñ­»·
+			if (qspeed.empty())			//å¦‚æœqspeedç©ºäº†ï¼Œè¯´æ˜è¯¥é€Ÿåº¦çš„è½¦åˆ†é…å®Œäº†ï¼Œé€€å‡ºå½“å‰å¾ªç¯
 				break;
 
-			vector <int>fromCross;				//ÓÃÓÚ´æ´¢Ã¿Ò»Ê±¼äÆ¬ÒÑ·ÖÅä³µÁ¾µÄ³ö·¢µØ£¬Ã¿Ò»Ê±¼äÆ¬¶¼Òª³õÊ¼»¯Îª0
+			vector <int>fromCross;				//ç”¨äºå­˜å‚¨æ¯ä¸€æ—¶é—´ç‰‡å·²åˆ†é…è½¦è¾†çš„å‡ºå‘åœ°ï¼Œæ¯ä¸€æ—¶é—´ç‰‡éƒ½è¦åˆå§‹åŒ–ä¸º0
 			fromCross.resize(num_Cross);
 			for (int i = 0; i < num_Cross; i++)
 			{
@@ -425,33 +505,33 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 
 			for (int carAssigned = 0; carAssigned < carStartPerSec; carAssigned++)
 			{
-				//¶ÓÁĞÖĞµÄ³µÁ¾ÊıÄ¿Ğ¡ÓÚcarStartPerSec
-				if (qspeed.empty())			//Èç¹ûqspeed¿ÕÁË£¬ËµÃ÷¸ÃËÙ¶ÈµÄ³µ·ÖÅäÍêÁË£¬ÍË³öµ±Ç°Ñ­»·
+				//é˜Ÿåˆ—ä¸­çš„è½¦è¾†æ•°ç›®å°äºcarStartPerSec
+				if (qspeed.empty())			//å¦‚æœqspeedç©ºäº†ï¼Œè¯´æ˜è¯¥é€Ÿåº¦çš„è½¦åˆ†é…å®Œäº†ï¼Œé€€å‡ºå½“å‰å¾ªç¯
 					break;
 
-				//¶ÓÁĞÖĞ»¹ÓĞ¿É·¢µÄ³µ
+				//é˜Ÿåˆ—ä¸­è¿˜æœ‰å¯å‘çš„è½¦
 				bool carIsAssigned = false;
-				int frequence = 0;			//ÓÃÓÚ¼ÇÂ¼Ñ­»·½øĞĞ´ÎÊıÒ²¼´¶ÓÁĞÖĞÒÑÓĞ¶àÉÙ³µ±»·ÃÎÊ¹ı
-				while (carIsAssigned == false)			//Èç¹û°²ÅÅÁËÒ»Á¾³µ£¬Ôò½áÊø£¬°²ÅÅÏÂÒ»Á¾³µ
+				int frequence = 0;			//ç”¨äºè®°å½•å¾ªç¯è¿›è¡Œæ¬¡æ•°ä¹Ÿå³é˜Ÿåˆ—ä¸­å·²æœ‰å¤šå°‘è½¦è¢«è®¿é—®è¿‡
+				while (carIsAssigned == false)			//å¦‚æœå®‰æ’äº†ä¸€è¾†è½¦ï¼Œåˆ™ç»“æŸï¼Œå®‰æ’ä¸‹ä¸€è¾†è½¦
 				{
 					++frequence;
-					int carOrder = qspeed.front().index;        //ÓÃÓÚ¼ÇÂ¼¶ÓÊ×µÄcarµÄÏÂ±ê
+					int carOrder = qspeed.front().index;        //ç”¨äºè®°å½•é˜Ÿé¦–çš„carçš„ä¸‹æ ‡
 
 					if (qspeed.front().plantime <= time && fromCross[qspeed.front().idCrossFrom - 1] < 1)
 					{
-						//Èô¶ÓÊ×µÄcarµÄplantimeĞ¡ÓÚµÈÓÚµ±Ç°Ê±¿ÌÇÒ¸Ã³ö·¢µØÖ»ÓĞÒ»Á¾£¬Ôò½«¸Ã³µstarttimeAnswerÉèÎª´Ë¿Ì£¬²¢´Óqspeed¶ÓÁĞÖĞµ¯³ö£¬carIsAssignedÉèÎªtrue£¬fromCrossµ±Ç°³ö·¢µØ¼ÓÒ»
+						//è‹¥é˜Ÿé¦–çš„carçš„plantimeå°äºç­‰äºå½“å‰æ—¶åˆ»ä¸”è¯¥å‡ºå‘åœ°åªæœ‰ä¸€è¾†ï¼Œåˆ™å°†è¯¥è½¦starttimeAnswerè®¾ä¸ºæ­¤åˆ»ï¼Œå¹¶ä»qspeedé˜Ÿåˆ—ä¸­å¼¹å‡ºï¼ŒcarIsAssignedè®¾ä¸ºtrueï¼ŒfromCrosså½“å‰å‡ºå‘åœ°åŠ ä¸€
 						cars[carOrder].starttimeAnswer = time;
 						cars[carOrder].starttime = time;
 						fromCross[qspeed.front().idCrossFrom - 1] ++;
 						qspeed.pop();
 						carIsAssigned = true;
 					}
-					else if (qspeed.front().plantime > time)		//plantimeÔÚtimeÖ®ºó»òÒÑÓĞÏàÍ¬³ö·¢µØµÄ³µ·¢³öÁËµÄÇé¿ö£¬Ç°ÕßÖ±½ÓÍùºóÅÅ£¬ºóÕßÒª¿´ÊÇ·ñ±éÀúÍêÒ»´Î¶ÓÁĞÁË
+					else if (qspeed.front().plantime > time)		//plantimeåœ¨timeä¹‹åæˆ–å·²æœ‰ç›¸åŒå‡ºå‘åœ°çš„è½¦å‘å‡ºäº†çš„æƒ…å†µï¼Œå‰è€…ç›´æ¥å¾€åæ’ï¼Œåè€…è¦çœ‹æ˜¯å¦éå†å®Œä¸€æ¬¡é˜Ÿåˆ—äº†
 					{
 						qspeed.pop();
 						qspeed.push(cars[carOrder]);
 					}
-					else      //ÒÑÓĞÏàÍ¬³ö·¢µØµÄ³µ·¢³öÁËµÄÇé¿ö£¬Èô´ËÊ±Ã»ÓĞ±éÀúÍêÒ»´Î¶ÓÁĞÁË£¬Ôò¼ÌĞø±éÀú£¬·ñÔò¶¨ÏÂ·¢³µÊ±¼ä£¬´ËÊ±»áÓĞ²»Ö¹Ò»Á¾³µ´Ó³ö·¢µØ·¢³ö
+					else      //å·²æœ‰ç›¸åŒå‡ºå‘åœ°çš„è½¦å‘å‡ºäº†çš„æƒ…å†µï¼Œè‹¥æ­¤æ—¶æ²¡æœ‰éå†å®Œä¸€æ¬¡é˜Ÿåˆ—äº†ï¼Œåˆ™ç»§ç»­éå†ï¼Œå¦åˆ™å®šä¸‹å‘è½¦æ—¶é—´ï¼Œæ­¤æ—¶ä¼šæœ‰ä¸æ­¢ä¸€è¾†è½¦ä»å‡ºå‘åœ°å‘å‡º
 					{
 						if (frequence < qspeed.size())
 						{
@@ -571,7 +651,7 @@ void Algorithm::reorderCars(vector<Car> &reorderCar)
 
 	for (int i = 0; i < num_Cars; i++)
 	{
-		reorderCar.push_back(cars[i]);//½«idË³ĞòµÄ³µÁ¾·Åµ½qcarµÄvectorÖĞ
+		reorderCar.push_back(cars[i]);//å°†idé¡ºåºçš„è½¦è¾†æ”¾åˆ°qcarçš„vectorä¸­
 	}
 
 	int begin = 0;
@@ -590,7 +670,7 @@ void Algorithm::reorderCarsStarttime()
 
 	for (int i = 0; i < num_Cars; i++)
 	{
-		qCar.push_back(cars[i]);//½«idË³ĞòµÄ³µÁ¾·Åµ½qcarµÄvectorÖĞ
+		qCar.push_back(cars[i]);//å°†idé¡ºåºçš„è½¦è¾†æ”¾åˆ°qcarçš„vectorä¸­
 	}
 
 	int begin = 0;

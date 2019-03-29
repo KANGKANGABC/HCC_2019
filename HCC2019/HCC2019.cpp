@@ -53,7 +53,8 @@ int main(int argc, char *argv[])
 	alg.DynamicPathByScheduler_SpeedBasic_AutoPara(7);
 	//alg.ShortestTime_SpeedBasicRoadStatus_AutoPara(0);
 	//alg.ShortestTime_SpeedBasic_AutoPara();
-	//alg.StaticAnalysisNor_SpeedBasicNoSame_AutoPara(59);
+
+	alg.StaticAnalysisNor_SpeedBasicNoSame_AutoPara(55);
 
 	dc.writeResult(answer_file);
 
