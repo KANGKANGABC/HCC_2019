@@ -356,32 +356,35 @@ void Algorithm::getPath_StaticAnalysis()
 
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		vector<int> pathCross = graph.DijkstraNor(qCar[i].idCrossFrom, qCar[i].idCrossTo, qCar[i].speed);
+		vector<int> pathCross = graph.Dijkstra(qCar[i].idCrossFrom, qCar[i].idCrossTo, qCar[i].speed);
 
 		num++;
 		//定时更新交通拥堵邻接矩阵jamDegreeLongBefore
-		if (num == 100)
+		if (num == 200)
 		{
 			num = 0;
-			graph.upDateJamStatic();
-			graph.cleanUpJamDegreeBefore();
+			graph.upDateJam();
 		}
+
 
 		//将统计的情况放到 jamDegreeBefore的矩阵中
 		for (int i = 0, j = 1; j < pathCross.size(); i++, j++)
 		{
-			graph.jamDegreeBefore[pathCross.at(i) - 1][pathCross.at(j) - 1]++;
+			graph.jamDegreeTmp[pathCross.at(i) - 1][pathCross.at(j) - 1]++;
 		}
 
-		graph.upDateJamDynamic();
-
+		//cross����תroad����
 		vector<int> pathRoad(pathCross.size() - 1);
 		for (int j = 0; j < pathRoad.size(); ++j)
 		{
 			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+			//assert(pathRoad[j] != 0);
 		}
+
 		qCar[i].path = pathRoad;
-		cars[qCar[i].index].path = qCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
+
+		cars[qCar[i].index].path = qCar[i].path;		//将qCar得到的路径赋值到cars的path变量中
+
 	}
 }
 

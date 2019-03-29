@@ -49,8 +49,9 @@ int main(int argc, char *argv[])
 	//Scheduler sd(dc);
 	//sd.SchedulerTest();
 
+	alg.StaticAnalysis_SpeedBasic_AutoPara();
 	//alg.unlockDead(78);
-	alg.DynamicPathByScheduler_SpeedBasic_AutoPara(7);
+	//alg.DynamicPathByScheduler_SpeedBasic_AutoPara(7);
 	//alg.ShortestTime_SpeedBasicRoadStatus_AutoPara(0);
 	//alg.ShortestTime_SpeedBasic_AutoPara();
 
