@@ -380,17 +380,17 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 	switch (cars[0].speed)				//选择不同速度的开始发车和终止发车时刻
 	{
 	case 8:  //地图1
-		early2 = 10;
+		early2 = 0;
 		early4 = 0;
 		early6 = 0;
-		early8 = 10;
+		early8 = 0;
 		delay =10;
 		break;
 	case 6:			//地图2
 		early2 = 0;
 		early4 = 0;
 		early6 = 0;
-		early8 = 10;
+		early8 = 0;
 		delay =8;
 		break;
 	default:
