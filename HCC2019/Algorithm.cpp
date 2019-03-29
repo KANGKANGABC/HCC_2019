@@ -85,7 +85,7 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 {
 	std::map<int, int> mapResult;
-	int para = 70;
+	int para = 68;
 	int time = 0;
 	Scheduler sd(*m_dc);
 
@@ -93,6 +93,7 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	{
 		getPath();
 		getStartTime_BySpeed(para);
+		reorderCarsStarttime();
 		int time = sd.getSysTimeChangePath(w);
 		if (time == false)
 			time = INT_MAX;
@@ -108,10 +109,12 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	para = it->second;
 	getPath();
 	getStartTime_BySpeed(para);
+	reorderCarsStarttime();
 	time = sd.getSysTimeChangePath(w);
 	PRINT("time:%d\n", time);
 	time = sd.getSysTime();
-	PRINT("timeFinal:%d\n", time);
+	int timeV2 = sd.getSysTimeV2();
+	PRINT("timeFinal:V0:%d   V2:%d\n", time, timeV2);
 }
 
 void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
@@ -151,7 +154,8 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 		}
 	}
 	time = sd.getSysTime();
-	PRINT("timeFinal:%d\n", time);
+	int timeV2 = sd.getSysTimeV2();
+	PRINT("timeFinal:V0:%d   V2:%d\n", time, timeV2);
 }
 
 void Algorithm::ShortestTime_SpeedBasicRoadStatus_AutoPara(int para)
