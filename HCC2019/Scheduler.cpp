@@ -1221,6 +1221,7 @@ int Scheduler::SchedulerInit()
 	carsWaitInGarage.clear();//等待车库归零
 	carsDeadLock.clear();//死锁车归零
 	vec_numCarsInRoadPerTime.clear();//每个时刻道路中车数量归零
+	carsRoadWaitting.clear();
 	for (int i = 0; i < num_Roads; ++i)
 	{
 		int idLaneStart = 0;
@@ -1276,6 +1277,7 @@ int Scheduler::SchedulerCore()
 					int idRoad = getFirstRoadFromCross(idCross, j);
 					if (idRoad != -1)
 					{
+						carsRoadWaitting.clear();
 						int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
 						if (roads[idRoad - 5000].idFrom == crosses[i].id)//如果cross为道路的入方向
 						{
