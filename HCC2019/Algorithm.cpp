@@ -56,6 +56,7 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 	Scheduler sd(*m_dc);
 
 	getStartTime_BySpeed(para);
+	reorderCarsStarttime();
 	getPath_StaticAnalysis();
 	for (int i = 0; i < 15; ++i)//迭代15次
 	{
@@ -79,26 +80,29 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 	reorderCarsStarttime();
 	getPath_StaticAnalysis();
 	int time = sd.getSysTime();
-	PRINT("timeFinal:%d\n", time);
+	int timeV2 = sd.getSysTimeV2();
+	PRINT("timeFinal:V0:%d   V2:%d\n", time, timeV2);
 }
 
 void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 {
 	std::map<int, int> mapResult;
-	int para = 55;
+	int para = 60;
 	int time = 0;
 	Scheduler sd(*m_dc);
 
+	getStartTime_BySpeed(para);
+	reorderCarsStarttime();
+	getPath_StaticAnalysis();
+
 	for (int i = 0; i < 15; ++i)//迭代15次
 	{
-		getPath();
 		getStartTime_BySpeed(para);
-		reorderCarsStarttime();
 		int time = sd.getSysTimeChangePath(w);
 		if (time == false)
 			time = INT_MAX;
 		mapResult.insert(pair<int, int>(time, para));
-		para -= 1;
+		para -= 2;
 	}
 	for (auto &v : mapResult)
 	{
