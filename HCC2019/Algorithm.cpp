@@ -87,23 +87,19 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 {
 	std::map<int, int> mapResult;
-	int para = 60;
+	int para = 400;
 	int time = 0;
 	Scheduler sd(*m_dc);
 
-	/*
+
 	getStartTime_BySpeed(para);
 	reorderCarsStarttime();
 	getPath_StaticAnalysis();
-	*/
-
-	ReOrderStartBySpeedAndStartCross(para);
-	reorderCarsStarttime();
 
 	for (int i = 0; i < 15; ++i)//迭代15次
 	{
-		//getStartTime_BySpeed(para);
-		ReOrderStartBySpeedAndStartCross(para);
+		getStartTime_BySpeed(para);
+		//ReOrderStartBySpeedAndStartCross(para);
 		int time = sd.getSysTimeChangePath(w);
 		if (time == false)
 		{
@@ -111,7 +107,7 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 			time = INT_MAX;
 		}
 		mapResult.insert(pair<int, int>(time, para));
-		para -= 3;
+		para -= 5;
 	}
 	for (auto &v : mapResult)
 	{
@@ -121,13 +117,13 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	it = mapResult.begin();
 	para = it->second;
 
-	/*
-	getPath();
+	
 	getStartTime_BySpeed(para);
 	reorderCarsStarttime();
-	*/
-	ReOrderStartBySpeedAndStartCross(para);
-	reorderCarsStarttime();
+	getPath_StaticAnalysis();
+	
+	//ReOrderStartBySpeedAndStartCross(para);
+	//reorderCarsStarttime();
 
 	time = sd.getSysTimeChangePath(w);
 	PRINT("time:%d\n", time);
@@ -141,6 +137,7 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	}
 	time = sd.getSysTime();
 	int timeV2 = sd.getSysTimeV2();
+
 	PRINT("timeFinal:V0:%d   V2:%d\n", time, timeV2);
 }
 
@@ -170,7 +167,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	{
 		ReOrderStartBySpeedAndStartCross(para);
 		reorderCarsStarttime();
-		getPath_StaticAnalysis();
+		getPath_StaticAnalysisNor();
 		int time = sd.getSysTime();
 		if (time == false)
 			time = INT_MAX;
@@ -187,7 +184,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	para = it->second;
 	ReOrderStartBySpeedAndStartCross(para);
 	reorderCarsStarttime();
-	getPath_StaticAnalysis();
+	getPath_StaticAnalysisNor();
 	int timeFinal = sd.getSysTime();
 	for (int i = 0; i < num_Cars; ++i)
 	{
@@ -210,7 +207,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	{
 		ReOrderStartBySpeedAndStartCross(para);
 		reorderCarsStarttime();
-		getPath_StaticAnalysis();
+		getPath_StaticAnalysisNor();
 		int time = sd.getSysTime();
 		if (time == false)
 			time = INT_MAX;
@@ -227,7 +224,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	para = it->second;
 	ReOrderStartBySpeedAndStartCross(para);
 	reorderCarsStarttime();
-	getPath_StaticAnalysis();
+	getPath_StaticAnalysisNor();
 	int timeFinal = sd.getSysTime();
 	for (int i = 0; i < num_Cars; ++i)
 	{
@@ -327,6 +324,17 @@ void Algorithm::unlockDead(int para)
 
 }
 
+void Algorithm::tryUnlockDead(Scheduler sd,int para)
+{
+	int count = 5;//尝试解锁5次
+	while (count > 0)
+	{
+
+		count--;
+	}
+}
+
+
 void Algorithm::getPath()
 {
 	Graph_DG graph(m_dc->vexnum, m_dc->edge);
@@ -385,6 +393,45 @@ void Algorithm::getPath_StaticAnalysis()
 
 		cars[qCar[i].index].path = qCar[i].path;		//将qCar得到的路径赋值到cars的path变量中
 
+	}
+}
+
+void Algorithm::getPath_StaticAnalysisNor()
+{
+	int num = 0;
+
+	Graph_DG graph(m_dc->vexnum, m_dc->edge);
+	graph.createArcGraph(m_dc->graphRoadLength);
+	graph.createArcRoadvGraph(m_dc->graphRoadMaxSpeed);
+
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		vector<int> pathCross = graph.DijkstraNor(qCar[i].idCrossFrom, qCar[i].idCrossTo, qCar[i].speed);
+
+		num++;
+		//定时更新交通拥堵邻接矩阵jamDegreeLongBefore
+		if (num == 100)
+		{
+			num = 0;
+			graph.upDateJamStatic();
+			graph.cleanUpJamDegreeBefore();
+		}
+
+		//将统计的情况放到 jamDegreeBefore的矩阵中
+		for (int i = 0, j = 1; j < pathCross.size(); i++, j++)
+		{
+			graph.jamDegreeBefore[pathCross.at(i) - 1][pathCross.at(j) - 1]++;
+		}
+
+		graph.upDateJamDynamic();
+
+		vector<int> pathRoad(pathCross.size() - 1);
+		for (int j = 0; j < pathRoad.size(); ++j)
+		{
+			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+		}
+		qCar[i].path = pathRoad;
+		cars[qCar[i].index].path = qCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
 	}
 }
 

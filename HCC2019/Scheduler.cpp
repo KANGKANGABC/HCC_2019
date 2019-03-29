@@ -142,7 +142,7 @@ int Scheduler::getSysTimeChangePath(int para)
 	SchedulerInit();
 	while (num_CarsScheduling > 0)
 	{
-		SchedulerCore_V2();
+		SchedulerCore();
 		driverCarInGarageDynamic(graph, para);
 		if (!putAllCarStatus())//输出所有车的状态
 			return false;//发生死锁
@@ -861,9 +861,9 @@ void Scheduler::driverCarInGarageDynamic(Graph_DG &graph,int para)
 		{
 			int timeCar = 0;
 			if (cars[i].speed == 8) para = 7;
-			else if (cars[i].speed == 6) para = 10;
-			else if (cars[i].speed == 4) para = 10;
-			else if (cars[i].speed == 2) para = 13;
+			else if (cars[i].speed == 6) para = 7;
+			else if (cars[i].speed == 4) para = 7;
+			else if (cars[i].speed == 2) para = 7;
 
 			vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed, graphRoadStatusByDS, para, timeCar);
 			cars[i].time = timeCar;

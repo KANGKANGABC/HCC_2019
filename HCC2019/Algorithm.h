@@ -52,10 +52,14 @@ public:
 	//修改死锁
 	void unlockDead(int para);
 
+	//尝试解锁
+	void tryUnlockDead(Scheduler sd, int para);
+
 private:
 	/*获得路径的方法*/
 	void getPath();//基于最短路径算法获得路径
 	void getPath_StaticAnalysis();//最短路径算法+静态分析
+	void getPath_StaticAnalysisNor();
 
 	/*获得出发时间的方法*/
 	void getStartTime_BySpeed(int para);
