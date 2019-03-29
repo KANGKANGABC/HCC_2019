@@ -114,11 +114,7 @@ int Scheduler::SchedulerTest()
 {
 	int para = 80;
 	getPath();
-	ReOrderStartBySpeed(71);
-	int time = getSysTime();
-	int timeV2 = getSysTimeV2();
-	PRINT("para:%d SysTime:%d   SysTimeV2:%d\n", para, time, timeV2);
-	/*
+
 	for (int i = 0; i < 10; ++i)//迭代5次
 	{
 		ReOrderStartBySpeed(para);
@@ -127,9 +123,13 @@ int Scheduler::SchedulerTest()
 		para -= 3;
 		PRINT("para:%d SysTime:%d   SysTimeV2:%d\n",para,time,timeV2);
 	}
+
+	/*
+	ReOrderStartBySpeed(71);
+	int time = getSysTime();
+	int timeV2 = getSysTimeV2();
+	PRINT("para:%d SysTime:%d   SysTimeV2:%d\n", para, time, timeV2);
 	*/
-
-
 
 	return 0;
 }
@@ -653,7 +653,6 @@ bool Scheduler::isBeDD(int idRoad, int idCross)//注意这里的ID不需要减1
 			if (roads[indexRoad].lane[idStartLane].laneCar[0].status == WAITTING)
 				return true;//存在左转车辆
 		}
-
 	}
 	return false;
 }
@@ -2074,17 +2073,18 @@ void Scheduler::mapUpdate(map<string, float > &mapForJamDegree, int RoadId, floa
 
 int Scheduler::getPartition(vector<Car> &reorderCar, int begin, int end)
 {
-	int keyVal = reorderCar[begin].speed;
+	Car keyVal;
+	keyVal = reorderCar[begin];
 	while (begin < end)
 	{
-		while (begin < end && reorderCar[end].speed >= keyVal)
+		while (begin < end && reorderCar[end].speed >= keyVal.speed)
 			end--;
 		reorderCar[begin] = reorderCar[end];
-		while (begin < end && reorderCar[begin].speed <= keyVal)
+		while (begin < end && reorderCar[begin].speed <= keyVal.speed)
 			begin++;
 		reorderCar[end] = reorderCar[begin];
 	}
-	reorderCar[begin].speed = keyVal;
+	reorderCar[begin] = keyVal;
 	return begin;
 }
 
