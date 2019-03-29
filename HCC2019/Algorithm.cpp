@@ -442,17 +442,18 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 
 int Algorithm::getPartition(vector<Car> &reorderCar, int begin, int end)
 {
-	int keyVal = reorderCar[begin].speed;
+	Car keyVal;
+	keyVal = reorderCar[begin];
 	while (begin < end)
 	{
-		while (begin < end && reorderCar[end].speed >= keyVal)
+		while (begin < end && reorderCar[end].speed >= keyVal.speed)
 			end--;
 		reorderCar[begin] = reorderCar[end];
-		while (begin < end && reorderCar[begin].speed <= keyVal)
+		while (begin < end && reorderCar[begin].speed <= keyVal.speed)
 			begin++;
 		reorderCar[end] = reorderCar[begin];
 	}
-	reorderCar[begin].speed = keyVal;
+	reorderCar[begin] = keyVal;
 	return begin;
 }
 

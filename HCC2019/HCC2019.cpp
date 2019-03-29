@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 	dc.readCarData();
 	dc.readCrossData();
 
-	//Algorithm alg(dc);
+	Algorithm alg(dc);
 	Scheduler sd(dc);
 	sd.SchedulerTest();
 
