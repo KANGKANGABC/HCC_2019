@@ -91,13 +91,20 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	int time = 0;
 	Scheduler sd(*m_dc);
 
+	/*
 	getStartTime_BySpeed(para);
+	reorderCarsStarttime();
+	getPath_StaticAnalysis();
+	*/
+
+	ReOrderStartBySpeedAndStartCross(para);
 	reorderCarsStarttime();
 	getPath_StaticAnalysis();
 
 	for (int i = 0; i < 15; ++i)//µü´ú15´Î
 	{
-		getStartTime_BySpeed(para);
+		//getStartTime_BySpeed(para);
+		ReOrderStartBySpeedAndStartCross(para);
 		int time = sd.getSysTimeChangePath(w);
 		if (time == false)
 			time = INT_MAX;
@@ -111,9 +118,16 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	map<int, int>::iterator it;
 	it = mapResult.begin();
 	para = it->second;
+
+	/*
 	getPath();
 	getStartTime_BySpeed(para);
 	reorderCarsStarttime();
+	*/
+	ReOrderStartBySpeedAndStartCross(para);
+	reorderCarsStarttime();
+	getPath_StaticAnalysis();
+
 	time = sd.getSysTimeChangePath(w);
 	PRINT("time:%d\n", time);
 	for (int i = 0; i < num_Cars; ++i)
