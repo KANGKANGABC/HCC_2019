@@ -56,6 +56,7 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 	Scheduler sd(*m_dc);
 
 	getStartTime_BySpeed(para);
+	reorderCarsStarttime();
 	getPath_StaticAnalysis();
 	for (int i = 0; i < 15; ++i)//µü´ú15´Î
 	{
@@ -79,7 +80,8 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 	reorderCarsStarttime();
 	getPath_StaticAnalysis();
 	int time = sd.getSysTime();
-	PRINT("timeFinal:%d\n", time);
+	int timeV2 = sd.getSysTimeV2();
+	PRINT("timeFinal:V0:%d   V2:%d\n", time, timeV2);
 }
 
 void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
