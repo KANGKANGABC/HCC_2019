@@ -64,9 +64,10 @@ private:
 	/*¸¨Öúº¯Êý*/
 	int getPartition(vector<Car> &reorderCar, int begin, int end);
 	void quicksort(vector<Car> &reorderCar, int begin, int end);
+	void swap(int i, int j);
 	void quicksort(int begin, int end);
 	void reorderCars(vector<Car> &reorderCar);
-	void reorderCarsStarttime(vector<Car> &reorderCar);
+	void reorderCarsStarttime();
 
 
 

@@ -117,10 +117,10 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	std::map<int, int> mapResult;
 	int time = 0;
 	Scheduler sd(*m_dc);
-	for (int i = 0; i < 3; ++i)//迭代15次
+	for (int i = 0; i < 15; ++i)//迭代15次
 	{
 		ReOrderStartBySpeedAndStartCross(para);
-		reorderCarsStarttime(qCar);
+		reorderCarsStarttime();
 		getPath_StaticAnalysis();
 		int time = sd.getSysTime();
 		if (time == false)
@@ -137,7 +137,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	it++;
 	para = it->second;
 	ReOrderStartBySpeedAndStartCross(para);
-	reorderCarsStarttime(qCar);
+	reorderCarsStarttime();
 	getPath_StaticAnalysis();
 	int timeFinal = sd.getSysTime();
 	for (int i = 0; i < num_Cars; ++i)
@@ -495,6 +495,14 @@ void Algorithm::quicksort(vector<Car> &reorderCar, int begin, int end)
 	}
 }
 
+void Algorithm::swap(int i, int j)
+{
+	Car tmp;
+	tmp = qCar[i];
+	qCar[i] = qCar[j];
+	qCar[j] = tmp;
+}
+
 void Algorithm::quicksort(int begin, int end)
 {
 	int i, j;
@@ -543,17 +551,16 @@ bool less_starttime(const Car & m1, const Car & m2) {
 	return m1.starttime < m2.starttime;
 }
 
-void Algorithm::reorderCarsStarttime(vector<Car>& reorderCar)
+void Algorithm::reorderCarsStarttime()
 {
-	reorderCar.clear();
+	qCar.clear();
 
 	for (int i = 0; i < num_Cars; i++)
 	{
-		reorderCar.push_back(cars[i]);//将id顺序的车辆放到qcar的vector中
+		qCar.push_back(cars[i]);//将id顺序的车辆放到qcar的vector中
 	}
 
 	int begin = 0;
-	int end = reorderCar.size() - 1;
+	int end = qCar.size() - 1;
 	quicksort(begin, end);
-	//std::sort(reorderCar.begin(), reorderCar.end(), less_starttime);
 }
