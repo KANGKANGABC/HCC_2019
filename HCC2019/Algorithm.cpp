@@ -99,7 +99,6 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 
 	ReOrderStartBySpeedAndStartCross(para);
 	reorderCarsStarttime();
-	getPath_StaticAnalysis();
 
 	for (int i = 0; i < 15; ++i)//µü´ú15´Î
 	{
@@ -107,9 +106,12 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 		ReOrderStartBySpeedAndStartCross(para);
 		int time = sd.getSysTimeChangePath(w);
 		if (time == false)
+		{
+			PRINT("DeadLock para:%d\n",para);
 			time = INT_MAX;
+		}
 		mapResult.insert(pair<int, int>(time, para));
-		para -= 2;
+		para -= 3;
 	}
 	for (auto &v : mapResult)
 	{
@@ -126,7 +128,6 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	*/
 	ReOrderStartBySpeedAndStartCross(para);
 	reorderCarsStarttime();
-	getPath_StaticAnalysis();
 
 	time = sd.getSysTimeChangePath(w);
 	PRINT("time:%d\n", time);
@@ -134,7 +135,7 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	{
 		if (cars[i].timeArrived > (time - 20))
 		{
-			cars[i].starttime = cars[i].starttime - 30;
+			cars[i].starttime = cars[i].starttime - 20;
 			cars[i].starttimeAnswer = cars[i].starttime;
 		}
 	}
