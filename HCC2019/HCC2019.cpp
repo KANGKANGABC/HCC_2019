@@ -46,14 +46,14 @@ int main(int argc, char *argv[])
 	dc.readCrossData();
 
 	Algorithm alg(dc);
-	Scheduler sd(dc);
-	sd.SchedulerTest();
+	//Scheduler sd(dc);
+	//sd.SchedulerTest();
 
 	//alg.unlockDead(78);
 	//alg.DynamicPathByScheduler_SpeedBasic_AutoPara(9);
 	//alg.ShortestTime_SpeedBasicRoadStatus_AutoPara(0);
 	//alg.ShortestTime_SpeedBasic_AutoPara();
-	//alg.StaticAnalysisNor_SpeedBasicNoSame_AutoPara(240);
+	alg.StaticAnalysisNor_SpeedBasicNoSame_AutoPara(70);
 
 	dc.writeResult(answer_file);
 

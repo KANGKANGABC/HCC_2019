@@ -55,6 +55,7 @@ public:
 	int getPartition(vector<Car> &reorderCar, int begin, int end);
 	void quicksort(vector<Car> &reorderCar, int begin, int end);
 	void reorderCars(vector<Car> &reorderCar);
+	
 
 private:
 	int num_CarsScheduling;//正在调度的car数量

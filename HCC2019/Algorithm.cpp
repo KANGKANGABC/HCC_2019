@@ -117,9 +117,10 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	std::map<int, int> mapResult;
 	int time = 0;
 	Scheduler sd(*m_dc);
-	for (int i = 0; i < 15; ++i)//迭代15次
+	for (int i = 0; i < 3; ++i)//迭代15次
 	{
 		ReOrderStartBySpeedAndStartCross(para);
+		reorderCarsStarttime(qCar);
 		getPath_StaticAnalysis();
 		int time = sd.getSysTime();
 		if (time == false)
@@ -136,6 +137,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	it++;
 	para = it->second;
 	ReOrderStartBySpeedAndStartCross(para);
+	reorderCarsStarttime(qCar);
 	getPath_StaticAnalysis();
 	int timeFinal = sd.getSysTime();
 	for (int i = 0; i < num_Cars; ++i)
@@ -263,7 +265,7 @@ void Algorithm::getPath_StaticAnalysis()
 
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		vector<int> pathCross = graph.DijkstraNor(reorderCar[i].idCrossFrom, reorderCar[i].idCrossTo, reorderCar[i].speed);
+		vector<int> pathCross = graph.DijkstraNor(qCar[i].idCrossFrom, qCar[i].idCrossTo, qCar[i].speed);
 
 		num++;
 		//定时更新交通拥堵邻接矩阵jamDegreeLongBefore
@@ -287,10 +289,8 @@ void Algorithm::getPath_StaticAnalysis()
 		{
 			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
 		}
-		if (reorderCar[i].id == 14989)
-			PRINT("get\n");
-		reorderCar[i].path = pathRoad;
-		cars[reorderCar[i].index].path = reorderCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
+		qCar[i].path = pathRoad;
+		cars[qCar[i].index].path = qCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
 	}
 }
 
@@ -495,6 +495,31 @@ void Algorithm::quicksort(vector<Car> &reorderCar, int begin, int end)
 	}
 }
 
+void Algorithm::quicksort(int begin, int end)
+{
+	int i, j;
+	i = begin + 1;
+	j = end;
+	if (begin < end)
+	{
+		while (i < j)
+		{
+			if (qCar[i].starttime > qCar[begin].starttime)
+			{
+				swap(i, j);
+				j--;
+			}
+			else
+				i++;
+		}
+		if (qCar[i].starttime > qCar[begin].starttime)
+			i--;
+		swap(i, begin);
+		quicksort(begin, i - 1);
+		quicksort(i + 1, end);
+	}
+}
+
 bool less_speed(const Car & m1, const Car & m2) {
 	return m1.speed < m2.speed;
 }
@@ -512,4 +537,23 @@ void Algorithm::reorderCars(vector<Car> &reorderCar)
 	int end = reorderCar.size() - 1;
 	//quicksort(reorderCar, begin, end);
 	std::sort(reorderCar.begin(), reorderCar.end(),less_speed);
+}
+
+bool less_starttime(const Car & m1, const Car & m2) {
+	return m1.starttime < m2.starttime;
+}
+
+void Algorithm::reorderCarsStarttime(vector<Car>& reorderCar)
+{
+	reorderCar.clear();
+
+	for (int i = 0; i < num_Cars; i++)
+	{
+		reorderCar.push_back(cars[i]);//将id顺序的车辆放到qcar的vector中
+	}
+
+	int begin = 0;
+	int end = reorderCar.size() - 1;
+	quicksort(begin, end);
+	//std::sort(reorderCar.begin(), reorderCar.end(), less_starttime);
 }

@@ -27,7 +27,8 @@ private:
 	std::vector<int> speedType;
 	//按照出发时间将车辆重排序
 
-	vector<Car> reorderCar;
+	vector<Car> reorderCar;//按照出发时间将车辆重排序
+	vector<Car> qCar;	//按照速度将车辆重排序
 
 //Functions
 public:
@@ -63,7 +64,9 @@ private:
 	/*辅助函数*/
 	int getPartition(vector<Car> &reorderCar, int begin, int end);
 	void quicksort(vector<Car> &reorderCar, int begin, int end);
+	void quicksort(int begin, int end);
 	void reorderCars(vector<Car> &reorderCar);
+	void reorderCarsStarttime(vector<Car> &reorderCar);
 
 
 
