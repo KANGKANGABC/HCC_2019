@@ -143,7 +143,7 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 
 void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 {
-	//根据地图选参数
+	/*//根据地图选参数
 	int paraFinal;
 	int carLastArrive;
 	int carTimeEarly;
@@ -198,9 +198,9 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 
 	PRINT("time:%d\n", timeFinal);
 	PRINT("timeFinal:%d\n", time);
+	*/
 
-
-	/*std::map<int, int> mapResult;
+	std::map<int, int> mapResult;
 	int time = 0;
 	Scheduler sd(*m_dc);
 	for (int i = 0; i < 15; ++i)//迭代15次
@@ -237,7 +237,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	time = sd.getSysTime();
 	PRINT("time:%d\n", timeFinal);
 	PRINT("timeFinal:%d\n", time);
-	*/
+	
 }
 
 void Algorithm::ShortestTime_SpeedBasicRoadStatus_AutoPara(int para)
@@ -473,33 +473,43 @@ bool Comp(const int &a, const int &b);
 
 void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 {
-	int early2,early4,early6,early8;
-	int delay;
+	int early4=0,early6=0,early8=0, early10 = 0, early12 = 0, early14=0, early16= 0;
+	int delay=0;
+
 	switch (cars[0].speed)				//选择不同速度的开始发车和终止发车时刻
 	{
-	case 8:  //地图1
-		early2 =0;
-		early4 =1;
-		early6 = para/36;
-		early8 =para/12;
-		delay =10;
+	case 10:  //地图1
+		early4 =0;
+		early6 = 0;
+		early8 =0;
+		early10 =0;
+		early12 =0;
+		early14 =0;
+		early16 =0;
+		delay =0;
 		break;
 	case 6:			//地图2
-		early2 = 0;
-		early4 = 0;
-		early6 = 2;
-		early8 = 8;
-		delay =10;
+		early4 =0;
+		early6 = 0;
+		early8 =0;
+		early10 =0;
+		early12 =0;
+		early14 =0;
+		early16 =0;
+		delay =0;
 		break;
 	default:
 		break;
 	}
-
-	int n2, n4, n6, n8;
-	n2 = para-early2;
+	
+	int n4, n6, n8,n10,n12,n14,n16;
 	n4 = para-early4;
 	n6 = para-early6;
 	n8 = para-early8;
+	n10 = para - early10;
+	n12 = para - early12;
+	n14 = para - early14;
+	n16 = para - early16;
 
 	sort(speedType.begin(), speedType.end(), Comp);  //speedType里存的是速度类型
 
@@ -520,21 +530,33 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 		int timebegin, timeend;
 		switch (speed)				//选择不同速度的开始发车和终止发车时刻
 		{
-		case 8:
+		case 16:
 			timebegin = 1;
-			timeend = 2 * n8;
+			timeend = 2 * n16;
+			break;
+		case 14:
+			timebegin = 2 * n16 + 1;
+			timeend = 2 * (n16 + n14);
+			break;
+		case 12:
+			timebegin = 2 * (n16 + n14) + 1;
+			timeend = 2 * (n16 + n14 + n12);
+			break;
+		case 10:
+			timebegin = 2 * (n16 + n14 + n12) ;
+			timeend = 2 * (n16+ n14 + n12 + n10) ;
+			break;
+		case 8:
+			timebegin = 2 * (n16 + n14 + n12 + n10) +1;
+			timeend = 2 * (n16 + n14 + n12 + n10+n8) ;
 			break;
 		case 6:
-			timebegin = 2 * n8 + 1;
-			timeend = 2 * (n8 + n6);
+			timebegin = 2 * (n16 + n14 + n12 + n10 + n8)+1 ;
+			timeend = 2 * (n16 + n14 + n12 + n10 + n8+n6) ;
 			break;
 		case 4:
-			timebegin = 2 * (n8 + n6) + 1;
-			timeend = 2 * (n8 + n6 + n4);
-			break;
-		case 2:
-			timebegin = 2 * (n8 + n6 + n4) + delay;
-			timeend = 2 * (n8 + n6 + n4 + n2) +delay;
+			timebegin = 2 * (n16 + n14 + n12 + n10 + n8 + n6) + delay;
+			timeend = 2 * (n16 + n14 + n12 + n10 + n8 + n6+n4) + delay;
 			break;
 		default:
 			break;
