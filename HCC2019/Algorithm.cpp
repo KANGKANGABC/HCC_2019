@@ -206,6 +206,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 
 	std::map<int, int> mapResult;
 	int time = 0;
+	int timeV2 = 0;
 	Scheduler sd(*m_dc);
 	for (int i = 0; i < 1; ++i)//迭代15次
 	{
@@ -236,16 +237,18 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	getPath_StaticAnalysisNor();
 	int timeFinal = sd.getSysTime();
 	*/
+	/*
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		if (cars[i].timeArrived > (time -20))
+		if (cars[i].timeArrived > (time -10))
 		{
 				cars[i].starttime = cars[i].starttime -20;
 				cars[i].starttimeAnswer = cars[i].starttime;
 		}
 	}
+	*/
 	time = sd.getSysTime();
-	int timeV2 = sd.getSysTimeV2();
+	timeV2 = sd.getSysTimeV2();
 	PRINT("timeFinal:V0:%d   V2:%d\n", time, timeV2);
 	
 }
