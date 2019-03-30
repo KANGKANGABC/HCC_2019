@@ -4,6 +4,8 @@
 #include<algorithm>
 using namespace std;
 
+std::map<int, int> mapId2IndexCross_Global;
+
 //构造函数定义
 Graph_DG::Graph_DG(int vexnum, int edge) :
 	vexnum(vexnum), edge(edge) {
@@ -217,19 +219,21 @@ void Graph_DG::printTimeArc() {
 
 void Graph_DG::Dijkstra(int begin) {
 	//首先初始化dis数组
+	int indexBegin = id2indexCross(begin);
 	int i;
 	for (i = 0; i < this->vexnum; i++) {
 		//设置当前的路径
 		vector<int> tmp;
 		tmp = dis[i].path;
-		tmp.push_back(begin);
-		tmp.push_back(i + 1);
+		tmp.push_back(indexBegin);
+		//tmp.push_back(i + 1);
+		tmp.push_back(i);
 		dis[i].path = tmp;
-		dis[i].value = arc[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
+		dis[i].value = arc[indexBegin][i];	//将邻接数组起点的那一行的值赋给dis数组
 	}
 	//设置起点到起点自己的路径为0
-	dis[begin - 1].value = 0;
-	dis[begin - 1].visit = true;
+	dis[indexBegin].value = 0;
+	dis[indexBegin].visit = true;
 
 	int count = 1;
 	//计算到其他各顶点的最短路径
@@ -254,7 +258,8 @@ void Graph_DG::Dijkstra(int begin) {
 				dis[i].value = dis[temp].value + arc[temp][i];
 				vector<int> tmp;
 				tmp = dis[temp].path;
-				tmp.push_back(i + 1);
+				//tmp.push_back(i + 1);
+				tmp.push_back(i);
 				dis[i].path = tmp;
 			}
 		}
@@ -264,20 +269,23 @@ void Graph_DG::Dijkstra(int begin) {
 //带返回值，返回start到end的路径值
 vector<int> Graph_DG::Dijkstra(int begin, int end) {
 	//首先初始化dis数组
+	int indexBegin = id2indexCross(begin);
+	int indexEnd = id2indexCross(end);
 	dis = new Dis[this->vexnum];
 	int i;
 	for (i = 0; i < this->vexnum; i++) {
 		//设置当前的路径
 		vector<int> tmp;
 		tmp = dis[i].path;
-		tmp.push_back(begin);
-		tmp.push_back(i + 1);
+		tmp.push_back(indexBegin);
+		//tmp.push_back(i + 1);
+		tmp.push_back(i);
 		dis[i].path = tmp;
-		dis[i].value = arc[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
+		dis[i].value = arc[indexBegin][i];	//将邻接数组起点的那一行的值赋给dis数组
 	}
 	//设置起点到起点自己的路径为0
-	dis[begin - 1].value = 0;
-	dis[begin - 1].visit = true;
+	dis[indexBegin].value = 0;
+	dis[indexBegin].visit = true;
 
 	int count = 1;
 	//计算到其他各顶点的最短路径
@@ -302,12 +310,13 @@ vector<int> Graph_DG::Dijkstra(int begin, int end) {
 				dis[i].value = dis[temp].value + arc[temp][i];
 				vector<int> tmp;
 				tmp = dis[temp].path;
-				tmp.push_back(i + 1);
+				//tmp.push_back(i + 1);
+				tmp.push_back(i);
 				dis[i].path = tmp;
 			}
 		}
 	}
-	vector<int> path_tmp = dis[end - 1].path;
+	vector<int> path_tmp = dis[indexEnd].path;
 	delete[] dis;
 	return path_tmp;
 }
@@ -315,6 +324,9 @@ vector<int> Graph_DG::Dijkstra(int begin, int end) {
 //带返回值，返回start到end的路径值，不考虑路径和时间
 vector<int> Graph_DG::DijkstraWeightOne(int begin, int end, int &timeCar) {
 	
+	int indexBegin = id2indexCross(begin);
+	int indexEnd = id2indexCross(end);
+
 	for (int i = 0; i < this->vexnum; i++)
 	{
 		for (int j = 0; j < this->vexnum; j++)
@@ -335,14 +347,15 @@ vector<int> Graph_DG::DijkstraWeightOne(int begin, int end, int &timeCar) {
 		//设置当前的路径
 		vector<int> tmp;
 		tmp = dis[i].path;
-		tmp.push_back(begin);
-		tmp.push_back(i + 1);
+		tmp.push_back(indexBegin);
+		//tmp.push_back(i + 1);
+		tmp.push_back(i);
 		dis[i].path = tmp;
-		dis[i].value = arc[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
+		dis[i].value = arc[indexBegin][i];	//将邻接数组起点的那一行的值赋给dis数组
 	}
 	//设置起点到起点自己的路径为0
-	dis[begin - 1].value = 0;
-	dis[begin - 1].visit = true;
+	dis[indexBegin].value = 0;
+	dis[indexBegin].visit = true;
 
 	int count = 1;
 	//计算到其他各顶点的最短路径
@@ -367,13 +380,14 @@ vector<int> Graph_DG::DijkstraWeightOne(int begin, int end, int &timeCar) {
 				dis[i].value = dis[temp].value + arc[temp][i];
 				vector<int> tmp;
 				tmp = dis[temp].path;
-				tmp.push_back(i + 1);
+				//tmp.push_back(i + 1);
+				tmp.push_back(i);
 				dis[i].path = tmp;
 			}
 		}
 	}
-	vector<int> path_tmp = dis[end - 1].path;
-	timeCar = dis[end - 1].value;
+	vector<int> path_tmp = dis[indexEnd].path;
+	timeCar = dis[indexEnd].value;
 	delete[] dis;
 	return path_tmp;
 }
@@ -381,6 +395,8 @@ vector<int> Graph_DG::DijkstraWeightOne(int begin, int end, int &timeCar) {
 //用归一化后的邻接矩阵实施dijkstra算法
 vector<int> Graph_DG::DijkstraNor(int begin, int end, int speed)
 {
+	int indexBegin = id2indexCross(begin);
+	int indexEnd = id2indexCross(end);
 	//首先初始化dis数组
 	disfloat = new DisFloat[this->vexnum];
 
@@ -434,14 +450,15 @@ vector<int> Graph_DG::DijkstraNor(int begin, int end, int speed)
 		//设置当前的路径
 		vector<int> tmp;
 		tmp = disfloat[i].path;
-		tmp.push_back(begin);
-		tmp.push_back(i + 1);
+		tmp.push_back(indexBegin);
+		//tmp.push_back(i + 1);
+		tmp.push_back(i);
 		disfloat[i].path = tmp;
-		disfloat[i].value = arcTime[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
+		disfloat[i].value = arcTime[indexBegin][i];	//将邻接数组起点的那一行的值赋给dis数组
 	}
 	//设置起点到起点自己的路径为0
-	disfloat[begin - 1].value = 0;
-	disfloat[begin - 1].visit = true;
+	disfloat[indexBegin].value = 0;
+	disfloat[indexBegin].visit = true;
 
 	int count = 1;
 	//计算到其他各顶点的最短路径
@@ -466,18 +483,21 @@ vector<int> Graph_DG::DijkstraNor(int begin, int end, int speed)
 				disfloat[i].value = disfloat[temp].value + arcTime[temp][i];
 				vector<int> tmp;
 				tmp = disfloat[temp].path;
-				tmp.push_back(i + 1);
+				//tmp.push_back(i + 1);
+				tmp.push_back(i);
 				disfloat[i].path = tmp;
 			}
 		}
 	}
-	vector<int> path_tmp = disfloat[end - 1].path;
+	vector<int> path_tmp = disfloat[indexEnd].path;
 
 	delete[] disfloat;//释放动态申请的disfloat数组
 	return path_tmp;
 }
 //重载dijkstra算法，返回从start到end的时间最短的路径
 vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
+	int indexBegin = id2indexCross(begin);
+	int indexEnd = id2indexCross(end);
 	//首先初始化dis数组
 	disfloat = new DisFloat[this->vexnum];
 
@@ -505,14 +525,15 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 		//设置当前的路径
 		vector<int> tmp;
 		tmp = disfloat[i].path;
-		tmp.push_back(begin);
-		tmp.push_back(i + 1);
+		tmp.push_back(indexBegin);
+		//tmp.push_back(i + 1);
+		tmp.push_back(i);
 		disfloat[i].path = tmp;
-		disfloat[i].value = arcTime[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
+		disfloat[i].value = arcTime[indexBegin][i];	//将邻接数组起点的那一行的值赋给dis数组
 	}
 	//设置起点到起点自己的路径为0
-	disfloat[begin - 1].value = 0;
-	disfloat[begin - 1].visit = true;
+	disfloat[indexBegin].value = 0;
+	disfloat[indexBegin].visit = true;
 
 	int count = 1;
 	//计算到其他各顶点的最短路径
@@ -537,17 +558,20 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed) {
 				disfloat[i].value = disfloat[temp].value + arcTime[temp][i];
 				vector<int> tmp;
 				tmp = disfloat[temp].path;
-				tmp.push_back(i + 1);
+				//tmp.push_back(i + 1);
+				tmp.push_back(i);
 				disfloat[i].path = tmp;
 			}
 		}
 	}
-	vector<int> path_tmp = disfloat[end - 1].path;
+	vector<int> path_tmp = disfloat[indexEnd].path;
 	delete[] disfloat;//释放动态申请的disfloat数组
 	return path_tmp;
 }
 //重载dijkstra算法，返回从start到end的时间最短的路径
 vector<int> Graph_DG::Dijkstra(int begin, int end, int speed, int &time) {
+	int indexBegin = id2indexCross(begin);
+	int indexEnd = id2indexCross(end);
 	//首先初始化dis数组
 	disfloat = new DisFloat[this->vexnum];
 
@@ -575,14 +599,15 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed, int &time) {
 		//设置当前的路径
 		vector<int> tmp;
 		tmp = disfloat[i].path;
-		tmp.push_back(begin);
-		tmp.push_back(i + 1);
+		tmp.push_back(indexBegin);
+		//tmp.push_back(i + 1);
+		tmp.push_back(i);
 		disfloat[i].path = tmp;
-		disfloat[i].value = arcTime[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
+		disfloat[i].value = arcTime[indexBegin][i];	//将邻接数组起点的那一行的值赋给dis数组
 	}
 	//设置起点到起点自己的路径为0
-	disfloat[begin - 1].value = 0;
-	disfloat[begin - 1].visit = true;
+	disfloat[indexBegin].value = 0;
+	disfloat[indexBegin].visit = true;
 
 	int count = 1;
 	//计算到其他各顶点的最短路径
@@ -607,19 +632,22 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed, int &time) {
 				disfloat[i].value = disfloat[temp].value + arcTime[temp][i];
 				vector<int> tmp;
 				tmp = disfloat[temp].path;
-				tmp.push_back(i + 1);
+				//tmp.push_back(i + 1);
+				tmp.push_back(i);
 				disfloat[i].path = tmp;
 			}
 		}
 	}
-	vector<int> path_tmp = disfloat[end - 1].path;
-	time = (int)disfloat[end - 1].value;
+	vector<int> path_tmp = disfloat[indexEnd].path;
+	time = (int)disfloat[indexEnd].value;
 	delete[] disfloat;//释放动态申请的disfloat数组
 	return path_tmp;
 }
 
 vector<int> Graph_DG::Dijkstra(int begin, int end, int speed, vector<std::vector<float>> jamDegree, float w, int &timeCar)
 {
+	int indexBegin = id2indexCross(begin);
+	int indexEnd = id2indexCross(end);
 	//首先初始化dis数组
 	disfloat = new DisFloat[this->vexnum];
 
@@ -645,14 +673,15 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed, vector<std::vector
 		//设置当前的路径
 		vector<int> tmp;
 		tmp = disfloat[i].path;
-		tmp.push_back(begin);
-		tmp.push_back(i + 1);
+		tmp.push_back(indexBegin);
+		//tmp.push_back(i + 1);
+		tmp.push_back(i);
 		disfloat[i].path = tmp;
-		disfloat[i].value = arcTime[begin - 1][i];	//将邻接数组起点的那一行的值赋给dis数组
+		disfloat[i].value = arcTime[indexBegin][i];	//将邻接数组起点的那一行的值赋给dis数组
 	}
 	//设置起点到起点自己的路径为0
-	disfloat[begin - 1].value = 0;
-	disfloat[begin - 1].visit = true;
+	disfloat[indexBegin].value = 0;
+	disfloat[indexBegin].visit = true;
 
 	int count = 1;
 	//计算到其他各顶点的最短路径
@@ -677,13 +706,14 @@ vector<int> Graph_DG::Dijkstra(int begin, int end, int speed, vector<std::vector
 				disfloat[i].value = disfloat[temp].value + arcTime[temp][i];
 				vector<int> tmp;
 				tmp = disfloat[temp].path;
-				tmp.push_back(i + 1);
+				//tmp.push_back(i + 1);
+				tmp.push_back(i);
 				disfloat[i].path = tmp;
 			}
 		}
 	}
-	vector<int> path_tmp = disfloat[end - 1].path;
-	timeCar = disfloat[end - 1].value;
+	vector<int> path_tmp = disfloat[indexEnd].path;
+	timeCar = disfloat[indexEnd].value;
 
 	delete[] disfloat;//释放动态申请的disfloat数组
 	return path_tmp;
@@ -845,4 +875,14 @@ void  Graph_DG::normalizedFloat( float**temp )   //归一化后存回原矩阵
 
 }
 
+int Graph_DG::id2indexCross(int id)
+{
+	map<int, int>::iterator it;
+	it = mapId2IndexCross_Global.find(id);
+	if (it == mapId2IndexCross_Global.end())
+	{
+		PRINT("ERROR!\n");
+	}
+	return it->second;
+}
 
