@@ -149,24 +149,95 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 
 void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 {
-	/*//根据地图选参数
+	Scheduler sd(*m_dc);
+	//根据地图选参数
 	int paraFinal;
 	int carLastArrive;
 	int carTimeEarly;
 	switch (cars[0].speed)				//选择不同速度的开始发车和终止发车时刻
 	{
-	case 8:  //地图1
-		carLastArrive = 15;
+	case 10:  //地图1
+		paraFinal = 110;
+		carLastArrive = 10;
 		carTimeEarly = 50;
 		break;
 	case 6:			//地图2
+		paraFinal = 110;
 		carLastArrive = 10;
 		carTimeEarly =50;
 		break;
 	default:
 		break;
 	}
-	std::map<int, int> mapResult;
+	ReOrderStartBySpeedAndStartCross(paraFinal);
+	reorderCarsStarttime();
+	getPath_StaticAnalysisNor();
+
+	int timeFinal = sd.getSysTime();
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].timeArrived > (timeFinal - carLastArrive))
+		{
+			cars[i].starttime = cars[i].starttime - carTimeEarly;
+			cars[i].starttimeAnswer = cars[i].starttime;
+		}
+	}
+	int time = sd.getSysTime();
+	PRINT("time:%d\n", timeFinal);
+	PRINT("timeFinal:%d\n", time);
+	//PRINT("timeFinal:V0:%d   V2:%d\n", time, timeV2);
+
+
+	/*std::map<int, int> mapResult;
+	int time = 0;
+	Scheduler sd(*m_dc);
+	for (int i = 0; i < 1; ++i)//迭代15次
+	{
+		ReOrderStartBySpeedAndStartCross(para);
+		reorderCarsStarttime();
+		getPath_StaticAnalysisNor();
+		int time = sd.getSysTime();
+		if (time == false)
+		{
+			PRINT("DeadLock para:%d\n", para);
+			time = INT_MAX;
+		}
+		else
+		{
+			PRINT("Good para:%d time:%d\n", para, time);
+		}
+		mapResult.insert(pair<int, int>(time, para));
+		para -=10;
+	}
+	for (auto &v : mapResult)
+	{
+		PRINT("result:%d para:%d\n", v.first, v.second);
+	}
+	map<int, int>::iterator it;
+	it = mapResult.begin();
+	it;
+	para = it->second;
+	ReOrderStartBySpeedAndStartCross(para);
+	reorderCarsStarttime();
+	getPath_StaticAnalysisNor();
+	int timeFinal = sd.getSysTime();
+	int timeFinalV2= sd.getSysTimeV2();
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].timeArrived > (timeFinal -10))
+		{
+				cars[i].starttime = cars[i].starttime -50;
+				cars[i].starttimeAnswer = cars[i].starttime;
+		}
+	}
+	time = sd.getSysTime();
+	int timeV2 = sd.getSysTimeV2();
+	PRINT("time:V0:%d   V2:%d\n", timeFinal, timeFinalV2);
+	//PRINT("time:%d\n", timeFinal);
+	PRINT("timeFinal:V0:%d   V2:%d\n", time, timeV2);
+
+	*/
+	/*	std::map<int, int> mapResult;
 	int time = 0;
 	Scheduler sd(*m_dc);
 	for (int i = 0; i < 15; ++i)//迭代15次
@@ -205,45 +276,6 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	PRINT("time:%d\n", timeFinal);
 	PRINT("timeFinal:%d\n", time);
 	*/
-
-	std::map<int, int> mapResult;
-	int time = 0;
-	Scheduler sd(*m_dc);
-	for (int i = 0; i < 15; ++i)//迭代15次
-	{
-		ReOrderStartBySpeedAndStartCross(para);
-		reorderCarsStarttime();
-		getPath_StaticAnalysisNor();
-		int time = sd.getSysTime();
-		if (time == false)
-			time = INT_MAX;
-		mapResult.insert(pair<int, int>(time, para));
-		para -=1;
-	}
-	for (auto &v : mapResult)
-	{
-		PRINT("result:%d para:%d\n", v.first, v.second);
-	}
-	map<int, int>::iterator it;
-	it = mapResult.begin();
-	it;
-	para = it->second;
-	ReOrderStartBySpeedAndStartCross(para);
-	reorderCarsStarttime();
-	getPath_StaticAnalysisNor();
-	int timeFinal = sd.getSysTime();
-	for (int i = 0; i < num_Cars; ++i)
-	{
-		if (cars[i].timeArrived > (timeFinal -10))
-		{
-				cars[i].starttime = cars[i].starttime -50;
-				cars[i].starttimeAnswer = cars[i].starttime;
-		}
-	}
-	time = sd.getSysTime();
-	PRINT("time:%d\n", timeFinal);
-	PRINT("timeFinal:%d\n", time);
-	
 }
 
 void Algorithm::ShortestTime_SpeedBasicRoadStatus_AutoPara(int para)
