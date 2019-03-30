@@ -159,12 +159,12 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	int carTimeEarly;
 	switch (cars[0].speed)				//选择不同速度的开始发车和终止发车时刻
 	{
-	case 10:  //地图1
+	case 10:
 		paraFinal = 103;
-		carLastArrive = 10;
-		carTimeEarly = 50;
+		carLastArrive = 0;
+		carTimeEarly = 0;
 		break;
-	case 6:			//地图2
+	case 6:	
 		paraFinal = 122;
 		carLastArrive = 0;
 		carTimeEarly = 0;
@@ -178,16 +178,6 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	reorderCarsStarttime();
 	getPath_StaticAnalysisNor();
 	time = sd.getSysTime();
-
-	for (int i = 0; i < num_Cars; ++i)
-	{
-		if (cars[i].timeArrived > (time - carLastArrive))
-		{
-			cars[i].starttime = cars[i].starttime - carTimeEarly;
-			cars[i].starttimeAnswer = cars[i].starttime;
-		}
-	}
-
 	PRINT("timeFinal:V0:%d   V2:%d\n", time);
 	
 }
