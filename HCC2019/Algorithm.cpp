@@ -90,7 +90,7 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 {
 	std::map<int, int> mapResult;
-	int para = 280;
+	int para = 200;
 	int time = 0;
 	Scheduler sd(*m_dc);
 
@@ -114,7 +114,7 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 			PRINT("Good para:%d time:%d\n", para,time);
 		}
 		mapResult.insert(pair<int, int>(time, para));
-		para -= 3;
+		para -= 10;
 	}
 	for (auto &v : mapResult)
 	{
@@ -443,27 +443,39 @@ void Algorithm::getPath_StaticAnalysisNor()
 
 void Algorithm::getStartTime_BySpeed(int para)
 {
-	int n2, n4, n6, n8;
-	n2 = para;
-	n4 = para;
-	n6 = para - para / 36;
-	n8 = para - para / 12;
+	int n4 = para;
+	int n6 = para;
+	int n8 = para;
+	int n10 = para;
+	int n12 = para;
+	int n14 = para;
+	int n16 = para;
+
 
 	for (int i = 0; i < num_Cars; ++i)//忽略第0行数据
 	{
-		switch (cars[i].speed)
+		switch (cars[i].speed)				//选择不同速度的开始发车和终止发车时刻
 		{
-		case 2:
-			cars[i].starttime = 2 * n8 + 2 * n6 + 2 * n4 + i % (2 * n2);
+		case 16:
+			cars[i].starttime = i % (2 * para);
 			break;
-		case 4:
-			cars[i].starttime = 2 * n8 + 2 * n6 + i % (2 * n4);
+		case 14:
+			cars[i].starttime = 2 * n16 + i % (2 * para);
 			break;
-		case 6:
-			cars[i].starttime = 2 * n8 + i % (2 * n6);
+		case 12:
+			cars[i].starttime = 2 * (n16 + n14) + i % (2 * para);
+			break;
+		case 10:
+			cars[i].starttime = 2 * (n16 + n14 + n12) + i % (2 * para);
 			break;
 		case 8:
-			cars[i].starttime = i % (2 * n8);
+			cars[i].starttime = 2 * (n16 + n14 + n12 + n10) + i % (2 * para);
+			break;
+		case 6:
+			cars[i].starttime = 2 * (n16 + n14 + n12 + n10 + n8) + i % (2 * para);
+			break;
+		case 4:
+			cars[i].starttime = 2 * (n16 + n14 + n12 + n10 + n8 + n6) + i % (2 * para);
 			break;
 		default:
 			break;

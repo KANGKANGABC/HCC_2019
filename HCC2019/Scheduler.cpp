@@ -515,6 +515,8 @@ void Scheduler::driveCarStep1(Car car, int indexCar)
 
 bool Scheduler::addCar(Car car, int i)
 {
+	if (car.id == 56851)
+		PRINT("get!");
 	assert(car.status == SLEEPING);//只有SLEEPING状态的车可以加入地图行驶
 	int idRoadTarget = car.path[0];//获取目标道路
 	int idCrossTarget = car.idCrossFrom;//获得该车出发路口
@@ -593,8 +595,9 @@ int Scheduler::isCanEnter(int idRoad, int idCross)
 	//     1
 	//——————————
 	int indexRoad = id2indexRoad(idRoad);
+	int indexCross = id2indexCross(idCross);
 	int idStartLane = 0;//如果cross为道路的入方向，需要调度 0 1 2车道，否则调度 3 4 5车道
-	if (roads[indexRoad].idTo == crosses[idCross - 1].id)//如果cross为道路的入方向
+	if (roads[indexRoad].idTo == crosses[indexCross].id)//如果cross为道路的入方向
 	{
 		idStartLane = roads[indexRoad].channel;
 		assert(roads[indexRoad].isDuplex == 1);//如果cross为road的出方向，但是却不是双向道，那么很可能路径规划错误
@@ -686,22 +689,23 @@ int Scheduler::getCrossDir(int idCurRoad, int idNextRoad, int idNextCross)
 {
 	int dirCurRoad = 0;//当前道路在路口的方向
 	int dirNextRoad = 0;//即将驶入道路在路口的方向
-	if (crosses[idNextCross - 1].roadID_T == idCurRoad)
+	int indexCross = id2indexCross(idNextCross);
+	if (crosses[indexCross].roadID_T == idCurRoad)
 		dirCurRoad = 0;
-	else if (crosses[idNextCross - 1].roadID_R == idCurRoad)
+	else if (crosses[indexCross].roadID_R == idCurRoad)
 		dirCurRoad = 1;
-	else if (crosses[idNextCross - 1].roadID_D == idCurRoad)
+	else if (crosses[indexCross].roadID_D == idCurRoad)
 		dirCurRoad = 2;
-	else if (crosses[idNextCross - 1].roadID_L == idCurRoad)
+	else if (crosses[indexCross].roadID_L == idCurRoad)
 		dirCurRoad = 3;
 
-	if (crosses[idNextCross - 1].roadID_T == idNextRoad)
+	if (crosses[indexCross].roadID_T == idNextRoad)
 		dirNextRoad = 0;
-	else if (crosses[idNextCross - 1].roadID_R == idNextRoad)
+	else if (crosses[indexCross].roadID_R == idNextRoad)
 		dirNextRoad = 1;
-	else if (crosses[idNextCross - 1].roadID_D == idNextRoad)
+	else if (crosses[indexCross].roadID_D == idNextRoad)
 		dirNextRoad = 2;
-	else if (crosses[idNextCross - 1].roadID_L == idNextRoad)
+	else if (crosses[indexCross].roadID_L == idNextRoad)
 		dirNextRoad = 3;
 
 	switch (dirNextRoad - dirCurRoad)
@@ -729,6 +733,7 @@ int Scheduler::getCrossDir(int idCurRoad, int idNextRoad, int idNextCross)
 	default:
 		break;
 	}
+	return 0;
 }
 
 int Scheduler::getCrossDistance(Car car, int idCurRoad, int idNextRoad)
@@ -765,7 +770,8 @@ void Scheduler::driverToNextRoad(Car car, int idNextRoad, int idNextLane, int lo
 bool Scheduler::isCanDriveToNextRoad(Car car, int dir, int idCross)
 {
 	int indexCarCurRoad = id2indexRoad(car.idCurRoad);
-	assert(crosses[idCross - 1].roadID[dir] != -1);//不可能进入无效路径
+	int indexCross = id2indexCross(idCross);
+	assert(crosses[indexCross].roadID[dir] != -1);//不可能进入无效路径
 	int idNextCross = 0;
 	if (car.idCurLane >= roads[indexCarCurRoad].channel)//逆向
 		idNextCross = roads[indexCarCurRoad].idFrom;//此车即将驶入的路口
