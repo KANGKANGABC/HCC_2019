@@ -387,7 +387,6 @@ void Algorithm::getPath_StaticAnalysis()
 			graph.jamDegreeTmp[pathCross.at(i) - 1][pathCross.at(j) - 1]++;
 		}
 
-		//cross����תroad����
 		vector<int> pathRoad(pathCross.size() - 1);
 		for (int j = 0; j < pathRoad.size(); ++j)
 		{

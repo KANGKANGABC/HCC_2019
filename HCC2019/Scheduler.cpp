@@ -640,8 +640,9 @@ bool Scheduler::isBeDD(int idRoad, int idCross)//注意这里的ID不需要减1
 	if (idRoad == -1)//如果冲突方向无道路，则任务无冲突车辆
 		return false;
 	int indexRoad = id2indexRoad(idRoad);
+	int indexCross = id2indexCross(idCross);
 	int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
-	if (roads[indexRoad].idFrom == crosses[idCross - 1].id)//如果cross为道路的出方向
+	if (roads[indexRoad].idFrom == crosses[indexCross].id)//如果cross为道路的出方向
 	{
 		idStartLane = roads[indexRoad].channel;
 		if (roads[indexRoad].isDuplex != 1)
@@ -665,8 +666,9 @@ bool Scheduler::isBeLEFT(int idRoad, int idCross)//注意这里的ID不需要减
 	if (idRoad == -1)//如果冲突方向无道路，则任务无冲突车辆
 		return false;
 	int indexRoad = id2indexRoad(idRoad);
+	int indexCross = id2indexCross(idCross);
 	int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
-	if (roads[indexRoad].idFrom == crosses[idCross - 1].id)//如果cross为道路的出方向
+	if (roads[indexRoad].idFrom == crosses[indexCross].id)//如果cross为道路的出方向
 	{
 		idStartLane = roads[indexRoad].channel;
 		if (roads[indexRoad].isDuplex != 1)
