@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 	//alg.ShortestTime_SpeedBasicRoadStatus_AutoPara(0);
 	//alg.ShortestTime_SpeedBasic_AutoPara();
 
-	alg.StaticAnalysisNor_SpeedBasicNoSame_AutoPara(115);
+	alg.StaticAnalysisNor_SpeedBasicNoSame_AutoPara(122);
 
 	dc.writeResult(answer_file);
 

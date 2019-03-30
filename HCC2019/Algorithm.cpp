@@ -221,7 +221,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 			PRINT("Good para:%d time:%d\n", para, time);
 		}
 		mapResult.insert(pair<int, int>(time, para));
-		para -=5;
+		para -=7;
 	}
 	for (auto &v : mapResult)
 	{
