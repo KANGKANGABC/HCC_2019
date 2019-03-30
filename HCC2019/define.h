@@ -12,6 +12,7 @@
 #include <queue>
 #include <map>
 #include <stack>
+#include <cstdlib>
 
 #include "lib_io.h"
 

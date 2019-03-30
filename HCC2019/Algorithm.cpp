@@ -90,7 +90,7 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 {
 	std::map<int, int> mapResult;
-	int para = 200;
+	int para = 420;
 	int time = 0;
 	Scheduler sd(*m_dc);
 
@@ -98,7 +98,7 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	//getStartTime_BySpeed(para);
 	//reorderCarsStarttime();
 
-	for (int i = 0; i < 1; ++i)//迭代15次
+	for (int i = 0; i < 20; ++i)//迭代15次
 	{
 		getStartTime_BySpeed(para);
 		//reorderCarsStarttime();
@@ -114,7 +114,7 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 			PRINT("Good para:%d time:%d\n", para,time);
 		}
 		mapResult.insert(pair<int, int>(time, para));
-		para -= 10;
+		para -= 15;
 	}
 	for (auto &v : mapResult)
 	{
@@ -209,7 +209,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	std::map<int, int> mapResult;
 	int time = 0;
 	Scheduler sd(*m_dc);
-	for (int i = 0; i < 15; ++i)//迭代15次
+	for (int i = 0; i < 1; ++i)//迭代15次
 	{
 		ReOrderStartBySpeedAndStartCross(para);
 		reorderCarsStarttime();
@@ -217,6 +217,10 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 		int time = sd.getSysTime();
 		if (time == false)
 			time = INT_MAX;
+		else
+		{
+			PRINT("Good para:%d time:%d\n", para, time);
+		}
 		mapResult.insert(pair<int, int>(time, para));
 		para -=1;
 	}
@@ -241,8 +245,8 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 		}
 	}
 	time = sd.getSysTime();
-	PRINT("time:%d\n", timeFinal);
-	PRINT("timeFinal:%d\n", time);
+	int timeV2 = sd.getSysTimeV2();
+	PRINT("timeFinal:V0:%d   V2:%d\n", time, timeV2);
 	
 }
 
@@ -380,7 +384,6 @@ void Algorithm::getPath_StaticAnalysis()
 			graph.upDateJam();
 		}
 
-
 		//将统计的情况放到 jamDegreeBefore的矩阵中
 		for (int i = 0, j = 1; j < pathCross.size(); i++, j++)
 		{
@@ -397,7 +400,6 @@ void Algorithm::getPath_StaticAnalysis()
 		qCar[i].path = pathRoad;
 
 		cars[qCar[i].index].path = qCar[i].path;		//将qCar得到的路径赋值到cars的path变量中
-
 	}
 }
 
@@ -456,25 +458,25 @@ void Algorithm::getStartTime_BySpeed(int para)
 		switch (cars[i].speed)				//选择不同速度的开始发车和终止发车时刻
 		{
 		case 16:
-			cars[i].starttime = i % (2 * para);
+			cars[i].starttime = rand() % (2 * para);
 			break;
 		case 14:
-			cars[i].starttime = 2 * n16 + i % (2 * para);
+			cars[i].starttime = 2 * n16 + rand() % (2 * para);
 			break;
 		case 12:
-			cars[i].starttime = 2 * (n16 + n14) + i % (2 * para);
+			cars[i].starttime = 2 * (n16 + n14) + rand() % (2 * para);
 			break;
 		case 10:
-			cars[i].starttime = 2 * (n16 + n14 + n12) + i % (2 * para);
+			cars[i].starttime = 2 * (n16 + n14 + n12) + rand() % (2 * para);
 			break;
 		case 8:
-			cars[i].starttime = 2 * (n16 + n14 + n12 + n10) + i % (2 * para);
+			cars[i].starttime = 2 * (n16 + n14 + n12 + n10) + rand() % (2 * para);
 			break;
 		case 6:
-			cars[i].starttime = 2 * (n16 + n14 + n12 + n10 + n8) + i % (2 * para);
+			cars[i].starttime = 2 * (n16 + n14 + n12 + n10 + n8) + rand() % (2 * para);
 			break;
 		case 4:
-			cars[i].starttime = 2 * (n16 + n14 + n12 + n10 + n8 + n6) + i % (2 * para);
+			cars[i].starttime = 2 * (n16 + n14 + n12 + n10 + n8 + n6) + rand() % (2 * para);
 			break;
 		default:
 			break;
@@ -764,6 +766,7 @@ void Algorithm::reorderCarsStarttime()
 
 	int begin = 0;
 	int end = qCar.size() - 1;
+	//std::sort(qCar.begin(), qCar.end(), less_starttime);
 	quicksort(begin, end);
 }
 
