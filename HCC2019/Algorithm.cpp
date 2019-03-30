@@ -90,7 +90,7 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 {
 	std::map<int, int> mapResult;
-	int para = 420;
+	int para = 220;
 	int time = 0;
 	Scheduler sd(*m_dc);
 
@@ -101,8 +101,6 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	for (int i = 0; i < 20; ++i)//迭代15次
 	{
 		getStartTime_BySpeed(para);
-		//reorderCarsStarttime();
-		//getPath_StaticAnalysisNor();
 		int time = sd.getSysTimeChangePath(w);
 		if (time == false)
 		{
@@ -114,7 +112,7 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 			PRINT("Good para:%d time:%d\n", para,time);
 		}
 		mapResult.insert(pair<int, int>(time, para));
-		para -= 15;
+		para -= 4;
 	}
 	for (auto &v : mapResult)
 	{
@@ -214,7 +212,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 		ReOrderStartBySpeedAndStartCross(para);
 		reorderCarsStarttime();
 		getPath_StaticAnalysisNor();
-		int time = sd.getSysTime();
+		time = sd.getSysTime();
 		if (time == false)
 			time = INT_MAX;
 		else
@@ -222,7 +220,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 			PRINT("Good para:%d time:%d\n", para, time);
 		}
 		mapResult.insert(pair<int, int>(time, para));
-		para -=1;
+		para -=5;
 	}
 	for (auto &v : mapResult)
 	{
@@ -232,15 +230,17 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	it = mapResult.begin();
 	it;
 	para = it->second;
+	/*
 	ReOrderStartBySpeedAndStartCross(para);
 	reorderCarsStarttime();
 	getPath_StaticAnalysisNor();
 	int timeFinal = sd.getSysTime();
+	*/
 	for (int i = 0; i < num_Cars; ++i)
 	{
-		if (cars[i].timeArrived > (timeFinal -10))
+		if (cars[i].timeArrived > (time -20))
 		{
-				cars[i].starttime = cars[i].starttime -50;
+				cars[i].starttime = cars[i].starttime -20;
 				cars[i].starttimeAnswer = cars[i].starttime;
 		}
 	}
@@ -508,14 +508,14 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 		delay =0;
 		break;
 	case 6:			//地图2
-		early4 =0;
+		early4 = 0;
 		early6 = 0;
-		early8 =0;
-		early10 =0;
-		early12 =0;
-		early14 =0;
-		early16 =0;
-		delay =0;
+		early8 = 0;
+		early10 = 0;
+		early12 = 0;
+		early14 = 0;
+		early16 = 0;
+		delay = 0;
 		break;
 	default:
 		break;

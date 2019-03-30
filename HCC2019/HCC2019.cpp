@@ -52,12 +52,12 @@ int main(int argc, char *argv[])
 
 	//alg.StaticAnalysis_SpeedBasic_AutoPara();
 	//alg.unlockDead(78);
-	//alg.DynamicPathByScheduler_SpeedBasic_AutoPara(3);
+	//alg.DynamicPathByScheduler_SpeedBasic_AutoPara(1);
 
 	//alg.ShortestTime_SpeedBasicRoadStatus_AutoPara(0);
 	//alg.ShortestTime_SpeedBasic_AutoPara();
 
-	alg.StaticAnalysisNor_SpeedBasicNoSame_AutoPara(140);
+	alg.StaticAnalysisNor_SpeedBasicNoSame_AutoPara(115);
 
 	dc.writeResult(answer_file);
 
