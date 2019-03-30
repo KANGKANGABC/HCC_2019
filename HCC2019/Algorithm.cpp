@@ -98,7 +98,7 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	//getStartTime_BySpeed(para);
 	//reorderCarsStarttime();
 
-	for (int i = 0; i < 15; ++i)//迭代15次
+	for (int i = 0; i < 1; ++i)//迭代15次
 	{
 		getStartTime_BySpeed(para);
 		//reorderCarsStarttime();
@@ -141,7 +141,7 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 			cars[i].starttimeAnswer = cars[i].starttime;
 		}
 	}
-	time = sd.getSysTime();
+	//time = sd.getSysTime();
 	int timeV2 = sd.getSysTimeV2();
 
 	PRINT("timeFinal:V0:%d   V2:%d\n", time, timeV2);
