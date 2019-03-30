@@ -15,6 +15,9 @@ Algorithm::Algorithm(DataCenter &dc)
 	graphC2R = dc.graphC2R;
 	speedType = dc.speedType;
 	reorderCars(reorderCar);
+	mapId2IndexCar = dc.mapId2IndexCar;
+	mapId2IndexCross = dc.mapId2IndexCross;
+	mapId2IndexRoad = dc.mapId2IndexRoad;
 }
 
 Algorithm::~Algorithm()
@@ -423,7 +426,7 @@ void Algorithm::getPath_StaticAnalysisNor()
 		//将统计的情况放到 jamDegreeBefore的矩阵中
 		for (int i = 0, j = 1; j < pathCross.size(); i++, j++)
 		{
-			graph.jamDegreeBefore[pathCross.at(i) - 1][pathCross.at(j) - 1]++;
+			graph.jamDegreeBefore[pathCross.at(i)][pathCross.at(j)]++;
 		}
 
 		graph.upDateJamDynamic();
@@ -431,7 +434,7 @@ void Algorithm::getPath_StaticAnalysisNor()
 		vector<int> pathRoad(pathCross.size() - 1);
 		for (int j = 0; j < pathRoad.size(); ++j)
 		{
-			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+			pathRoad[j] = graphC2R[pathCross[j]][pathCross[j + 1]];
 		}
 		qCar[i].path = pathRoad;
 		cars[qCar[i].index].path = qCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
@@ -592,12 +595,12 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 					++frequence;
 					int carOrder = qspeed.front().index;        //用于记录队首的car的下标
 
-					if (qspeed.front().plantime <= time && fromCross[qspeed.front().idCrossFrom - 1] < 1)
+					if (qspeed.front().plantime <= time && fromCross[id2indexCross(qspeed.front().idCrossFrom)] < 1)
 					{
 						//若队首的car的plantime小于等于当前时刻且该出发地只有一辆，则将该车starttimeAnswer设为此刻，并从qspeed队列中弹出，carIsAssigned设为true，fromCross当前出发地加一
 						cars[carOrder].starttimeAnswer = time;
 						cars[carOrder].starttime = time;
-						fromCross[qspeed.front().idCrossFrom - 1] ++;
+						fromCross[id2indexCross(qspeed.front().idCrossFrom)] ++;
 						qspeed.pop();
 						carIsAssigned = true;
 					}
@@ -617,7 +620,7 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 						{
 							cars[carOrder].starttimeAnswer = time;
 							cars[carOrder].starttime = time;
-							fromCross[qspeed.front().idCrossFrom - 1] ++;
+							fromCross[id2indexCross(qspeed.front().idCrossFrom)] ++;
 							qspeed.pop();
 							carIsAssigned = true;
 						}
@@ -751,5 +754,29 @@ void Algorithm::reorderCarsStarttime()
 	int begin = 0;
 	int end = qCar.size() - 1;
 	quicksort(begin, end);
+}
+
+int Algorithm::id2indexCar(int id)
+{
+	map<int, int>::iterator it;
+	it = mapId2IndexCar.find(id);
+	assert(it != mapId2IndexCar.end());
+	return it->second;
+}
+
+int Algorithm::id2indexRoad(int id)
+{
+	map<int, int>::iterator it;
+	it = mapId2IndexRoad.find(id);
+	assert(it != mapId2IndexRoad.end());
+	return it->second;
+}
+
+int Algorithm::id2indexCross(int id)
+{
+	map<int, int>::iterator it;
+	it = mapId2IndexCross.find(id);
+	assert(it != mapId2IndexCross.end());
+	return it->second;
 }
 

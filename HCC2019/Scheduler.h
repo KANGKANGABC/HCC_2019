@@ -29,10 +29,6 @@ public:
 	//获得路径后，规划出发时间,para为参数
 	void getStartTime(int para);
 	void getStartTime_loadbalance(int carnum);
-	//获得路径,为每辆车规划路径，基于时间
-	void getPathByTime();
-	//车辆按出发时间重排序后进行静态规划
-	void getPathByTime_dynamic(); //根据1-100 和101-199车的轨迹，更新第200辆车的邻接矩阵
 	void getTimeByDir(int para);//根据车的行驶方向发车（++）和（--）的一起跑 （+-）和（-+）的一起跑 
 	void ReOrderStartByTime(int para);//根据行驶时间重新安排出发时间
 	void ReOrderStartBySpeed(int para);//根据行驶时间重新安排出发时间
