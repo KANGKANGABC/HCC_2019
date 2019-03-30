@@ -159,12 +159,12 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	case 10:  //地图1
 		paraFinal = 103;
 		carLastArrive = 10;
-		carTimeEarly = 50;
+		carTimeEarly =50;
 		break;
 	case 6:			//地图2
-		paraFinal = 110;
-		carLastArrive = 10;
-		carTimeEarly =50;
+		paraFinal = 122;
+		carLastArrive = 0;
+		carTimeEarly =0;
 		break;
 	default:
 		break;
@@ -581,28 +581,28 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 			timeend = 2 * n16;
 			break;
 		case 14:
-			timebegin = 2 * n16 + 1 + delay;
-			timeend = 2 * (n16 + n14) + delay;
+			timebegin = 2 * n16 + 1 ;
+			timeend = 2 * (n16 + n14) ;
 			break;
 		case 12:
-			timebegin = 2 * (n16 + n14) + 1 + 2*delay;
-			timeend = 2 * (n16 + n14 + n12) + 2*delay;
+			timebegin = 2 * (n16 + n14) + 1  ;
+			timeend = 2 * (n16 + n14 + n12) ;
 			break;
 		case 10:
-			timebegin = 2 * (n16 + n14 + n12) + 1+3*delay;
-			timeend = 2 * (n16+ n14 + n12 + n10) +3* delay;
+			timebegin = 2 * (n16 + n14 + n12) + 1;
+			timeend = 2 * (n16+ n14 + n12 + n10) ;
 			break;
 		case 8:
-			timebegin = 2 * (n16 + n14 + n12 + n10) +1 + 4*delay;
-			timeend = 2 * (n16 + n14 + n12 + n10+n8) +4*delay;
+			timebegin = 2 * (n16 + n14 + n12 + n10) +1 ;
+			timeend = 2 * (n16 + n14 + n12 + n10+n8) ;
 			break;
 		case 6:
-			timebegin = 2 * (n16 + n14 + n12 + n10 + n8)+1 + 5*delay;
-			timeend = 2 * (n16 + n14 + n12 + n10 + n8+n6) + 5*delay;
+			timebegin = 2 * (n16 + n14 + n12 + n10 + n8)+1;
+			timeend = 2 * (n16 + n14 + n12 + n10 + n8+n6) ;
 			break;
 		case 4:
-			timebegin = 2 * (n16 + n14 + n12 + n10 + n8 + n6) + 6*delay;
-			timeend = 2 * (n16 + n14 + n12 + n10 + n8 + n6+n4) + 6*delay;
+			timebegin = 2 * (n16 + n14 + n12 + n10 + n8 + n6) + delay;
+			timeend = 2 * (n16 + n14 + n12 + n10 + n8 + n6+n4) + delay;
 			break;
 		default:
 			break;
