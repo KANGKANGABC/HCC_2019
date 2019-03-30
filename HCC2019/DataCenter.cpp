@@ -89,22 +89,25 @@ void DataCenter::readRoadData()
 		//初始化每个Road中Lane
 		this->road[i - 1].CreateLane();
 
+		int indexCrossFrom = id2indexCross(road[i - 1].idFrom);
+		int indexCrossTo = id2indexCross(road[i - 1].idTo);
+
 		if (sp[6].substr(0, 1) == "1")
 		{
-			graphRoadLength[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].length;
-			graphRoadLength[road[i - 1].idTo - 1][road[i - 1].idFrom - 1] = road[i - 1].length;
+			graphRoadLength[indexCrossFrom][indexCrossTo] = road[i - 1].length;
+			graphRoadLength[indexCrossTo][indexCrossFrom] = road[i - 1].length;
 
-			graphRoadMaxSpeed[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].speed;
-			graphRoadMaxSpeed[road[i - 1].idTo - 1][road[i - 1].idFrom - 1] = road[i - 1].speed;
+			graphRoadMaxSpeed[indexCrossFrom][indexCrossTo] = road[i - 1].speed;
+			graphRoadMaxSpeed[indexCrossTo][indexCrossFrom] = road[i - 1].speed;
 
-			graphC2R[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].id;
-			graphC2R[road[i - 1].idTo - 1][road[i - 1].idFrom - 1] = road[i - 1].id;
+			graphC2R[indexCrossFrom][indexCrossTo] = road[i - 1].id;
+			graphC2R[indexCrossTo][indexCrossFrom] = road[i - 1].id;
 		}
 		else
 		{
-			graphRoadLength[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].length;
-			graphRoadMaxSpeed[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].speed;
-			graphC2R[road[i - 1].idFrom - 1][road[i - 1].idTo - 1] = road[i - 1].id;
+			graphRoadLength[indexCrossFrom][indexCrossTo] = road[i - 1].length;
+			graphRoadMaxSpeed[indexCrossFrom][indexCrossTo] = road[i - 1].speed;
+			graphC2R[indexCrossFrom][indexCrossTo] = road[i - 1].id;
 		}
 	}
 	printf("readRoadData done!\n");
@@ -165,6 +168,7 @@ void DataCenter::readCrossData()
 		cross[i - 1].roadID.resize(4);
 		cross[i - 1].roadID = { cross[i - 1].roadID_T ,cross[i - 1].roadID_R ,cross[i - 1].roadID_D ,cross[i - 1].roadID_L };
 		mapId2IndexCross.insert(pair<int, int>(cross[i - 1].id, cross[i - 1].index));//建立Id到Index的索引
+		mapId2IndexCross_Global.insert(pair<int, int>(cross[i - 1].id, cross[i - 1].index));//建立Id到Index的索引
 	}
 
 	printf("readCrossData done!\n");
@@ -237,4 +241,28 @@ void DataCenter::writeResultWithTime(const char *filename)
 	}
 	const char *result_file = result.c_str();
 	write_result(result_file, filename);
+}
+
+int DataCenter::id2indexCar(int id)
+{
+	map<int, int>::iterator it;
+	it = mapId2IndexCar.find(id);
+	assert(it != mapId2IndexCar.end());
+	return it->second;
+}
+
+int DataCenter::id2indexRoad(int id)
+{
+	map<int, int>::iterator it;
+	it = mapId2IndexRoad.find(id);
+	assert(it != mapId2IndexRoad.end());
+	return it->second;
+}
+
+int DataCenter::id2indexCross(int id)
+{
+	map<int, int>::iterator it;
+	it = mapId2IndexCross.find(id);
+	assert(it != mapId2IndexCross.end());
+	return it->second;
 }

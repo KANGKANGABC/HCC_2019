@@ -41,9 +41,10 @@ int main(int argc, char *argv[])
 	int cross_line_num = read_file(data_cross, MAX_CROSS_NUM, crossPath.c_str());
 
 	DataCenter dc(data_road, road_line_num, data_car, car_line_num, data_cross, cross_line_num);
+	dc.readCrossData();
 	dc.readRoadData();
 	dc.readCarData();
-	dc.readCrossData();
+
 
 	Algorithm alg(dc);
 	//Scheduler sd(dc);
@@ -52,6 +53,7 @@ int main(int argc, char *argv[])
 	//alg.StaticAnalysis_SpeedBasic_AutoPara();
 	//alg.unlockDead(78);
 	//alg.DynamicPathByScheduler_SpeedBasic_AutoPara(7);
+
 	//alg.ShortestTime_SpeedBasicRoadStatus_AutoPara(0);
 	//alg.ShortestTime_SpeedBasic_AutoPara();
 

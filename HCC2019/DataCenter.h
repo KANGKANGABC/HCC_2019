@@ -7,6 +7,7 @@
 #include "dijkstra.h"
 #include "vector"
 
+extern map<int, int> mapId2IndexCross_Global;
 
 class DataCenter
 {
@@ -104,6 +105,10 @@ private:
 
 	//路径列表
 	std::vector<std::vector<int> > carPathList;
+
+	int id2indexCar(int id);
+	int id2indexRoad(int id);
+	int id2indexCross(int id);
 
 };
 

@@ -142,7 +142,7 @@ int Scheduler::getSysTimeChangePath(int para)
 	SchedulerInit();
 	while (num_CarsScheduling > 0)
 	{
-		SchedulerCore();
+		SchedulerCore_V2();
 		driverCarInGarageDynamic(graph, para);
 		if (!putAllCarStatus())//输出所有车的状态
 			return false;//发生死锁
@@ -860,18 +860,19 @@ void Scheduler::driverCarInGarageDynamic(Graph_DG &graph,int para)
 		if (cars[i].starttime == time_Scheduler && cars[i].status == SLEEPING)
 		{
 			int timeCar = 0;
+			/*
 			if (cars[i].speed == 8) para = 7;
 			else if (cars[i].speed == 6) para = 7;
 			else if (cars[i].speed == 4) para = 7;
 			else if (cars[i].speed == 2) para = 7;
-
+			*/
 			vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed, graphRoadStatusByDS, para, timeCar);
 			cars[i].time = timeCar;
 			//cross矩阵转road矩阵
 			vector<int> pathRoad(pathCross.size() - 1);
 			for (int j = 0; j < pathRoad.size(); ++j)
 			{
-				pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+				pathRoad[j] = graphC2R[pathCross[j]][pathCross[j + 1]];
 			}
 			cars[i].path = pathRoad;
 			addCar(cars[i], i);
@@ -905,16 +906,16 @@ void Scheduler::driverCarInGarageChangeTime(Graph_DG &graph,int para)
 			vector<int> pathRoadWithDir(pathCross.size() - 1);
 			for (int j = 0; j < pathRoad.size(); ++j)
 			{
-				pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
-				if (roads[pathRoad[j] - 5000].idFrom == pathCross[j])
+				pathRoad[j] = graphC2R[pathCross[j]][pathCross[j + 1]];
+				if (roads[id2indexRoad(pathRoad[j])].idFrom == pathCross[j])
 					pathRoadWithDir[j] = pathRoad[j];
 				else
 					pathRoadWithDir[j] = -pathRoad[j];
 			}
 			reorderCar[i].path = pathRoad;
 			reorderCar[i].time = timeCar;
-			cars[reorderCar[i].id - 10000].path = pathRoad;
-			cars[reorderCar[i].id - 10000].time = timeCar;
+			cars[reorderCar[i].index].path = pathRoad;
+			cars[reorderCar[i].index].time = timeCar;
 
 			if (reorderCar[i].speed == 8)
 				loadAdded = loadAdded + timeCar;
@@ -934,9 +935,9 @@ void Scheduler::driverCarInGarageChangeTime(Graph_DG &graph,int para)
 			if (judgement(mapForJamDegree, pathRoadWithDir))
 			{
 				reorderCar[i].starttime = time_Scheduler;
-				cars[reorderCar[i].id - 10000].starttime = time_Scheduler;
+				cars[reorderCar[i].index].starttime = time_Scheduler;
 				reorderCar[i].starttimeAnswer = reorderCar[i].starttime;
-				cars[reorderCar[i].id - 10000].starttimeAnswer = cars[reorderCar[i].id - 10000].starttime;
+				cars[reorderCar[i].index].starttimeAnswer = cars[reorderCar[i].index].starttime;
 				carsDeparture.push_back(reorderCar[i]);
 			}
 		}
@@ -946,11 +947,11 @@ void Scheduler::driverCarInGarageChangeTime(Graph_DG &graph,int para)
 	{
 		Car car = carsWaitInGarage.front();
 		carsWaitInGarage.pop_front();
-		addCar(car, car.id - 10000);
+		addCar(car, car.index);
 	}
 	for (auto car : carsDeparture)
 	{
-		addCar(car, car.id - 10000);
+		addCar(car, car.index);
 	}
 	carsDeparture.clear();
 	flag++;
@@ -1025,6 +1026,8 @@ void Scheduler::putAllRoadStatus()
 	{
 		float perRoad = 0;
 		float threshold = 0.5;
+		int indexCrossFrom = id2indexCross(roads[i].idFrom);
+		int indexCrossTo = id2indexCross(roads[i].idTo);
 		if (roads[i].isDuplex)
 		{
 			for (int j = 0; j < roads[i].channel; ++j)
@@ -1034,7 +1037,7 @@ void Scheduler::putAllRoadStatus()
 				num_cars_road += roads[i].lane[j].laneCar.size();
 			}
 			perRoad = perRoad / roads[i].channel;
-			graphRoadStatusByDS[roads[i].idFrom - 1][roads[i].idTo - 1] = perRoad;//更新拥堵情况矩阵
+			graphRoadStatusByDS[indexCrossFrom][indexCrossTo] = perRoad;//更新拥堵情况矩阵
 
 			mapUpdate(mapForJamDegree, roads[i].id, perRoad);
 			perRoad = 0;
@@ -1045,7 +1048,7 @@ void Scheduler::putAllRoadStatus()
 				num_cars_road += roads[i].lane[j].laneCar.size();
 			}
 			perRoad = perRoad / roads[i].channel;
-			graphRoadStatusByDS[roads[i].idTo - 1][roads[i].idFrom - 1] = perRoad;//更新拥堵情况矩阵
+			graphRoadStatusByDS[indexCrossTo][indexCrossFrom] = perRoad;//更新拥堵情况矩阵
 
 			mapUpdate(mapForJamDegree, -roads[i].id, perRoad);//道路反方向的路况以id的负值来存储
 			perRoad = 0;
@@ -1059,7 +1062,7 @@ void Scheduler::putAllRoadStatus()
 				num_cars_road += roads[i].lane[j].laneCar.size();
 			}
 			perRoad = perRoad / roads[i].channel;
-			graphRoadStatusByDS[roads[i].idFrom - 1][roads[i].idTo - 1] = perRoad;//更新拥堵情况矩阵
+			graphRoadStatusByDS[indexCrossFrom][indexCrossTo] = perRoad;//更新拥堵情况矩阵
 			mapUpdate(mapForJamDegree, roads[i].id, perRoad);
 
 		}
@@ -1070,12 +1073,13 @@ void Scheduler::putAllRoadStatus()
 int Scheduler::getFirstRoadFromCross(int idCross, int index)
 {
 	std::vector<int> idRoad;
+	int indexCross = id2indexCross(idCross);
 	for (int i = 0; i < 4; ++i)
 	{
-		if (crosses[idCross - 1].roadID[i] == -1)
+		if (crosses[indexCross].roadID[i] == -1)
 			idRoad.push_back(INT_MAX);
 		else
-			idRoad.push_back(crosses[idCross - 1].roadID[i]);
+			idRoad.push_back(crosses[indexCross].roadID[i]);
 	}
 	std::sort(idRoad.begin(),idRoad.end());
 	for (int i = 0; i < 4; ++i)
@@ -1089,9 +1093,10 @@ int Scheduler::getFirstRoadFromCross(int idCross, int index)
 int Scheduler::getDirByRoadCrossDir(int idCross, int idRoad)
 {
 	int dirFrom = -1;//设置初值为-1，便于后续错误检测
+	int indexCross = id2indexCross(idCross);
 	for (int i = 0; i < 4; ++i)
 	{
-		if (crosses[idCross - 1].roadID[i] == idRoad)
+		if (crosses[indexCross].roadID[i] == idRoad)
 			dirFrom = i;
 	}
 	assert(dirFrom != -1);//如果未在该cross找到该road，则报错
@@ -1282,29 +1287,31 @@ int Scheduler::SchedulerCore()
 					int idRoad = getFirstRoadFromCross(idCross, j);
 					if (idRoad != -1)
 					{
+						int indexRoad = id2indexRoad(idRoad);
 						carsRoadWaitting.clear();
 						int idStartLane = 0;//如果cross为道路的出方向，需要调度 0 1 2车道，否则调度 3 4 5车道
-						if (roads[idRoad - 5000].idFrom == crosses[i].id)//如果cross为道路的入方向
+						if (roads[indexRoad].idFrom == crosses[i].id)//如果cross为道路的入方向
 						{
-							idStartLane = roads[idRoad - 5000].channel;
-							if (roads[idRoad - 5000].isDuplex != 1)
+							idStartLane = roads[indexRoad].channel;
+							if (roads[indexRoad].isDuplex != 1)
 								continue;//如果非双车道，退出本次循环
 						}
 						while (1)
 						{
 							bool isWorkingLane = false;
-							for (int m = idStartLane; m < idStartLane + roads[idRoad - 5000].channel; ++m)//遍历所有lane
+							for (int m = idStartLane; m < idStartLane + roads[indexRoad].channel; ++m)//遍历所有lane
 							{
-								if (roads[idRoad - 5000].lane[m].laneCar.size() != 0)
+								if (roads[indexRoad].lane[m].laneCar.size() != 0)
 								{
-									Car car = roads[idRoad - 5000].lane[m].laneCar[0];
+									Car car = roads[indexRoad].lane[m].laneCar[0];
 									if (car.status == WAITTING)//只处理在路口且为等待状态的车
 									{
 										assert(car.status == WAITTING);//车辆在路口调度时一定要是WAITTING状态
 										int dirConflict = 0;
 										int dirTarget = 0;
 										int idNextCross = 0;
-										std::vector<Car>::iterator itCar = roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.begin();
+										int indexCarCurRoad = id2indexRoad(car.idCurRoad);
+										std::vector<Car>::iterator itCar = roads[indexCarCurRoad].lane[car.idCurLane].laneCar.begin();
 										switch (car.dirCross)
 										{
 										case NONE:
@@ -1313,21 +1320,21 @@ int Scheduler::SchedulerCore()
 										case DD://直行>左转>右转
 											//根据官方说明，即将到达终点的车以直行方式进入路口
 											/***************************************************************/
-											if (car.idCurLane >= roads[car.idCurRoad - 5000].channel)//逆向
-												idNextCross = roads[car.idCurRoad - 5000].idFrom;//此车即将驶入的路口
+											if (car.idCurLane >= roads[indexCarCurRoad].channel)//逆向
+												idNextCross = roads[indexCarCurRoad].idFrom;//此车即将驶入的路口
 											else
-												idNextCross = roads[car.idCurRoad - 5000].idTo;//此车即将驶入的路口
+												idNextCross = roads[indexCarCurRoad].idTo;//此车即将驶入的路口
 											//根据假设AA，此时可能有车辆驶入终点
 											if (idNextCross == car.idCrossTo)//如果此车将要驶出出口
 											{
 												num_CarsScheduling -= 1;//正在调度的车辆数减一
-												roads[car.idCurRoad - 5000].lane[car.idCurLane].laneCar.erase(itCar);//删除该道路第一辆车
+												roads[indexCarCurRoad].lane[car.idCurLane].laneCar.erase(itCar);//删除该道路第一辆车
 												isWorkingCross = true;
 												isWorkingRoad = true;
 												isWorkingLane = true;
 												driveAllCarsJustOnOneChannelToEndState(idRoad, idCross, m);
 												//记录到达时间
-												cars[car.id - 10000].timeArrived = time_Scheduler;
+												cars[car.index].timeArrived = time_Scheduler;
 
 												break;
 												//该车准备通过路口
@@ -1465,9 +1472,6 @@ int Scheduler::SchedulerCore_V2()
 							if (roads[indexRoad].isDuplex != 1)
 								continue;//如果非双车道，退出本次循环
 						}
-						//在这里存入需要调度的车
-						std::vector<Car> vec_carsPerRoad;
-						std::vector<Car> vec_carsPerLine;
 						for (int m = idStartLane; m < idStartLane + roads[indexRoad].channel; ++m)//遍历所有lane
 						{
 							if (roads[indexRoad].lane[m].laneCar.size() > 0)
@@ -1480,28 +1484,6 @@ int Scheduler::SchedulerCore_V2()
 							}
 						}
 						std::sort(carsRoadWaitting.begin(), carsRoadWaitting.end(), more_location);
-						
-						for (int n = roads[indexRoad].length; n > 0; n--)
-						{
-							for (int m = idStartLane; m < idStartLane + roads[indexRoad].channel; ++m)//遍历所有lane
-							{
-								for (int t = 0; t < roads[indexRoad].lane[m].laneCar.size(); t++)
-								{
-									if (roads[indexRoad].lane[m].laneCar[t].location == n
-										&& roads[indexRoad].lane[m].laneCar[t].status == WAITTING
-										&& roads[indexRoad].lane[m].laneCar[t].dirCross != NONE)
-									{
-										vec_carsPerLine.push_back(roads[indexRoad].lane[m].laneCar[t]);
-									}
-								}
-							}
-							//std::sort(vec_carsPerLine.begin(), vec_carsPerLine.end(), more_location);
-							for (auto car : vec_carsPerLine)
-							{
-								vec_carsPerRoad.push_back(car);
-							}
-							vec_carsPerLine.clear();
-						}
 						while(carsRoadWaitting.size() > 0)
 						//for (auto car : vec_carsPerRoad)
 						{
@@ -1612,7 +1594,6 @@ int Scheduler::SchedulerCore_V2()
 								break;
 							}
 						}
-						vec_carsPerRoad.clear();
 					}
 				}
 			}
@@ -1749,7 +1730,7 @@ void Scheduler::getPath()//获得最短路径和该路径下的运行时间
 		vector<int> pathRoad(pathCross.size() - 1);
 		for (int j = 0; j < pathRoad.size(); ++j)
 		{
-			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+			pathRoad[j] = graphC2R[pathCross[j]][pathCross[j + 1]];
 		}
 		cars[i].path = pathRoad;
 		cars[i].time = timeCar;
@@ -1768,7 +1749,7 @@ void Scheduler::getPathWeightOne()
 		vector<int> pathRoad(pathCross.size() - 1);
 		for (int j = 0; j < pathRoad.size(); ++j)
 		{
-			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+			pathRoad[j] = graphC2R[pathCross[j]][pathCross[j + 1]];
 			//assert(pathRoad[j] != 0);
 		}
 		cars[i].path = pathRoad;
@@ -1883,97 +1864,6 @@ void Scheduler::getStartTime_loadbalance(int carnum)
 		L2:timeStart++;
 	}
 	L1:cout << endl;
-}
-
-void Scheduler::getPathByTime() 
-{
-	int num = 0;
-	static int flagnum = 0;
-	static int flag[100] = { 0 };
-	static int flag_road[120] = { 0 };
-
-	Graph_DG graph(vexnum, edge);
-	graph.createArcGraph(tmp);
-	graph.createArcRoadvGraph(tmp1);
-
-	int timeCar = 0;
-
-	for (int i = 0; i < num_Cars; ++i)
-	{
-		vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo, cars[i].speed, timeCar);
-
-		cars[i].time = timeCar;
-
-		//统计车辆情况，每100辆车更新一次jamDegree的矩阵
-		num++;
-		flagnum++;
-		if (num == 200)
-		{
-			num = 0;
-			graph.upDateJam();
-		}
-		for (int i = 0; i < pathCross.size(); i++)
-		{
-			flag[pathCross.at(i) - 1]++;//记录64个cross的使用情况
-		}
-		//将统计的情况放到jamDegreeTmp的矩阵中
-		for (int i = 0, j = 1; j < pathCross.size(); i++, j++)
-		{
-			graph.jamDegreeTmp[pathCross.at(i) - 1][pathCross.at(j) - 1]++;
-		}
-
-		//cross矩阵转road矩阵
-		vector<int> pathRoad(pathCross.size() - 1);
-		for (int j = 0; j < pathRoad.size(); ++j)
-		{
-			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
-			//assert(pathRoad[j] != 0);
-		}
-		cars[i].path = pathRoad;
-
-	}
-}
-
-void Scheduler::getPathByTime_dynamic()
-{
-	int num = 0;
-
-	Graph_DG graph(vexnum, edge);
-	graph.createArcGraph(tmp);
-	graph.createArcRoadvGraph(tmp1);
-
-	for (int i = 0; i < num_Cars; ++i)
-	{
-		vector<int> pathCross = graph.DijkstraNor(qCar[i].idCrossFrom, qCar[i].idCrossTo, qCar[i].speed);
-
-		num++;
-		//定时更新交通拥堵邻接矩阵jamDegreeLongBefore
-		if (num == 100)
-		{
-			num = 0;
-			graph.upDateJamStatic();
-			graph.cleanUpJamDegreeBefore();
-
-		}
-
-		//将统计的情况放到 jamDegreeBefore的矩阵中
-		for (int i = 0, j = 1; j < pathCross.size(); i++, j++)
-		{
-			graph.jamDegreeBefore[pathCross.at(i) - 1][pathCross.at(j) - 1]++;
-		}
-
-		graph.upDateJamDynamic();
-
-		vector<int> pathRoad(pathCross.size() - 1);
-		for (int j = 0; j < pathRoad.size(); ++j)
-		{
-			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
-			//assert(pathRoad[j] != 0);
-		}
-
-		qCar[i].path = pathRoad;
-		cars[qCar[i].index].path = qCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
-	}
 }
 
 bool CompDirMap(const Car &a, const Car &b)

@@ -87,27 +87,31 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 {
 	std::map<int, int> mapResult;
-	int para = 400;
+	int para = 280;
 	int time = 0;
 	Scheduler sd(*m_dc);
 
 
-	getStartTime_BySpeed(para);
-	reorderCarsStarttime();
-	getPath_StaticAnalysis();
+	//getStartTime_BySpeed(para);
+	//reorderCarsStarttime();
 
 	for (int i = 0; i < 15; ++i)//迭代15次
 	{
 		getStartTime_BySpeed(para);
-		//ReOrderStartBySpeedAndStartCross(para);
+		//reorderCarsStarttime();
+		//getPath_StaticAnalysisNor();
 		int time = sd.getSysTimeChangePath(w);
 		if (time == false)
 		{
 			PRINT("DeadLock para:%d\n",para);
 			time = INT_MAX;
 		}
+		else
+		{
+			PRINT("Good para:%d time:%d\n", para,time);
+		}
 		mapResult.insert(pair<int, int>(time, para));
-		para -= 5;
+		para -= 3;
 	}
 	for (auto &v : mapResult)
 	{
@@ -117,13 +121,12 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	it = mapResult.begin();
 	para = it->second;
 
-	
+	/*
 	getStartTime_BySpeed(para);
 	reorderCarsStarttime();
-	getPath_StaticAnalysis();
+	*/
 	
-	//ReOrderStartBySpeedAndStartCross(para);
-	//reorderCarsStarttime();
+	getStartTime_BySpeed(para);
 
 	time = sd.getSysTimeChangePath(w);
 	PRINT("time:%d\n", time);
@@ -749,3 +752,4 @@ void Algorithm::reorderCarsStarttime()
 	int end = qCar.size() - 1;
 	quicksort(begin, end);
 }
+
