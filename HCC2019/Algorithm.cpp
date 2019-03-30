@@ -494,7 +494,15 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 			timeend = 2 * (n16 + n14 + n12);
 			break;
 		case 10:
-			timebegin = 2 * (n16 + n14 + n12) ;
+			if (para == 122)
+			{
+				timebegin = 2 * (n16 + n14 + n12);
+			}
+			else
+			{
+				timebegin = 2 * (n16 + n14 + n12) + 1;
+			}
+			
 			timeend = 2 * (n16+ n14 + n12 + n10) ;
 			break;
 		case 8:
