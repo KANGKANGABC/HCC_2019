@@ -73,7 +73,14 @@ private:
 	void reorderCars(vector<Car> &reorderCar);
 	void reorderCarsStarttime();
 
+	//Í¨¹ýid²éÕÒindex
+	map<int, int> mapId2IndexCar;
+	map<int, int> mapId2IndexRoad;
+	map<int, int> mapId2IndexCross;
 
+	int id2indexCar(int id);
+	int id2indexRoad(int id);
+	int id2indexCross(int id);
 
 };
 

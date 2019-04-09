@@ -15,6 +15,9 @@ Algorithm::Algorithm(DataCenter &dc)
 	graphC2R = dc.graphC2R;
 	speedType = dc.speedType;
 	reorderCars(reorderCar);
+	mapId2IndexCar = dc.mapId2IndexCar;
+	mapId2IndexCross = dc.mapId2IndexCross;
+	mapId2IndexRoad = dc.mapId2IndexRoad;
 }
 
 Algorithm::~Algorithm()
@@ -52,7 +55,7 @@ void Algorithm::ShortestTime_SpeedBasic_AutoPara()
 void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 {
 	std::map<int, int> mapResult;
-	int para = 400;
+	int para = 300;
 	Scheduler sd(*m_dc);
 
 	getStartTime_BySpeed(para);
@@ -67,7 +70,7 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 		if (time == false)
 			time = INT_MAX;
 		mapResult.insert(pair<int, int>(time, para));
-		para -= 11;
+		para -= 10;
 	}
 	for (auto &v : mapResult)
 	{
@@ -87,14 +90,15 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 {
 	std::map<int, int> mapResult;
-	int para = 400;
+	int para = 350;
 	int time = 0;
 	Scheduler sd(*m_dc);
 
-	getStartTime_BySpeed(para);
-	reorderCarsStarttime();
 
-	for (int i = 0; i < 10; ++i)//迭代15次
+	//getStartTime_BySpeed(para);
+	//reorderCarsStarttime();
+
+	for (int i = 0; i < 20; ++i)//迭代15次
 	{
 		getStartTime_BySpeed(para);
 		int time = sd.getSysTimeChangePath(w);
@@ -103,8 +107,12 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 			PRINT("DeadLock para:%d\n",para);
 			time = INT_MAX;
 		}
+		else
+		{
+			PRINT("Good para:%d time:%d\n", para,time);
+		}
 		mapResult.insert(pair<int, int>(time, para));
-		para -= 10;
+		para -= 4;
 	}
 	for (auto &v : mapResult)
 	{
@@ -114,11 +122,13 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	it = mapResult.begin();
 	para = it->second;
 
+	/*
 	getStartTime_BySpeed(para);
 	reorderCarsStarttime();
+	*/
 	
-	//ReOrderStartBySpeedAndStartCross(para);
-	//reorderCarsStarttime();
+	getStartTime_BySpeed(para);
+
 
 	time = sd.getSysTimeChangePath(w);
 	PRINT("time:%d\n", time);
@@ -130,7 +140,7 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 			cars[i].starttimeAnswer = cars[i].starttime;
 		}
 	}
-	time = sd.getSysTime();
+	//time = sd.getSysTime();
 	int timeV2 = sd.getSysTimeV2();
 
 	PRINT("timeFinal:V0:%d   V2:%d\n", time, timeV2);
@@ -138,101 +148,38 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 
 void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 {
-	//根据地图选参数
+
+	std::map<int, int> mapResult;
+	int time = 0;
+	int timeV2 = 0;
+	Scheduler sd(*m_dc);
+
 	int paraFinal;
 	int carLastArrive;
 	int carTimeEarly;
 	switch (cars[0].speed)				//选择不同速度的开始发车和终止发车时刻
 	{
-	case 8:  //地图1
-		carLastArrive = 15;
-		carTimeEarly = 50;
+	case 10:
+		paraFinal = 103;
+		carLastArrive = 0;
+		carTimeEarly = 0;
 		break;
-	case 6:			//地图2
-		carLastArrive = 10;
-		carTimeEarly =50;
+	case 6:	
+		paraFinal = 122;
+		carLastArrive = 0;
+		carTimeEarly = 0;
 		break;
 	default:
 		break;
 	}
-	std::map<int, int> mapResult;
-	int time = 0;
-	Scheduler sd(*m_dc);
-	for (int i = 0; i < 15; ++i)//迭代15次
-	{
-		ReOrderStartBySpeedAndStartCross(para);
-		reorderCarsStarttime();
-		getPath_StaticAnalysisNor();
-		int time = sd.getSysTime();
-		if (time == false)
-			time = INT_MAX;
-		mapResult.insert(pair<int, int>(time, para));
-		para -=1;
-	}
-	for (auto &v : mapResult)
-	{
-		PRINT("result:%d para:%d\n", v.first, v.second);
-	}
-	map<int, int>::iterator it;
-	it = mapResult.begin();
-	it;
-	para = it->second;
-	ReOrderStartBySpeedAndStartCross(para);
+
+
+	ReOrderStartBySpeedAndStartCross(paraFinal);
 	reorderCarsStarttime();
 	getPath_StaticAnalysisNor();
-	int timeFinal = sd.getSysTime();
-	for (int i = 0; i < num_Cars; ++i)
-	{
-		if (cars[i].timeArrived > (timeFinal - carLastArrive))
-		{
-			cars[i].starttime = cars[i].starttime - carTimeEarly;
-			cars[i].starttimeAnswer = cars[i].starttime;
-		}
-	}
 	time = sd.getSysTime();
-
-	PRINT("time:%d\n", timeFinal);
-	PRINT("timeFinal:%d\n", time);
-
-
-	/*std::map<int, int> mapResult;
-	int time = 0;
-	Scheduler sd(*m_dc);
-	for (int i = 0; i < 15; ++i)//迭代15次
-	{
-		ReOrderStartBySpeedAndStartCross(para);
-		reorderCarsStarttime();
-		getPath_StaticAnalysisNor();
-		int time = sd.getSysTime();
-		if (time == false)
-			time = INT_MAX;
-		mapResult.insert(pair<int, int>(time, para));
-		para -=1;
-	}
-	for (auto &v : mapResult)
-	{
-		PRINT("result:%d para:%d\n", v.first, v.second);
-	}
-	map<int, int>::iterator it;
-	it = mapResult.begin();
-	it;
-	para = it->second;
-	ReOrderStartBySpeedAndStartCross(para);
-	reorderCarsStarttime();
-	getPath_StaticAnalysisNor();
-	int timeFinal = sd.getSysTime();
-	for (int i = 0; i < num_Cars; ++i)
-	{
-		if (cars[i].timeArrived > (timeFinal -10))
-		{
-				cars[i].starttime = cars[i].starttime -50;
-				cars[i].starttimeAnswer = cars[i].starttime;
-		}
-	}
-	time = sd.getSysTime();
-	PRINT("time:%d\n", timeFinal);
-	PRINT("timeFinal:%d\n", time);
-	*/
+	PRINT("timeFinal:V0:%d   V2:%d\n", time);
+	
 }
 
 void Algorithm::ShortestTime_SpeedBasicRoadStatus_AutoPara(int para)
@@ -369,25 +316,22 @@ void Algorithm::getPath_StaticAnalysis()
 			graph.upDateJam();
 		}
 
-
 		//将统计的情况放到 jamDegreeBefore的矩阵中
 		for (int i = 0, j = 1; j < pathCross.size(); i++, j++)
 		{
-			graph.jamDegreeTmp[pathCross.at(i) - 1][pathCross.at(j) - 1]++;
+			graph.jamDegreeTmp[pathCross.at(i)][pathCross.at(j)]++;
 		}
 
-		//cross����תroad����
 		vector<int> pathRoad(pathCross.size() - 1);
 		for (int j = 0; j < pathRoad.size(); ++j)
 		{
-			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+			pathRoad[j] = graphC2R[pathCross[j]][pathCross[j + 1]];
 			//assert(pathRoad[j] != 0);
 		}
 
 		qCar[i].path = pathRoad;
 
 		cars[qCar[i].index].path = qCar[i].path;		//将qCar得到的路径赋值到cars的path变量中
-
 	}
 }
 
@@ -415,7 +359,7 @@ void Algorithm::getPath_StaticAnalysisNor()
 		//将统计的情况放到 jamDegreeBefore的矩阵中
 		for (int i = 0, j = 1; j < pathCross.size(); i++, j++)
 		{
-			graph.jamDegreeBefore[pathCross.at(i) - 1][pathCross.at(j) - 1]++;
+			graph.jamDegreeBefore[pathCross.at(i)][pathCross.at(j)]++;
 		}
 
 		graph.upDateJamDynamic();
@@ -423,7 +367,7 @@ void Algorithm::getPath_StaticAnalysisNor()
 		vector<int> pathRoad(pathCross.size() - 1);
 		for (int j = 0; j < pathRoad.size(); ++j)
 		{
-			pathRoad[j] = graphC2R[pathCross[j] - 1][pathCross[j + 1] - 1];
+			pathRoad[j] = graphC2R[pathCross[j]][pathCross[j + 1]];
 		}
 		qCar[i].path = pathRoad;
 		cars[qCar[i].index].path = qCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
@@ -431,54 +375,45 @@ void Algorithm::getPath_StaticAnalysisNor()
 }
 
 void Algorithm::getStartTime_BySpeed(int para)
-{ 
-	int n2, n4, n6, n8;
-	n2 = para;
-	n4 = para;
-	n6 = para;
-	n8 = para;
-	//n6 = para - para / 36;
-	//n8 = para - para / 12;
+{
+	int n4 = para;
+	int n6 = para;
+	int n8 = para;
+	int n10 = para;
+	int n12 = para;
+	int n14 = para;
+	int n16 = para;
+
 
 	for (int i = 0; i < num_Cars; ++i)//忽略第0行数据
 	{
-		/*
-		switch (cars[i].speed)
+		switch (cars[i].speed)				//选择不同速度的开始发车和终止发车时刻
 		{
-		case 2:
-			cars[i].starttime = 2 * n8 + 2 * n6 + 2 * n4 + i % (2 * n2);
+		case 16:
+			cars[i].starttime = rand() % (2 * para);
 			break;
-		case 4:
-			cars[i].starttime = 2 * n8 + 2 * n6 + i % (2 * n4);
+		case 14:
+			cars[i].starttime = 2 * n16 + rand() % (2 * para);
 			break;
-		case 6:
-			cars[i].starttime = 2 * n8 + i % (2 * n6);
+		case 12:
+			cars[i].starttime = 2 * (n16 + n14) + rand() % (2 * para);
+			break;
+		case 10:
+			cars[i].starttime = 2 * (n16 + n14 + n12) + rand() % (2 * para);
 			break;
 		case 8:
-			cars[i].starttime = i % (2 * n8);
+			cars[i].starttime = 2 * (n16 + n14 + n12 + n10) + rand() % (2 * para);
+			break;
+		case 6:
+			cars[i].starttime = 2 * (n16 + n14 + n12 + n10 + n8) + rand() % (2 * para);
+			break;
+		case 4:
+			cars[i].starttime = 2 * (n16 + n14 + n12 + n10 + n8 + n6) + rand() % (2 * para);
 			break;
 		default:
 			break;
 		}
-		*/
 
-		switch (cars[i].speed)
-		{
-		case 2:
-			cars[i].starttime = 2 * n8 + 2 * n6 + 2 * n4 + rand() % (2 * n2);
-			break;
-		case 4:
-			cars[i].starttime = 2 * n8 + 2 * n6 + rand() % (2 * n4);
-			break;
-		case 6:
-			cars[i].starttime = 2 * n8 + rand() % (2 * n6);
-			break;
-		case 8:
-			cars[i].starttime = rand() % (2 * n8);
-			break;
-		default:
-			break;
-		}
 		if (cars[i].starttime < cars[i].plantime)
 			cars[i].starttime = cars[i].plantime;
 		cars[i].starttimeAnswer = cars[i].starttime;//starttimeAnswer为最终写出的出发时间，不会更改
@@ -489,33 +424,43 @@ bool Comp(const int &a, const int &b);
 
 void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 {
-	int early2,early4,early6,early8;
-	int delay;
+	int early4=0,early6=0,early8=0, early10 = 0, early12 = 0, early14=0, early16= 0;
+	int delay=0;
+
 	switch (cars[0].speed)				//选择不同速度的开始发车和终止发车时刻
 	{
-	case 8:  //地图1
-		early2 =0;
-		early4 =1;
-		early6 = para/36;
-		early8 =para/12;
-		delay =10;
+	case 10:  //地图1
+		early4 =0;
+		early6 = 0;
+		early8 =0;
+		early10 =0;
+		early12 =0;
+		early14 =0;
+		early16 =0;
+		delay =0;
 		break;
 	case 6:			//地图2
-		early2 = 0;
 		early4 = 0;
-		early6 = 2;
-		early8 = 8;
-		delay =10;
+		early6 = 0;
+		early8 = 0;
+		early10 = 0;
+		early12 = 0;
+		early14 = 0;
+		early16 = 0;
+		delay = 0;
 		break;
 	default:
 		break;
 	}
-
-	int n2, n4, n6, n8;
-	n2 = para-early2;
+	
+	int n4, n6, n8,n10,n12,n14,n16;
 	n4 = para-early4;
 	n6 = para-early6;
 	n8 = para-early8;
+	n10 = para - early10;
+	n12 = para - early12;
+	n14 = para - early14;
+	n16 = para - early16;
 
 	sort(speedType.begin(), speedType.end(), Comp);  //speedType里存的是速度类型
 
@@ -536,21 +481,41 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 		int timebegin, timeend;
 		switch (speed)				//选择不同速度的开始发车和终止发车时刻
 		{
-		case 8:
+		case 16:
 			timebegin = 1;
-			timeend = 2 * n8;
+			timeend = 2 * n16;
+			break;
+		case 14:
+			timebegin = 2 * n16 + 1;
+			timeend = 2 * (n16 + n14);
+			break;
+		case 12:
+			timebegin = 2 * (n16 + n14) + 1;
+			timeend = 2 * (n16 + n14 + n12);
+			break;
+		case 10:
+			if (para == 122)
+			{
+				timebegin = 2 * (n16 + n14 + n12);
+			}
+			else
+			{
+				timebegin = 2 * (n16 + n14 + n12) + 1;
+			}
+			
+			timeend = 2 * (n16+ n14 + n12 + n10) ;
+			break;
+		case 8:
+			timebegin = 2 * (n16 + n14 + n12 + n10) +1;
+			timeend = 2 * (n16 + n14 + n12 + n10+n8) ;
 			break;
 		case 6:
-			timebegin = 2 * n8 + 1;
-			timeend = 2 * (n8 + n6);
+			timebegin = 2 * (n16 + n14 + n12 + n10 + n8)+1 ;
+			timeend = 2 * (n16 + n14 + n12 + n10 + n8+n6) ;
 			break;
 		case 4:
-			timebegin = 2 * (n8 + n6) + 1;
-			timeend = 2 * (n8 + n6 + n4);
-			break;
-		case 2:
-			timebegin = 2 * (n8 + n6 + n4) + delay;
-			timeend = 2 * (n8 + n6 + n4 + n2) +delay;
+			timebegin = 2 * (n16 + n14 + n12 + n10 + n8 + n6) + delay;
+			timeend = 2 * (n16 + n14 + n12 + n10 + n8 + n6+n4) + delay;
 			break;
 		default:
 			break;
@@ -583,12 +548,12 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 					++frequence;
 					int carOrder = qspeed.front().index;        //用于记录队首的car的下标
 
-					if (qspeed.front().plantime <= time && fromCross[qspeed.front().idCrossFrom - 1] < 1)
+					if (qspeed.front().plantime <= time && fromCross[id2indexCross(qspeed.front().idCrossFrom)] < 1)
 					{
 						//若队首的car的plantime小于等于当前时刻且该出发地只有一辆，则将该车starttimeAnswer设为此刻，并从qspeed队列中弹出，carIsAssigned设为true，fromCross当前出发地加一
 						cars[carOrder].starttimeAnswer = time;
 						cars[carOrder].starttime = time;
-						fromCross[qspeed.front().idCrossFrom - 1] ++;
+						fromCross[id2indexCross(qspeed.front().idCrossFrom)] ++;
 						qspeed.pop();
 						carIsAssigned = true;
 					}
@@ -608,7 +573,7 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 						{
 							cars[carOrder].starttimeAnswer = time;
 							cars[carOrder].starttime = time;
-							fromCross[qspeed.front().idCrossFrom - 1] ++;
+							fromCross[id2indexCross(qspeed.front().idCrossFrom)] ++;
 							qspeed.pop();
 							carIsAssigned = true;
 						}
@@ -741,5 +706,31 @@ void Algorithm::reorderCarsStarttime()
 
 	int begin = 0;
 	int end = qCar.size() - 1;
+	//std::sort(qCar.begin(), qCar.end(), less_starttime);
 	quicksort(begin, end);
 }
+
+int Algorithm::id2indexCar(int id)
+{
+	map<int, int>::iterator it;
+	it = mapId2IndexCar.find(id);
+	assert(it != mapId2IndexCar.end());
+	return it->second;
+}
+
+int Algorithm::id2indexRoad(int id)
+{
+	map<int, int>::iterator it;
+	it = mapId2IndexRoad.find(id);
+	assert(it != mapId2IndexRoad.end());
+	return it->second;
+}
+
+int Algorithm::id2indexCross(int id)
+{
+	map<int, int>::iterator it;
+	it = mapId2IndexCross.find(id);
+	assert(it != mapId2IndexCross.end());
+	return it->second;
+}
+

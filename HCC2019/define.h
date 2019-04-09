@@ -19,9 +19,10 @@
 #define _DEBUG
 
 #define MAX_ROAD_NUM    1000 //最大ROAD条数
-#define MAX_CAR_NUM    50000 //最大CAR条数
+#define MAX_CAR_NUM    90000 //最大CAR条数
 #define MAX_CROSS_NUM    1000 //最大CROSS条数
 #define MAX_PATHPRESET_NUM    50000 //最大PATHPRESET条数
+
 
 #define INT_MAX 0x7fffffff
 #define FLT_MAX 3.402823466e+38F
