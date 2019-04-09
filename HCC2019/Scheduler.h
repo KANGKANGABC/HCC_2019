@@ -143,6 +143,9 @@ private:
 	//输出所有道路状态
 	void putAllRoadStatus();
 
+	//为了提高速度，减少循环查找
+	bool putAllStatus();
+
 	//获得该cross的对应优先级道路ID，如果道路ID为-1则返回-1
 	int getFirstRoadFromCross(int idCross,int index);
 

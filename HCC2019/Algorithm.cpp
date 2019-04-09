@@ -52,13 +52,13 @@ void Algorithm::ShortestTime_SpeedBasic_AutoPara()
 void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 {
 	std::map<int, int> mapResult;
-	int para = 80;
+	int para = 400;
 	Scheduler sd(*m_dc);
 
 	getStartTime_BySpeed(para);
 	reorderCarsStarttime();
 	getPath_StaticAnalysis();
-	for (int i = 0; i < 15; ++i)//迭代15次
+	for (int i = 0; i < 5; ++i)//迭代15次
 	{
 		getStartTime_BySpeed(para);
 		reorderCarsStarttime();
@@ -67,7 +67,7 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 		if (time == false)
 			time = INT_MAX;
 		mapResult.insert(pair<int, int>(time, para));
-		para -= 2;
+		para -= 11;
 	}
 	for (auto &v : mapResult)
 	{
@@ -87,18 +87,16 @@ void Algorithm::StaticAnalysis_SpeedBasic_AutoPara()
 void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 {
 	std::map<int, int> mapResult;
-	int para = 340;
+	int para = 400;
 	int time = 0;
 	Scheduler sd(*m_dc);
-
 
 	getStartTime_BySpeed(para);
 	reorderCarsStarttime();
 
-	for (int i = 0; i < 15; ++i)//迭代15次
+	for (int i = 0; i < 10; ++i)//迭代15次
 	{
 		getStartTime_BySpeed(para);
-		//ReOrderStartBySpeedAndStartCross(para);
 		int time = sd.getSysTimeChangePath(w);
 		if (time == false)
 		{
@@ -106,7 +104,7 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 			time = INT_MAX;
 		}
 		mapResult.insert(pair<int, int>(time, para));
-		para -= 4;
+		para -= 10;
 	}
 	for (auto &v : mapResult)
 	{
@@ -116,7 +114,6 @@ void Algorithm::DynamicPathByScheduler_SpeedBasic_AutoPara(int w)
 	it = mapResult.begin();
 	para = it->second;
 
-	
 	getStartTime_BySpeed(para);
 	reorderCarsStarttime();
 	
@@ -434,15 +431,18 @@ void Algorithm::getPath_StaticAnalysisNor()
 }
 
 void Algorithm::getStartTime_BySpeed(int para)
-{
+{ 
 	int n2, n4, n6, n8;
 	n2 = para;
 	n4 = para;
-	n6 = para - para / 36;
-	n8 = para - para / 12;
+	n6 = para;
+	n8 = para;
+	//n6 = para - para / 36;
+	//n8 = para - para / 12;
 
 	for (int i = 0; i < num_Cars; ++i)//忽略第0行数据
 	{
+		/*
 		switch (cars[i].speed)
 		{
 		case 2:
@@ -460,7 +460,25 @@ void Algorithm::getStartTime_BySpeed(int para)
 		default:
 			break;
 		}
+		*/
 
+		switch (cars[i].speed)
+		{
+		case 2:
+			cars[i].starttime = 2 * n8 + 2 * n6 + 2 * n4 + rand() % (2 * n2);
+			break;
+		case 4:
+			cars[i].starttime = 2 * n8 + 2 * n6 + rand() % (2 * n4);
+			break;
+		case 6:
+			cars[i].starttime = 2 * n8 + rand() % (2 * n6);
+			break;
+		case 8:
+			cars[i].starttime = rand() % (2 * n8);
+			break;
+		default:
+			break;
+		}
 		if (cars[i].starttime < cars[i].plantime)
 			cars[i].starttime = cars[i].plantime;
 		cars[i].starttimeAnswer = cars[i].starttime;//starttimeAnswer为最终写出的出发时间，不会更改
