@@ -151,6 +151,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <Profile>true</Profile>
+      <StackReserveSize>2000000</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -32,7 +32,6 @@ int main(int argc, char *argv[])
 	std::cout << "presetAnswerPath is " << presetAnswerPath << std::endl;
 	std::cout << "answerPath is " << answerPath << std::endl;
 
-
 	const char *answer_file = answerPath.c_str();
 
 	char *data_road[MAX_ROAD_NUM];
@@ -60,7 +59,7 @@ int main(int argc, char *argv[])
 	//alg.ShortestTime_SpeedBasicRoadStatus_AutoPara(0);
 	//alg.ShortestTime_SpeedBasic_AutoPara();
 
-	//alg.StaticAnalysisNor_SpeedBasicNoSame_AutoPara(300);
+	alg.StaticAnalysisNor_SpeedBasicNoSame_AutoPara(300);
 
 	dc.writeResult(answer_file);
 

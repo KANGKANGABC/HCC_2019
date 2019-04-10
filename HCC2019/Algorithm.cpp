@@ -160,12 +160,12 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	switch (cars[0].speed)				//选择不同速度的开始发车和终止发车时刻
 	{
 	case 10:
-		paraFinal = 103;
+		paraFinal = 800;
 		carLastArrive = 0;
 		carTimeEarly = 0;
 		break;
-	case 6:	
-		paraFinal = 122;
+	case 14:	
+		paraFinal = 800;
 		carLastArrive = 0;
 		carTimeEarly = 0;
 		break;
@@ -173,12 +173,19 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 		break;
 	}
 
-
 	ReOrderStartBySpeedAndStartCross(paraFinal);
 	reorderCarsStarttime();
 	getPath_StaticAnalysisNor();
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].preset != 1)
+		{
+			cars[i].starttime = cars[i].starttime + 1000;
+			cars[i].starttimeAnswer = cars[i].starttime;
+		}
+	}
 	time = sd.getSysTime();
-	PRINT("timeFinal:V0:%d   V2:%d\n", time);
+	PRINT("timeFinal:V0:%d", time);
 	
 }
 
@@ -369,8 +376,12 @@ void Algorithm::getPath_StaticAnalysisNor()
 		{
 			pathRoad[j] = graphC2R[pathCross[j]][pathCross[j + 1]];
 		}
-		qCar[i].path = pathRoad;
-		cars[qCar[i].index].path = qCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
+		if (cars[qCar[i].index].preset != 1)
+		{
+			qCar[i].path = pathRoad;
+			cars[qCar[i].index].path = qCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
+		}
+
 	}
 }
 
@@ -551,8 +562,15 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 					if (qspeed.front().plantime <= time && fromCross[id2indexCross(qspeed.front().idCrossFrom)] < 1)
 					{
 						//若队首的car的plantime小于等于当前时刻且该出发地只有一辆，则将该车starttimeAnswer设为此刻，并从qspeed队列中弹出，carIsAssigned设为true，fromCross当前出发地加一
-						cars[carOrder].starttimeAnswer = time;
-						cars[carOrder].starttime = time;
+						if (cars[carOrder].preset == 1)
+						{
+							cars[carOrder].starttimeAnswer = cars[carOrder].starttime;
+						}
+						else
+						{
+							cars[carOrder].starttimeAnswer = time;
+							cars[carOrder].starttime = time;
+						}
 						fromCross[id2indexCross(qspeed.front().idCrossFrom)] ++;
 						qspeed.pop();
 						carIsAssigned = true;
@@ -571,8 +589,15 @@ void Algorithm::ReOrderStartBySpeedAndStartCross(int para)
 						}
 						else
 						{
-							cars[carOrder].starttimeAnswer = time;
-							cars[carOrder].starttime = time;
+							if (cars[carOrder].preset == 1)
+							{
+								cars[carOrder].starttimeAnswer = cars[carOrder].starttime;
+							}
+							else
+							{
+								cars[carOrder].starttimeAnswer = time;
+								cars[carOrder].starttime = time;
+							}
 							fromCross[id2indexCross(qspeed.front().idCrossFrom)] ++;
 							qspeed.pop();
 							carIsAssigned = true;

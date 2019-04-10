@@ -10,7 +10,7 @@
 #include <signal.h>
 #include "define.h"
 
-#define MAX_LINE_LEN 500
+#define MAX_LINE_LEN 400
 
 #define INLINE  static __inline
 
