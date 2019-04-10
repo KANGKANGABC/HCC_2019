@@ -8,7 +8,7 @@ DataCenter::DataCenter()
 {
 }
 
-DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM], int road_count, char *data_car[MAX_CAR_NUM], int car_count, char *data_cross[MAX_CROSS_NUM], int cross_count)
+DataCenter::DataCenter(char * data_road[MAX_ROAD_NUM], int road_count, char * data_car[MAX_CAR_NUM], int car_count, char * data_cross[MAX_CROSS_NUM], int cross_count, char * data_pathPreset[MAX_PATHPRESET_NUM], int pathPreset_count)
 {
 	inputRoadData = data_road;
 	m_road_num = road_count - 1;//忽略第一行注释
@@ -16,6 +16,8 @@ DataCenter::DataCenter(char *data_road[MAX_ROAD_NUM], int road_count, char *data
 	m_car_num = car_count - 1;//忽略第一行注释
 	inputCrossData = data_cross;
 	m_cross_num = cross_count - 1;//忽略第一行注释
+	inputPathPresetData = data_pathPreset;
+	m_path_preset_num = pathPreset_count - 1;
 
 	//将速度邻接矩阵大小设置为36，不邻接的点初值为0
 	graphRoadMaxSpeed.resize(m_cross_num);
@@ -131,7 +133,9 @@ void DataCenter::readCarData()
 		car[i - 1].idCrossFrom = std::stoi(sp[1]);
 		car[i - 1].idCrossTo = std::stoi(sp[2]);
 		car[i - 1].speed = std::stoi(sp[3]);
-		car[i - 1].plantime = std::stoi(sp[4].substr(0, sp[4].size() - 1));//去除右括号
+		car[i - 1].plantime = std::stoi(sp[4]);
+		car[i - 1].priority = std::stoi(sp[5]);
+		car[i - 1].preset = std::stoi(sp[6].substr(0, sp[6].size() - 1));//去除右括号
 		car[i - 1].status = SLEEPING;//车的初始状态为SLEEPING
 		car[i - 1].dirCross = NONE;//车的过路口状态为NONE
 		car[i - 1].starttime = 0;
@@ -172,6 +176,27 @@ void DataCenter::readCrossData()
 	}
 
 	printf("readCrossData done!\n");
+}
+
+void DataCenter::readPathPresetData()
+{
+	printf("readPathPresetData\n");
+	for (int i = 1; i <= m_path_preset_num; ++i)//忽略第0行数据
+	{
+		std::string pathInfo = inputPathPresetData[i];
+		std::vector<std::string> sp = Tools::split(pathInfo, ",");
+		std::vector<int> path;
+		for (int j = 2; j < sp.size() - 1; ++j)
+		{
+			path.push_back(std::stoi(sp[j]));
+		}
+		path.push_back(std::stoi(sp[sp.size() - 1]));
+		int index = id2indexCar(std::stoi(sp[0].substr(1)));
+		car[index].path = path;
+		car[index].starttime = std::stoi(sp[1]);
+	}
+
+	printf("readPathPresetData!\n");
 }
 
 //获取点和边的数量

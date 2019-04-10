@@ -44,10 +44,11 @@ int main(int argc, char *argv[])
 	int cross_line_num = read_file(data_cross, MAX_CROSS_NUM, crossPath.c_str());
 	int pathPreset_line_num = read_file(data_pathPreset, MAX_PATHPRESET_NUM, presetAnswerPath.c_str());
 
-	DataCenter dc(data_road, road_line_num, data_car, car_line_num, data_cross, cross_line_num);
+	DataCenter dc(data_road, road_line_num, data_car, car_line_num, data_cross, cross_line_num, data_pathPreset, pathPreset_line_num);
+	dc.readCrossData();
 	dc.readRoadData();
 	dc.readCarData();
-	dc.readCrossData();
+	dc.readPathPresetData();
 
 	Algorithm alg(dc);
 	//Scheduler sd(dc);

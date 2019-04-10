@@ -16,7 +16,8 @@ class DataCenter
 	friend class Algorithm;
 public:
 	DataCenter();
-	DataCenter(char *data_road[MAX_ROAD_NUM], int road_count, char *data_car[MAX_CAR_NUM], int car_count, char *data_cross[MAX_CROSS_NUM], int cross_count);
+	DataCenter(char *data_road[MAX_ROAD_NUM], int road_count, char *data_car[MAX_CAR_NUM], int car_count,
+		char *data_cross[MAX_CROSS_NUM], int cross_count, char *data_pathPreset[MAX_PATHPRESET_NUM], int pathPreset_count);
 	~DataCenter();
 
 
@@ -27,6 +28,7 @@ public:
 	void readRoadData();
 	void readCarData();
 	void readCrossData();
+	void readPathPresetData();
 
 	//获取点和边的数量
 	int getRoadNum();
@@ -75,6 +77,7 @@ public:
 	int m_road_num;//ROAD数量
 	int m_car_num;//CAR数量
 	int m_cross_num;//CROSS数量
+	int m_path_preset_num;
 	int car_speed_num; //car可能的速度类型
 
 	std::string result;//输出结果存储矩阵
@@ -91,6 +94,7 @@ private:
 	char **inputRoadData;//输入道路数据
 	char **inputCarData;//输入道路数据
 	char **inputCrossData;//输入道路数据
+	char **inputPathPresetData;
 
 	//道路有向图邻接矩阵
 	std::vector<std::vector<int> > graphRoadLength;	//距离邻接矩阵，不邻接的点用正无穷表示

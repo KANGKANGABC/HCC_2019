@@ -20,6 +20,8 @@ public:
 	int idCrossTo;//车的终止路口
 	int time;
 	int dirMap;//车在地图上的方向，分为（++）（--）（+-）（-+）四种
+	int priority;//优先级
+	int preset;//是否预置path
 	std::vector<int> path;
 }; 
 
