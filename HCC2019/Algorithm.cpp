@@ -188,6 +188,38 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 			cars[i].starttimeAnswer = cars[i].starttime;
 		}
 	}
+	vector<Car> carsChangeTime;
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].starttime > timePresetLast && cars[i].starttime < timePresetLast + timePresetLast/2)
+		{
+			carsChangeTime.push_back(cars[i]);
+		}
+	}
+	printf("carsChangeTime.size:%d\n", carsChangeTime.size());
+	for (auto car : carsChangeTime)
+	{
+		int startTime = rand() % (timePresetLast);
+		if (startTime >= car.plantime)
+		{
+			//修改plantime
+			cars[car.index].starttime = startTime;
+			cars[car.index].starttimeAnswer = startTime;
+		}
+		else
+		{
+			cars[car.index].starttime = car.plantime;
+			cars[car.index].starttimeAnswer = startTime;
+		}
+	}
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].preset != 1&& cars[i].starttime > timePresetLast)
+		{
+			cars[i].starttime = cars[i].starttime - timePresetLast/2;
+			cars[i].starttimeAnswer = cars[i].starttime;
+		}
+	}
 	//time = sd.getSysTime();
 	PRINT("timeFinal:V0:%d\n", time);
 }
@@ -398,7 +430,7 @@ void Algorithm::getPath_StaticAnalysisNor()
 			{
 				pathRoadDJ[j] = graphC2R[pathCross[j]][pathCross[j + 1]];
 			}
-			if ((pathRoadDJ.size() + 2) < cars[i].path.size())
+			if ((pathRoadDJ.size() + 3) < cars[i].path.size())
 			{
 				cars[i].path = pathRoadDJ;
 				cars[i].isChanged = true;
