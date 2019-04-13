@@ -227,6 +227,10 @@ void DataCenter::writeResult(const char *filename)
 	result += "#(carId,StartTime,RoadId...)\n";
 	for (int i = 0; i < m_car_num; ++i)
 	{
+		if (car[i].preset == 1)
+		{
+			continue;
+		}
 		std::string line = "(" + std::to_string(car[i].id);
 		line += ", ";
 		line += std::to_string(car[i].starttimeAnswer);
