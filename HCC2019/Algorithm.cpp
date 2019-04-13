@@ -157,17 +157,20 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	int paraFinal;
 	int carLastArrive;
 	int carTimeEarly;
+	int timePresetLast;
 	switch (cars[1].speed)				//选择不同速度的开始发车和终止发车时刻
 	{
 	case 14:
 		paraFinal = 150;
 		carLastArrive = 0;
 		carTimeEarly = 0;
+		timePresetLast = 323;
 		break;
 	case 8:	
 		paraFinal = 150;
 		carLastArrive = 0;
 		carTimeEarly = 0;
+		timePresetLast = 223;
 		break;
 	default:
 		break;
@@ -180,7 +183,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	{
 		if (cars[i].preset != 1)
 		{
-			cars[i].starttime = cars[i].starttime + 800;
+			cars[i].starttime = cars[i].starttime + timePresetLast + 10;
 			cars[i].starttimeAnswer = cars[i].starttime;
 		}
 	}
