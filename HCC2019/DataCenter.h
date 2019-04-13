@@ -44,6 +44,7 @@ public:
 
 	void writeResultWithTime(const char *filename);
 
+	vector<int> vec_car_pathPreset;
 
 	//快速排序用
 	void swap(int i, int j);

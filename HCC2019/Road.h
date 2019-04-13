@@ -22,6 +22,7 @@ public:
 	int dirMap;//车在地图上的方向，分为（++）（--）（+-）（-+）四种
 	int priority;//优先级
 	int preset;//是否预置path
+	bool isChanged;//预置车辆，且path被修改
 	std::vector<int> path;
 }; 
 

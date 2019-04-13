@@ -17,6 +17,7 @@ private:
 	int num_Cars;
 	int num_Roads;
 	int num_Cross;
+	int num_path_preset;
 	Car *cars;//所有的车（车对象数组的指针）
 	Road *roads;//所有的道路（道路对象数组的指针）
 	Cross *crosses;//所有的路口（路口对象数组的指针）

@@ -18,6 +18,7 @@ Algorithm::Algorithm(DataCenter &dc)
 	mapId2IndexCar = dc.mapId2IndexCar;
 	mapId2IndexCross = dc.mapId2IndexCross;
 	mapId2IndexRoad = dc.mapId2IndexRoad;
+	num_path_preset = dc.m_path_preset_num;
 }
 
 Algorithm::~Algorithm()
@@ -161,13 +162,13 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 	switch (cars[1].speed)				//选择不同速度的开始发车和终止发车时刻
 	{
 	case 14:
-		paraFinal = 150;
+		paraFinal = 120;
 		carLastArrive = 0;
 		carTimeEarly = 0;
 		timePresetLast = 323;
 		break;
 	case 8:	
-		paraFinal = 150;
+		paraFinal = 135;
 		carLastArrive = 0;
 		carTimeEarly = 0;
 		timePresetLast = 223;
@@ -187,7 +188,7 @@ void Algorithm::StaticAnalysisNor_SpeedBasicNoSame_AutoPara(int para)
 			cars[i].starttimeAnswer = cars[i].starttime;
 		}
 	}
-	time = sd.getSysTime();
+	//time = sd.getSysTime();
 	PRINT("timeFinal:V0:%d\n", time);
 }
 
@@ -384,6 +385,28 @@ void Algorithm::getPath_StaticAnalysisNor()
 			cars[qCar[i].index].path = qCar[i].path;	//将qCar得到的路径赋值到cars的path变量中
 		}
 
+	}
+	int numCanBeChange = num_path_preset / 10;
+	printf("numCanBeChange:%d\n", numCanBeChange);
+	for (int i = 0; i < num_Cars; ++i)
+	{
+		if (cars[i].preset == 1)
+		{
+			vector<int> pathCross = graph.Dijkstra(cars[i].idCrossFrom, cars[i].idCrossTo);
+			vector<int> pathRoadDJ(pathCross.size() - 1);
+			for (int j = 0; j < pathRoadDJ.size(); ++j)
+			{
+				pathRoadDJ[j] = graphC2R[pathCross[j]][pathCross[j + 1]];
+			}
+			if ((pathRoadDJ.size() + 2) < cars[i].path.size())
+			{
+				cars[i].path = pathRoadDJ;
+				cars[i].isChanged = true;
+				numCanBeChange--;
+			}
+		}
+		if (numCanBeChange <= 0)
+			break;
 	}
 }
 

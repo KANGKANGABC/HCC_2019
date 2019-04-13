@@ -196,6 +196,7 @@ void DataCenter::readPathPresetData()
 		car[index].starttime = std::stoi(sp[1]);
 	}
 
+
 	printf("readPathPresetData!\n");
 }
 
@@ -227,7 +228,7 @@ void DataCenter::writeResult(const char *filename)
 	result += "#(carId,StartTime,RoadId...)\n";
 	for (int i = 0; i < m_car_num; ++i)
 	{
-		if (car[i].preset == 1)
+		if (car[i].preset == 1&&car[i].isChanged == false)
 		{
 			continue;
 		}
