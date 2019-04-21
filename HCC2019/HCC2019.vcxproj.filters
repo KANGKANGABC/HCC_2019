@@ -9,6 +9,7 @@
     <ClCompile Include="Tools.cpp" />
     <ClCompile Include="Scheduler.cpp" />
     <ClCompile Include="dijkstra.cpp" />
+    <ClCompile Include="Algorithm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataCenter.h" />
@@ -19,5 +20,6 @@
     <ClInclude Include="Tools.h" />
     <ClInclude Include="Scheduler.h" />
     <ClInclude Include="dijkstra.h" />
+    <ClInclude Include="Algorithm.h" />
   </ItemGroup>
 </Project>

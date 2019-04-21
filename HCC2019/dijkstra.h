@@ -90,6 +90,8 @@ public:
 	//归一化
 	void normalizedInt( int ** temp , float **tempNormalized);
 	void normalizedFloat(float **temp);
+
+	int id2indexCross(int id);
 	//更新
 	//清空
 };

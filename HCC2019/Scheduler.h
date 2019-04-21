@@ -9,14 +9,17 @@ class DataCenter;
 
 class Scheduler
 {
+	friend class Algorithm;
 public:
 	Scheduler(DataCenter &dc);
+	Scheduler(DataCenter *dc);
 	~Scheduler();
-	int getParaByScheduler();//请将初始参数设置为70以上
 	int getSysTime();
+	int getSysTimeV2();
+	int SchedulerTest();
 	int getSysTimeChangePath(int para);
+	int getSysTimeChangeTime(int para);//边跑调度器边修改出发时间
 	//基于动态调度器规划路径
-	int getPathByScheduler(int para);
 	//获得路径,为每辆车规划路径
 	//尝试解决死锁
 	int unlockDead(int para);
@@ -26,18 +29,9 @@ public:
 	//获得路径后，规划出发时间,para为参数
 	void getStartTime(int para);
 	void getStartTime_loadbalance(int carnum);
-	//获得路径,为每辆车规划路径，基于时间
-	void getPathByTime();
-	void getPathByTime_reorderCars();
-	void reorderCars();
-	//车辆按出发时间重排序后进行静态规划
-	void getPathByTime_dynamic(); //根据1-100 和101-199车的轨迹，更新第200辆车的邻接矩阵
-	void swap(int i, int j);
-	void quicksort(int begin, int end);
 	void getTimeByDir(int para);//根据车的行驶方向发车（++）和（--）的一起跑 （+-）和（-+）的一起跑 
 	void ReOrderStartByTime(int para);//根据行驶时间重新安排出发时间
 	void ReOrderStartBySpeed(int para);//根据行驶时间重新安排出发时间
-	void ReOrderStartBySpeedAndStartCross(int para);//根据速度和出发点重新安排出发时间
 	bool addCarandChangeSTime(Car car);//往道路中添加车辆，并且通过改变出发时间留出空位
 	int vexnum, edge;
 	std::vector<std::vector<int> > tmp;
@@ -49,6 +43,17 @@ public:
 	void mapUpdate(map<string, float > &mapForJamDegree, int RoadId, float percent);
 
 	int num_changeSTime;
+
+	//反映调度器状态的数据结构
+	std::vector<int> vec_numCarsInRoadPerTime;//每个时间片车的数量
+
+	/*辅助函数*/
+	int getPartition(vector<Car> &reorderCar, int begin, int end);
+	void quicksort(vector<Car> &reorderCar, int begin, int end);
+	void reorderCars(vector<Car> &reorderCar);
+	
+	
+
 private:
 	int num_CarsScheduling;//正在调度的car数量
 	int num_CarsPut;//已经发车的car数量
@@ -59,6 +64,11 @@ private:
 	Road *roads;//所有的道路（道路对象数组的指针）
 	Cross *crosses;//所有的路口（路口对象数组的指针）
 	Car *cars;//所有的车
+
+	//通过id查找index
+	map<int, int> mapId2IndexCar;
+	map<int, int> mapId2IndexRoad;
+	map<int, int> mapId2IndexCross;
   
 	vector<Car> qCar;	//按照出发时间将车辆重排序
 
@@ -117,6 +127,9 @@ private:
 	//车库中的车辆上路行驶,动态更新其路径
 	void driverCarInGarageDynamic(Graph_DG &graph,int para);
 
+	//车库中的车辆上路行驶,动态更新其出发时间
+	void driverCarInGarageChangeTime(Graph_DG &graph, int para);
+
 	//打印车辆状态
 	void putCarStatus(Car car);
 
@@ -125,6 +138,9 @@ private:
 
 	//输出所有道路状态
 	void putAllRoadStatus();
+
+	//为了提高速度，减少循环查找
+	bool putAllStatus();
 
 	//获得该cross的对应优先级道路ID，如果道路ID为-1则返回-1
 	int getFirstRoadFromCross(int idCross,int index);
@@ -138,5 +154,18 @@ private:
 	//根据时间周期安排出发时间
 	void getPlantimeByPeriod(int period);
 
+	int id2indexCar(int id);
+	int id2indexRoad(int id);
+	int id2indexCross(int id);
+	
+	//调度器初始化
+	int SchedulerInit();
+	//调度器主要逻辑代码，便于多算法复用
+	int SchedulerCore();
+	int SchedulerCore_V2();
+
+	//等待在路口的车
+	std::deque<Car> carsRoadWaitting;
 
 };
+

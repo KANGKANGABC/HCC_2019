@@ -4,6 +4,7 @@
 class Car
 {
 public:
+	int index;
 	int id;
 	int location;
 	int status;
@@ -19,12 +20,16 @@ public:
 	int idCrossTo;//车的终止路口
 	int time;
 	int dirMap;//车在地图上的方向，分为（++）（--）（+-）（-+）四种
+	int priority;//优先级
+	int preset;//是否预置path
+	bool isChanged;//预置车辆，且path被修改
 	std::vector<int> path;
 }; 
 
 class Cross
 {
 public:
+	int index;
 	int id;
 	int roadID_T; //顺时针第1个 Top
 	int roadID_R; //顺时针第2个 Right
@@ -51,6 +56,7 @@ public:
 	//创建车道信息
 	void CreateLane();
 
+	int index;
 	int id;
 	int length;
 	int speed;

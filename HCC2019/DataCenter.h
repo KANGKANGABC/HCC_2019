@@ -7,14 +7,17 @@
 #include "dijkstra.h"
 #include "vector"
 
+extern map<int, int> mapId2IndexCross_Global;
 
 class DataCenter
 {
 
 	friend class Graph_DG;
+	friend class Algorithm;
 public:
 	DataCenter();
-	DataCenter(char *data_road[MAX_ROAD_NUM], int road_count, char *data_car[MAX_CAR_NUM], int car_count, char *data_cross[MAX_CROSS_NUM], int cross_count);
+	DataCenter(char *data_road[MAX_ROAD_NUM], int road_count, char *data_car[MAX_CAR_NUM], int car_count,
+		char *data_cross[MAX_CROSS_NUM], int cross_count, char *data_pathPreset[MAX_PATHPRESET_NUM], int pathPreset_count);
 	~DataCenter();
 
 
@@ -25,6 +28,7 @@ public:
 	void readRoadData();
 	void readCarData();
 	void readCrossData();
+	void readPathPresetData();
 
 	//获取点和边的数量
 	int getRoadNum();
@@ -40,6 +44,7 @@ public:
 
 	void writeResultWithTime(const char *filename);
 
+	vector<int> vec_car_pathPreset;
 
 	//快速排序用
 	void swap(int i, int j);
@@ -65,9 +70,15 @@ public:
 	//经过排序的car的指针
 	vector<Car*> carOrderTime;
 
+	//通过id查找index
+	map<int, int> mapId2IndexCar;
+	map<int, int> mapId2IndexRoad;
+	map<int, int> mapId2IndexCross;
+
 	int m_road_num;//ROAD数量
 	int m_car_num;//CAR数量
 	int m_cross_num;//CROSS数量
+	int m_path_preset_num;
 	int car_speed_num; //car可能的速度类型
 
 	std::string result;//输出结果存储矩阵
@@ -80,18 +91,15 @@ public:
 	//动态调度器计算出来的道路情况矩阵
 	std::vector<std::vector<float> > graphRoadStatusByDS;
 
-	//将车辆按时间进行重排序
-	void reorderCars();
-
-
 private:
 	char **inputRoadData;//输入道路数据
 	char **inputCarData;//输入道路数据
 	char **inputCrossData;//输入道路数据
+	char **inputPathPresetData;
 
 	//道路有向图邻接矩阵
-	std::vector<std::vector<int> > graphRoad;	//距离邻接矩阵，不邻接的点用正无穷表示
-	std::vector<std::vector<int> > graphMaxSpeed;	//道路最大速度邻接矩阵，不邻接的点用0表示
+	std::vector<std::vector<int> > graphRoadLength;	//距离邻接矩阵，不邻接的点用正无穷表示
+	std::vector<std::vector<int> > graphRoadMaxSpeed;	//道路最大速度邻接矩阵，不邻接的点用0表示
 	//std::vector<std::vector<float> > timeGraph;		// 时间邻接矩阵，不邻接的点用正无穷表示
 
 	//存储车辆的速度种类的向量
@@ -102,6 +110,10 @@ private:
 
 	//路径列表
 	std::vector<std::vector<int> > carPathList;
+
+	int id2indexCar(int id);
+	int id2indexRoad(int id);
+	int id2indexCross(int id);
 
 };
 
